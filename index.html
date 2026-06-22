@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mansa Sports Park — Entry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green-dark:  #1A6B3C;
+    --green-mid:   #23904F;
+    --green-light: #7ED348;
+    --green-glow:  #D4F5C0;
+    --bg:          #F6FBF4;
+    --surface:     #FFFFFF;
+    --text:        #0F1F17;
+    --muted:       #6B7B72;
+    --border:      #D6E8DC;
+    --error:       #D0302A;
+    --radius-sm:   10px;
+    --radius-md:   16px;
+    --radius-lg:   24px;
+    --shadow-card: 0 4px 24px rgba(26,107,60,0.10);
+    --shadow-btn:  0 4px 16px rgba(26,107,60,0.30);
+    --font:        'Inter', system-ui, sans-serif;
+  }
+
+  html, body {
+    min-height: 100%;
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  .app {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 52px;
+  }
+
+  /* ── Header ──────────────────────────────────────────────────────────── */
+  .header {
+    width: 100%;
+    background: linear-gradient(160deg, var(--green-dark) 0%, var(--green-mid) 100%);
+    padding: 28px 24px 38px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 28px;
+    background: var(--bg);
+    border-radius: 28px 28px 0 0;
+  }
+  .header-inner { display: flex; align-items: center; gap: 14px; }
+  .logo-badge {
+    width: 48px; height: 48px;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.30);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+  }
+  .header-text h1 { color:#fff; font-size:18px; font-weight:800; letter-spacing:-0.3px; line-height:1.2; }
+  .header-text p  { color:rgba(255,255,255,0.70); font-size:12.5px; font-weight:500; margin-top:2px; }
+
+  /* ── Progress ────────────────────────────────────────────────────────── */
+  .progress-wrap { width:100%; max-width:480px; padding:20px 24px 0; }
+  .progress-track { height:4px; background:var(--border); border-radius:4px; overflow:hidden; }
+  .progress-fill {
+    height:100%;
+    background: linear-gradient(90deg, var(--green-dark), var(--green-light));
+    border-radius:4px;
+    transition: width 0.45s cubic-bezier(.4,0,.2,1);
+    width:25%;
+  }
+  .progress-labels { display:flex; justify-content:space-between; margin-top:8px; }
+  .progress-label  { font-size:10px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; transition:color 0.3s; }
+  .progress-label.active { color:var(--green-dark); }
+
+  /* ── Card ────────────────────────────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 28px 24px;
+    width: calc(100% - 32px);
+    max-width: 480px;
+    margin-top: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .step { display:none; }
+  .step.active { display:block; }
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
+  .step-title { font-size:20px; font-weight:800; color:var(--green-dark); margin-bottom:4px; letter-spacing:-0.4px; }
+  .step-sub   { font-size:13.5px; color:var(--muted); margin-bottom:24px; line-height:1.5; }
+
+  /* ── Inputs ──────────────────────────────────────────────────────────── */
+  label {
+    display:block; font-size:12.5px; font-weight:600; color:var(--green-dark);
+    text-transform:uppercase; letter-spacing:0.6px; margin-bottom:6px;
+  }
+  .input-wrap { position:relative; }
+  .input-wrap input { padding-right: 44px; }
+  .input-icon {
+    position:absolute; right:13px; top:50%; transform:translateY(-50%);
+    font-size:18px; pointer-events:none;
+  }
+
+  input[type="text"], input[type="tel"] {
+    width:100%;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 16px;         /* 16px prevents iOS auto-zoom */
+    font-weight: 500;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input:focus { border-color:var(--green-mid); box-shadow:0 0 0 3px rgba(35,144,79,0.12); }
+  input.error  { border-color:var(--error); box-shadow:0 0 0 3px rgba(208,48,42,0.10); }
+  input.ok     { border-color:var(--green-light); }
+
+  .field { margin-bottom:18px; }
+  .field-msg { font-size:12px; margin-top:5px; font-weight:500; display:none; }
+  .field-msg.show { display:block; }
+  .field-msg.err  { color:var(--error); }
+  .field-msg.ok   { color:var(--green-mid); }
+
+  .phone-row { display:flex; gap:10px; }
+  .phone-prefix {
+    padding: 13px 14px;
+    background: var(--green-glow);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--green-dark);
+    white-space: nowrap;
+    display: flex; align-items: center;
+    flex-shrink: 0;
+  }
+  .phone-row input { flex:1; }
+
+  /* ── Buttons ─────────────────────────────────────────────────────────── */
+  .btn {
+    width:100%; padding:16px; border:none; border-radius:var(--radius-md);
+    font-family:var(--font); font-size:15.5px; font-weight:700;
+    cursor:pointer; transition:transform 0.15s, opacity 0.2s;
+    -webkit-tap-highlight-color:transparent;
+    position:relative; overflow:hidden; display:block; text-align:center;
+  }
+  .btn:active:not(:disabled) { transform:scale(0.97); }
+  .btn-primary { background:linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%); color:#fff; box-shadow:var(--shadow-btn); }
+  .btn-primary:disabled { opacity:0.45; cursor:not-allowed; transform:none !important; }
+  .btn-outline { background:transparent; border:2px solid var(--green-dark); color:var(--green-dark); margin-top:12px; }
+  .btn-camera  {
+    background:var(--green-glow); border:2px dashed var(--green-mid);
+    color:var(--green-dark);
+    display:flex !important; align-items:center; justify-content:center;
+    gap:10px; padding:20px; border-radius:var(--radius-md);
+    width:100%; font-family:var(--font); font-size:15px; font-weight:700;
+    cursor:pointer; -webkit-tap-highlight-color:transparent;
+  }
+  .btn-pay {
+    background:linear-gradient(135deg, #1A6B3C 0%, #7ED348 100%);
+    color:#fff; font-size:17px; padding:18px;
+    box-shadow:0 6px 24px rgba(126,211,72,0.40);
+  }
+  .btn-pay:disabled { opacity:0.6; cursor:not-allowed; }
+
+  /* ── Camera ──────────────────────────────────────────────────────────── */
+  #camera-container {
+    position:relative; border-radius:var(--radius-md);
+    background:#111; display:none; margin-bottom:16px;
+  }
+  #camera-container.show { display:block; }
+  #video {
+    width:100%; display:block;
+    min-height:240px; max-height:360px;
+    object-fit:cover;
+    border-radius:var(--radius-md);
+    /* NO transform — causes blank screen on iOS Safari & many Android browsers */
+  }
+  .shutter-row { display:flex; justify-content:center; align-items:center; padding:14px 0 4px; }
+  .shutter-btn {
+    width:64px; height:64px; border-radius:50%;
+    background:#fff; border:4px solid var(--green-light);
+    box-shadow:0 4px 16px rgba(0,0,0,0.3);
+    cursor:pointer; -webkit-tap-highlight-color:transparent;
+    transition:transform 0.15s; position:relative;
+  }
+  .shutter-btn:active { transform:scale(0.92); }
+  .shutter-btn::after {
+    content:''; position:absolute; inset:5px;
+    border-radius:50%; background:var(--green-light);
+  }
+  #selfie-preview {
+    width:100%; border-radius:var(--radius-md); display:none;
+    border:3px solid var(--green-light); margin-bottom:16px;
+  }
+  #selfie-preview.show { display:block; }
+  #canvas { display:none; }
+  .selfie-placeholder {
+    border:2px dashed var(--border); border-radius:var(--radius-md);
+    padding:36px 20px; text-align:center; margin-bottom:16px;
+    color:var(--muted); font-size:13px;
+  }
+  .selfie-placeholder .icon { font-size:36px; margin-bottom:8px; }
+
+  /* ── Consent ─────────────────────────────────────────────────────────── */
+  .consent-box {
+    display:flex; gap:12px; align-items:flex-start;
+    background:var(--green-glow); border:1.5px solid rgba(35,144,79,0.25);
+    border-radius:var(--radius-sm); padding:14px; margin:20px 0;
+    cursor:pointer; user-select:none; -webkit-user-select:none;
+  }
+  .consent-check {
+    width:22px; height:22px; border:2px solid var(--green-mid);
+    border-radius:6px; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; margin-top:1px; transition:background 0.2s, border-color 0.2s;
+  }
+  .consent-check.checked { background:var(--green-dark); border-color:var(--green-dark); }
+  .consent-check svg { display:none; }
+  .consent-check.checked svg { display:block; }
+  .consent-text { font-size:13px; color:var(--text); line-height:1.5; font-weight:500; pointer-events:none; }
+
+  /* ── Review ──────────────────────────────────────────────────────────── */
+  .summary-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); font-size:14px; }
+  .summary-row:last-child { border-bottom:none; }
+  .summary-row .key { color:var(--muted); font-weight:500; }
+  .summary-row .val { font-weight:600; color:var(--text); }
+  .summary-selfie { width:52px; height:52px; border-radius:50%; object-fit:cover; border:2px solid var(--green-light); }
+
+  .fee-pill {
+    background:var(--green-glow); border-radius:999px; padding:10px 20px;
+    display:flex; justify-content:center; align-items:center; gap:8px; margin:16px auto;
+  }
+  .fee-pill .amt { font-size:26px; font-weight:800; color:var(--green-dark); letter-spacing:-0.5px; }
+  .fee-pill .label { font-size:12px; color:var(--muted); font-weight:500; line-height:1.3; }
+
+  /* ── Success ─────────────────────────────────────────────────────────── */
+  .success-wrap { text-align:center; padding:12px 0 8px; }
+  .success-icon {
+    width:80px; height:80px; background:var(--green-glow); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 20px; font-size:40px; border:3px solid var(--green-light);
+  }
+  .success-name { font-size:24px; font-weight:800; color:var(--green-dark); letter-spacing:-0.5px; margin-bottom:6px; }
+  .success-msg  { font-size:14px; color:var(--muted); line-height:1.5; margin-bottom:24px; }
+
+  .ticket {
+    background:var(--bg); border:1.5px dashed var(--green-mid);
+    border-radius:var(--radius-md); padding:20px; text-align:left; position:relative;
+    overflow:hidden;
+  }
+  .ticket::before, .ticket::after {
+    content:''; position:absolute; top:50%; width:24px; height:24px;
+    background:var(--surface); border-radius:50%; transform:translateY(-50%);
+    border:1.5px dashed var(--green-mid);
+  }
+  .ticket::before { left:-13px; }
+  .ticket::after  { right:-13px; }
+  .ticket-header { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--green-mid); margin-bottom:12px; }
+  .ticket-row { display:flex; justify-content:space-between; font-size:13.5px; padding:7px 0; border-bottom:1px dashed var(--border); }
+  .ticket-row:last-child { border-bottom:none; padding-bottom:0; }
+  .ticket-row .tk { color:var(--muted); font-weight:500; }
+  .ticket-row .tv { font-weight:700; color:var(--text); text-align:right; max-width:62%; word-break:break-all; }
+
+  .whatsapp-note {
+    background:#E8F5E9; border:1px solid #A5D6A7; border-radius:var(--radius-sm);
+    padding:12px 14px; display:flex; gap:10px; align-items:center;
+    margin-top:18px; font-size:13px; color:#2E7D32; font-weight:500;
+  }
+
+  /* ── Divider ─────────────────────────────────────────────────────────── */
+  .divider { display:flex; align-items:center; gap:12px; margin:20px 0; color:var(--muted); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+  .divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ── Spinner ─────────────────────────────────────────────────────────── */
+  .spinner {
+    display:inline-block; width:17px; height:17px;
+    border:2.5px solid rgba(255,255,255,0.35); border-top-color:#fff;
+    border-radius:50%; animation:spin 0.7s linear infinite;
+    vertical-align:middle; margin-right:8px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* ── Toast ───────────────────────────────────────────────────────────── */
+  .toast {
+    position:fixed; bottom:28px; left:50%;
+    transform:translateX(-50%) translateY(80px);
+    background:#1A1A1A; color:#fff; padding:12px 22px;
+    border-radius:999px; font-size:13.5px; font-weight:600;
+    white-space:nowrap; z-index:9999;
+    transition:transform 0.3s cubic-bezier(.4,0,.2,1), opacity 0.3s;
+    opacity:0; pointer-events:none; max-width:90vw;
+    white-space:normal; text-align:center;
+  }
+  .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+  .toast.err  { background:var(--error); }
+  .toast.ok   { background:var(--green-dark); }
+
+  /* ── Char counter ────────────────────────────────────────────────────── */
+  .char-count { font-size:11px; color:var(--muted); text-align:right; margin-top:3px; }
+
+  @media (max-width:360px) {
+    .card { padding:22px 16px; }
+    .header { padding:22px 16px 34px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-inner">
+      <div class="logo-badge">🏟️</div>
+      <div class="header-text">
+        <h1>Mansa Sports Park</h1>
+        <p>Visitor Entry System</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-labels">
+      <span class="progress-label active" id="pl1">Details</span>
+      <span class="progress-label" id="pl2">Selfie</span>
+      <span class="progress-label" id="pl3">Review</span>
+      <span class="progress-label" id="pl4">Done</span>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <!-- ── STEP 1: Details ──────────────────────────────────────────────── -->
+    <div class="step active" id="step1">
+      <div class="step-title">Visitor Details</div>
+      <div class="step-sub">Enter your name and mobile number to begin.</div>
+
+      <!-- Name -->
+      <div class="field">
+        <label for="visitorName">Full Name</label>
+        <div class="input-wrap">
+          <input
+            type="text"
+            id="visitorName"
+            placeholder="e.g. Arjun Sharma"
+            autocomplete="name"
+            autocorrect="off"
+            autocapitalize="words"
+            spellcheck="false"
+            maxlength="60"
+          >
+          <span class="input-icon">👤</span>
+        </div>
+        <div class="field-msg err" id="nameErr">Please enter your full name (letters only)</div>
+        <div class="field-msg ok"  id="nameOk">✓ Looks good</div>
+      </div>
+
+      <!-- Phone -->
+      <div class="field">
+        <label for="visitorPhone">Mobile Number</label>
+        <div class="phone-row">
+          <div class="phone-prefix">🇮🇳 +91</div>
+          <input
+            type="tel"
+            id="visitorPhone"
+            placeholder="10-digit number"
+            inputmode="numeric"
+            pattern="[6-9][0-9]{9}"
+            autocomplete="tel-national"
+            maxlength="10"
+          >
+        </div>
+        <div class="field-msg err" id="phoneErr">Enter a valid 10-digit Indian mobile number (starts with 6–9)</div>
+        <div class="field-msg ok"  id="phoneOk">✓ Valid number</div>
+      </div>
+
+      <button class="btn btn-primary" id="btnStep1">Continue →</button>
+    </div>
+
+    <!-- ── STEP 2: Selfie ───────────────────────────────────────────────── -->
+    <div class="step" id="step2">
+      <div class="step-title">Take a Selfie</div>
+      <div class="step-sub">Your photo is used for gate verification. It's stored securely.</div>
+
+      <div id="selfie-placeholder-wrap" class="selfie-placeholder">
+        <div class="icon">🤳</div>
+        <div>Your selfie will appear here</div>
+      </div>
+
+      <div id="camera-container">
+        <video id="video" autoplay playsinline muted></video>
+        <div class="shutter-row">
+          <button class="shutter-btn" id="shutterBtn" aria-label="Take photo"></button>
+        </div>
+      </div>
+      <canvas id="canvas"></canvas>
+      <img id="selfie-preview" alt="Your selfie">
+
+      <div class="field-msg err show" id="selfiePhotoMsg" style="display:none; margin-bottom:10px;">Please take a selfie to continue</div>
+
+      <button class="btn btn-camera" id="btnCamera" type="button">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        <span id="cameraLabel">Open Front Camera</span>
+      </button>
+
+      <!-- Consent -->
+      <div class="consent-box" id="consentBox" role="checkbox" aria-checked="false" tabindex="0">
+        <div class="consent-check" id="consentCheck">
+          <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
+            <path d="M1.5 5L5 8.5L11.5 1.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="consent-text">I agree to Mansa Sports Park storing my photo and details for faster entry on future visits.</div>
+      </div>
+      <div class="field-msg err" id="consentErr" style="margin-top:-10px; margin-bottom:14px;">You must agree to continue</div>
+
+      <button class="btn btn-primary" id="btnStep2">Continue →</button>
+      <button class="btn btn-outline" id="btnBackStep2">← Back</button>
+    </div>
+
+    <!-- ── STEP 3: Review & Pay ─────────────────────────────────────────── -->
+    <div class="step" id="step3">
+      <div class="step-title">Confirm & Pay</div>
+      <div class="step-sub">Review your details before completing payment.</div>
+
+      <div class="summary-row">
+        <span class="key">Photo</span>
+        <img class="summary-selfie" id="summaryPhoto" alt="Your selfie">
+      </div>
+      <div class="summary-row">
+        <span class="key">Name</span>
+        <span class="val" id="summaryName">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="key">Mobile</span>
+        <span class="val" id="summaryPhone">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="key">Type</span>
+        <span class="val">Regular Visitor</span>
+      </div>
+
+      <div class="fee-pill">
+        <div class="amt">₹50</div>
+        <div class="label">Entry Fee<br><span style="font-size:10px;color:var(--muted)">One-time · Valid today only</span></div>
+      </div>
+
+      <button class="btn btn-pay" id="btnPay">🔒 Pay ₹50 Entry Fee</button>
+      <button class="btn btn-outline" id="btnBackStep3">← Edit Details</button>
+    </div>
+
+    <!-- ── STEP 4: Success ──────────────────────────────────────────────── -->
+    <div class="step" id="step4">
+      <div class="success-wrap">
+        <div class="success-icon">✅</div>
+        <div class="success-name">Welcome, <span id="successName"></span>!</div>
+        <div class="success-msg">Your entry is confirmed.<br>Show this screen at the gate.</div>
+
+        <div class="ticket">
+          <div class="ticket-header">🏟️ Mansa Sports Park — Entry Pass</div>
+          <div class="ticket-row"><span class="tk">Name</span>      <span class="tv" id="ticketName">—</span></div>
+          <div class="ticket-row"><span class="tk">Mobile</span>    <span class="tv" id="ticketPhone">—</span></div>
+          <div class="ticket-row"><span class="tk">Date &amp; Time</span><span class="tv" id="ticketDateTime">—</span></div>
+          <div class="ticket-row"><span class="tk">Type</span>      <span class="tv">Regular Visitor</span></div>
+          <div class="ticket-row"><span class="tk">Ref ID</span>    <span class="tv" id="ticketRef">—</span></div>
+          <div class="ticket-row"><span class="tk">Status</span>    <span class="tv" style="color:var(--green-dark);">✅ PAID &amp; VALID</span></div>
+        </div>
+
+        <div class="whatsapp-note">
+          <span style="font-size:20px;">💬</span>
+          <span>A confirmation has been sent to your WhatsApp number.</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<!-- Razorpay SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<!-- Firebase SDK (module) -->
+<script type="module">
+  import { initializeApp }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+  /* ══════════════════════════════════════════════════════════════
+     ⚙️  CONFIGURATION — Replace ALL placeholder values below
+  ══════════════════════════════════════════════════════════════ */
+  const FIREBASE_CONFIG = {
+    apiKey:            "YOUR_FIREBASE_API_KEY",
+    authDomain:        "YOUR_PROJECT.firebaseapp.com",
+    projectId:         "YOUR_PROJECT_ID",
+    storageBucket:     "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId:             "YOUR_APP_ID"
+  };
+  const RAZORPAY_KEY  = "YOUR_RAZORPAY_KEY_ID";           // rzp_live_xxx or rzp_test_xxx
+  const TWILIO_FN_URL = "YOUR_TWILIO_CLOUD_FUNCTION_URL";  // Your serverless proxy URL
+  /* ══════════════════════════════════════════════════════════════ */
+
+  const app     = initializeApp(FIREBASE_CONFIG);
+  const db      = getFirestore(app);
+  const storage = getStorage(app);
+
+  // Expose to main script — set BEFORE DOMContentLoaded fires on the inline script
+  window.__fb  = { db, storage, collection, addDoc, ref, uploadString, getDownloadURL };
+  window.__cfg = { RAZORPAY_KEY, TWILIO_FN_URL };
+
+  // Signal readiness
+  window.dispatchEvent(new Event('fb-ready'));
+</script>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════════════════ */
+const state = {
+  name: '',
+  phone: '',
+  photoDataUrl: '',
+  consentGiven: false,
+  stream: null,
+  cameraOpen: false,
+  photoTaken: false,
+  paymentInProgress: false,
+  fbReady: false
+};
+
+/* ══════════════════════════════════════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════════════════════════════════════ */
+const $  = id => document.getElementById(id);
+const el = id => $(id);
+
+function showToast(msg, type = 'ok') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function setFieldState(inputId, errId, okId, isError, isOk) {
+  const inp = $(inputId);
+  const err = $(errId);
+  const ok  = $(okId);
+  inp.classList.toggle('error', isError);
+  inp.classList.toggle('ok',    isOk && !isError);
+  if (err) { err.classList.toggle('show', isError); }
+  if (ok)  { ok.classList.toggle('show',  isOk && !isError); }
+}
+
+/* Safely set text content (prevents XSS) */
+function safeText(id, val) { $(id).textContent = val; }
+
+/* Sanitize a string for use in Firestore / WhatsApp — strip control chars */
+function sanitize(str) {
+  return String(str).replace(/[\x00-\x1F\x7F]/g, '').trim().slice(0, 200);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════════════════════════ */
+const steps      = [null, $('step1'), $('step2'), $('step3'), $('step4')];
+const progFill   = $('progressFill');
+const progLabels = [$('pl1'), $('pl2'), $('pl3'), $('pl4')];
+let currentStep  = 1;
+
+function goTo(n) {
+  steps[currentStep]?.classList.remove('active');
+  currentStep = n;
+  steps[n]?.classList.add('active');
+  progFill.style.width = ['25%','50%','75%','100%'][n - 1];
+  progLabels.forEach((lbl, i) => lbl.classList.toggle('active', i < n));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STEP 1 — DETAILS
+══════════════════════════════════════════════════════════════════════════ */
+const nameInput  = $('visitorName');
+const phoneInput = $('visitorPhone');
+
+/* — Name: block digits & special chars in real-time — */
+nameInput.addEventListener('input', () => {
+  // Strip anything that isn't a letter, space, hyphen, apostrophe, or dot
+  nameInput.value = nameInput.value.replace(/[^a-zA-Z\u00C0-\u024F\s\-'.]/g, '');
+  validateName(false);
+});
+
+/* — Phone: strip non-digits in real-time (Android + iOS + desktop) — */
+phoneInput.addEventListener('input', () => {
+  const pos = phoneInput.selectionStart;
+  let val = phoneInput.value.replace(/[^0-9]/g, '');
+  if (val.length > 10) val = val.slice(0, 10);
+  if (phoneInput.value !== val) {
+    phoneInput.value = val;
+    try { phoneInput.setSelectionRange(Math.min(pos, val.length), Math.min(pos, val.length)); } catch(_) {}
+  }
+  validatePhone(false);
+});
+
+/* Desktop: block non-digit keys — SKIP if key is "Unidentified" (Android soft keyboard) */
+phoneInput.addEventListener('keydown', e => {
+  if (e.key === 'Unidentified' || e.key === '') return; // Android — let oninput handle it
+  const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Tab','Enter','Home','End'];
+  if (!allowed.includes(e.key) && !/^\d$/.test(e.key)) {
+    e.preventDefault();
+  }
+});
+
+/* Paste guard: strip non-digits from paste */
+phoneInput.addEventListener('paste', e => {
+  e.preventDefault();
+  const pasted = (e.clipboardData || window.clipboardData).getData('text');
+  const digitsOnly = pasted.replace(/\D/g, '').slice(0, 10);
+  phoneInput.value = digitsOnly;
+  validatePhone(false);
+});
+
+function validateName(showError = true) {
+  const val = nameInput.value.trim();
+  const valid = val.length >= 2 && /^[a-zA-Z\u00C0-\u024F]/.test(val);
+  if (showError || val.length > 0) {
+    setFieldState('visitorName', 'nameErr', 'nameOk', !valid && val.length > 0, valid);
+  }
+  return valid;
+}
+
+function validatePhone(showError = true) {
+  const val = phoneInput.value.replace(/\D/g, '');
+  // Valid Indian mobile: 10 digits, starts with 6, 7, 8, or 9
+  const valid = /^[6-9]\d{9}$/.test(val);
+  if (showError || val.length > 0) {
+    setFieldState('visitorPhone', 'phoneErr', 'phoneOk', !valid && val.length > 0, valid);
+  }
+  return valid;
+}
+
+$('btnStep1').addEventListener('click', () => {
+  const nameOk  = validateName(true);
+  const phoneOk = validatePhone(true);
+  if (!nameOk || !phoneOk) return;
+  state.name  = sanitize(nameInput.value.trim());
+  state.phone = phoneInput.value.replace(/\D/g, '');
+  goTo(2);
+});
+
+nameInput.addEventListener('keydown',  e => e.key === 'Enter' && phoneInput.focus());
+phoneInput.addEventListener('keydown', e => e.key === 'Enter' && $('btnStep1').click());
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STEP 2 — SELFIE + CONSENT
+══════════════════════════════════════════════════════════════════════════ */
+const video           = $('video');
+const canvas          = $('canvas');
+const selfiePreview   = $('selfie-preview');
+const cameraContainer = $('camera-container');
+const placeholderWrap = $('selfie-placeholder-wrap');
+const cameraLabel     = $('cameraLabel');
+
+function stopCamera() {
+  if (state.stream) {
+    state.stream.getTracks().forEach(t => t.stop());
+    state.stream = null;
+  }
+  state.cameraOpen = false;
+  cameraContainer.classList.remove('show');
+}
+
+$('btnCamera').addEventListener('click', async () => {
+  // Reset if retaking photo
+  if (state.photoTaken) {
+    state.photoTaken   = false;
+    state.photoDataUrl = '';
+    selfiePreview.classList.remove('show');
+    selfiePreview.src  = '';
+    placeholderWrap.style.display = 'block';
+    cameraLabel.textContent = 'Open Front Camera';
+    stopCamera();
+  }
+
+  // Already streaming — do nothing
+  if (state.cameraOpen) return;
+
+  // Check API exists
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showToast('Camera not supported on this browser. Try Chrome or Safari.', 'err');
+    return;
+  }
+
+  cameraLabel.textContent = 'Starting camera…';
+  $('btnCamera').disabled = true;
+
+  try {
+    // Try front camera first, fall back to any camera
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'user' }, width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false
+      });
+    } catch (_) {
+      // Fallback: just any video device
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    }
+
+    state.stream     = stream;
+    video.srcObject  = stream;
+    video.setAttribute('autoplay', '');
+    video.setAttribute('playsinline', '');
+    video.muted      = true;
+
+    // play() needed on Android WebView and some iOS
+    try { await video.play(); } catch(_) {}
+
+    cameraContainer.classList.add('show');
+    placeholderWrap.style.display  = 'none';
+    cameraLabel.textContent        = 'Retake Photo';
+    $('btnCamera').disabled        = false;
+    state.cameraOpen               = true;
+    $('selfiePhotoMsg').style.display = 'none';
+
+  } catch (err) {
+    console.error('Camera error:', err.name, err.message);
+    $('btnCamera').disabled = false;
+    cameraLabel.textContent = 'Open Front Camera';
+
+    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+      showToast('Camera permission denied. Tap your browser address bar → Site settings → Allow Camera.', 'err');
+    } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+      showToast('No camera found on this device.', 'err');
+    } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+      showToast('Camera is in use by another app. Close it and try again.', 'err');
+    } else if (err.name === 'OverconstrainedError') {
+      showToast('Camera constraint error. Trying default camera…', 'err');
+    } else {
+      showToast('Could not open camera: ' + (err.message || err.name), 'err');
+    }
+  }
+});
+
+$('shutterBtn').addEventListener('click', () => {
+  if (!state.cameraOpen || !state.stream) return;
+
+  // Capture at 480×360 and compress to ~55% JPEG quality (~40–80 KB)
+  canvas.width  = 480;
+  canvas.height = 360;
+  const ctx = canvas.getContext('2d');
+  // Mirror-correct: save non-mirrored (even though preview shows mirrored)
+  ctx.drawImage(video, 0, 0, 480, 360);
+  state.photoDataUrl = canvas.toDataURL('image/jpeg', 0.55);
+
+  selfiePreview.src = state.photoDataUrl;
+  selfiePreview.classList.add('show');
+  stopCamera();
+  state.photoTaken = true;
+  cameraLabel.textContent = 'Retake Photo';
+  placeholderWrap.style.display = 'none';
+  $('selfiePhotoMsg').style.display = 'none';
+});
+
+/* Consent toggle — handle both click and keyboard */
+const consentBox   = $('consentBox');
+const consentCheck = $('consentCheck');
+
+function toggleConsent() {
+  state.consentGiven = !state.consentGiven;
+  consentCheck.classList.toggle('checked', state.consentGiven);
+  consentBox.setAttribute('aria-checked', state.consentGiven ? 'true' : 'false');
+  if (state.consentGiven) $('consentErr').classList.remove('show');
+}
+
+consentBox.addEventListener('click', toggleConsent);
+consentBox.addEventListener('keydown', e => {
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleConsent(); }
+});
+
+$('btnStep2').addEventListener('click', () => {
+  let ok = true;
+  if (!state.photoTaken) {
+    $('selfiePhotoMsg').style.display = 'block';
+    ok = false;
+  }
+  if (!state.consentGiven) {
+    $('consentErr').classList.add('show');
+    ok = false;
+  }
+  if (!ok) return;
+
+  // Populate review screen
+  $('summaryPhoto').src = state.photoDataUrl;
+  safeText('summaryName',  state.name);
+  safeText('summaryPhone', '+91 ' + state.phone);
+  goTo(3);
+});
+
+$('btnBackStep2').addEventListener('click', () => { stopCamera(); goTo(1); });
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STEP 3 — PAYMENT
+══════════════════════════════════════════════════════════════════════════ */
+$('btnBackStep3').addEventListener('click', () => goTo(2));
+
+$('btnPay').addEventListener('click', () => {
+  if (state.paymentInProgress) return; // prevent double-tap
+
+  const key = window.__cfg?.RAZORPAY_KEY;
+  if (!key || key === 'YOUR_RAZORPAY_KEY_ID') {
+    showToast('Razorpay is not configured yet. See README.', 'err');
+    return;
+  }
+  if (!window.__fb) {
+    showToast('Firebase not ready yet. Please wait a moment and try again.', 'err');
+    return;
+  }
+
+  state.paymentInProgress = true;
+  $('btnPay').disabled = true;
+
+  const options = {
+    key,
+    amount: 5000,          // ₹50 in paise
+    currency: 'INR',
+    name: 'Mansa Sports Park',
+    description: 'Visitor Entry Fee',
+    prefill: {
+      name:    state.name,
+      contact: '+91' + state.phone
+    },
+    notes: {
+      visitor_name:  state.name,
+      visitor_phone: state.phone
+    },
+    theme: { color: '#1A6B3C' },
+    handler: async (response) => {
+      await onPaymentSuccess(response.razorpay_payment_id);
+    },
+    modal: {
+      ondismiss: () => {
+        state.paymentInProgress = false;
+        $('btnPay').disabled = false;
+        showToast('Payment cancelled. Try again when ready.', 'err');
+      }
+    }
+  };
+
+  try {
+    const rzp = new Razorpay(options);
+    rzp.on('payment.failed', (resp) => {
+      state.paymentInProgress = false;
+      $('btnPay').disabled = false;
+      showToast('Payment failed: ' + (resp.error?.description || 'Unknown error'), 'err');
+    });
+    rzp.open();
+  } catch (e) {
+    state.paymentInProgress = false;
+    $('btnPay').disabled = false;
+    showToast('Could not open payment. Check your connection.', 'err');
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════════════════
+   POST-PAYMENT: SAVE + WHATSAPP + SUCCESS
+══════════════════════════════════════════════════════════════════════════ */
+async function onPaymentSuccess(paymentId) {
+  const btn = $('btnPay');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Saving your entry…';
+
+  const now         = new Date();
+  const dateStr     = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  const timeStr     = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  const dateTimeStr = dateStr + ' · ' + timeStr;
+
+  // Sanitize everything before storing
+  const safeName    = sanitize(state.name);
+  const safePhone   = state.phone.replace(/\D/g, '').slice(0, 10);
+  const safePayRef  = sanitize(paymentId);
+
+  try {
+    const fb  = window.__fb;
+    const cfg = window.__cfg;
+
+    // 1. Upload compressed selfie
+    const storageRef = fb.ref(fb.storage, `selfies/${safePhone}_${Date.now()}.jpg`);
+    await fb.uploadString(storageRef, state.photoDataUrl, 'data_url');
+    const photoURL = await fb.getDownloadURL(storageRef);
+
+    // 2. Write visitor record to Firestore
+    await fb.addDoc(fb.collection(fb.db, 'visitors'), {
+      name:          safeName,
+      phone:         safePhone,
+      photoURL,
+      paymentId:     safePayRef,
+      visitorType:   'Regular',
+      entryDateTime: now.toISOString(),
+      createdAt:     Date.now()
+    });
+
+    // 3. WhatsApp via Twilio serverless proxy
+    if (cfg.TWILIO_FN_URL && cfg.TWILIO_FN_URL !== 'YOUR_TWILIO_CLOUD_FUNCTION_URL') {
+      try {
+        const waMsg =
+          `✅ Entry confirmed - Mansa Sports Park\n` +
+          `Name: ${safeName}\n` +
+          `Date: ${dateStr}\n` +
+          `Ref: ${safePayRef}\n` +
+          `Show this at the gate. Valid today only.`;
+
+        const res = await fetch(cfg.TWILIO_FN_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ to: '+91' + safePhone, body: waMsg })
+        });
+        if (!res.ok) console.warn('WhatsApp response:', res.status);
+      } catch (waErr) {
+        console.warn('WhatsApp delivery failed (non-critical):', waErr);
+      }
+    }
+
+    // 4. Populate and show success screen
+    safeText('successName',    safeName);
+    safeText('ticketName',     safeName);
+    safeText('ticketPhone',    '+91 ' + safePhone);
+    safeText('ticketDateTime', dateTimeStr);
+    safeText('ticketRef',      safePayRef);
+    goTo(4);
+
+    // 5. Request wake lock so screen stays on at the gate
+    if ('wakeLock' in navigator) {
+      try { await navigator.wakeLock.request('screen'); } catch (_) {}
+    }
+
+  } catch (err) {
+    console.error('Save error:', err);
+    // Payment succeeded — don't lose the ref
+    showToast(
+      `Payment OK! But save failed. Note Ref: ${safePayRef} and show it at the gate.`,
+      'err'
+    );
+    btn.disabled = false;
+    btn.innerHTML = '🔒 Retry Save';
+    state.paymentInProgress = false;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   FIREBASE READINESS — re-enable Pay if FB loads after page paints
+══════════════════════════════════════════════════════════════════════════ */
+window.addEventListener('fb-ready', () => { state.fbReady = true; });
+
+</script>
+</body>
+</html>

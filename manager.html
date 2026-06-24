@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Mansa Sports Park — Manager booking panel.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manager Panel — Mansa Sports Park</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#0D4A26;--g2:#166534;--g3:#16a34a;--g4:#4ade80;--gbg:#f0fdf4;
+  --blue:#1d4ed8;--bluebg:#eff6ff;--bluebdr:#bfdbfe;
+  --gold:#92400e;--goldb:#d97706;--goldbg:#fffbeb;--goldbdr:#fde68a;
+  --red:#dc2626;--redbg:#fee2e2;--redbdr:#fca5a5;
+  --orange:#c2410c;--orangebg:#fff7ed;--orangebdr:#fed7aa;
+  --avail:#16a34a;--avail-bg:#dcfce7;
+  --booked:#dc2626;--booked-bg:#fee2e2;
+  --grace:#d97706;--grace-bg:#fef3c7;
+  --tent:#7c3aed;--tent-bg:#ede9fe;--tent-bdr:#c4b5fd;
+  --past:#94a3b8;--past-bg:#f1f5f9;
+  --bg:#f0f4f1;--surf:#fff;--text:#0a150d;--muted:#4b6358;--border:#d1e4d9;
+  --r:10px;--rlg:18px;--font:'Inter',system-ui,sans-serif;
+  --shadow:0 2px 14px rgba(13,74,38,.09);--shadow-lg:0 8px 36px rgba(0,0,0,.16);
+}
+html,body{min-height:100vh;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-size:14px}
+
+/* ── LOGIN ──────────────────────────────────────── */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(145deg,#050f08,var(--g1))}
+.lcard{background:var(--surf);border-radius:20px;padding:40px 32px;width:100%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.3);text-align:center}
+.lbadge{font-size:40px;margin-bottom:14px}
+.ltitle{font-size:20px;font-weight:900;color:var(--g1);margin-bottom:3px}
+.lsub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.linp{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:16px;font-weight:600;color:var(--text);background:var(--gbg);outline:none;margin-bottom:8px;-webkit-appearance:none}
+.linp:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+.linp.shake{animation:shk .4s ease;border-color:var(--red)}
+@keyframes shk{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-8px)}50%{transform:translateX(8px)}}
+.lerr{font-size:12px;color:var(--red);font-weight:600;min-height:16px;margin-bottom:10px;text-align:left}
+.btn-login{width:100%;padding:15px;background:linear-gradient(135deg,var(--g1),var(--g3));color:#fff;border:none;border-radius:var(--r);font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(22,163,74,.3)}
+
+/* ── TOP BAR ────────────────────────────────────── */
+.topbar{background:linear-gradient(135deg,var(--g1),#0a3520);padding:0 16px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-title{color:#fff;font-size:15px;font-weight:900;letter-spacing:-.2px}
+.tb-sub{color:rgba(255,255,255,.55);font-size:11px;font-weight:600}
+.tb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tb-stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:5px 12px;color:#fff;font-size:12px;font-weight:700;white-space:nowrap}
+.tb-stat span{color:var(--g4);font-size:14px;font-weight:900}
+.btn-tb{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:5px 10px;color:rgba(255,255,255,.75);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-tb:hover{background:rgba(255,255,255,.2)}
+
+/* ── TAB NAV ────────────────────────────────────── */
+.tabnav{display:flex;background:var(--surf);border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:54px;z-index:100}
+.tabnav::-webkit-scrollbar{display:none}
+.tab-btn{padding:14px 18px;border:none;background:none;font-family:var(--font);font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;-webkit-tap-highlight-color:transparent}
+.tab-btn.active{color:var(--g2);border-bottom-color:var(--g2)}
+.tab-btn .tb-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:var(--red);color:#fff;border-radius:50%;font-size:9px;font-weight:800;margin-left:5px;vertical-align:middle}
+
+/* ── PANELS ─────────────────────────────────────── */
+.panel{display:none;padding:14px;max-width:1100px;margin:0 auto}
+.panel.active{display:block}
+
+/* ── FORM CARD ──────────────────────────────────── */
+.fcard{background:var(--surf);border-radius:var(--rlg);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.fcard-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.fcard-head.blue{background:linear-gradient(135deg,#eff6ff,#dbeafe)}
+.fcard-head.green{background:linear-gradient(135deg,var(--gbg),#dcfce7)}
+.fcard-head.gold{background:linear-gradient(135deg,var(--goldbg),#fef3c7)}
+.fcard-head.dark{background:linear-gradient(135deg,#0a150d,var(--g1))}
+.fhi{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.fhi.blue{background:#dbeafe;border:1px solid #93c5fd}
+.fhi.green{background:#dcfce7;border:1px solid var(--g4)}
+.fhi.gold{background:var(--goldbg);border:1px solid var(--goldbdr)}
+.fcard-head.dark .fhi{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2)}
+.fht h3{font-size:14px;font-weight:800;color:var(--text)}
+.fcard-head.dark .fht h3{color:#fff}
+.fht p{font-size:11.5px;color:var(--muted);margin-top:1px}
+.fcard-head.dark .fht p{color:rgba(255,255,255,.55)}
+.fbody{padding:18px}
+
+/* FORM ELEMENTS */
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.frow.three{grid-template-columns:1fr 1fr 1fr}
+.frow.one{grid-template-columns:1fr}
+@media(max-width:600px){.frow,.frow.three{grid-template-columns:1fr}}
+.fg{display:flex;flex-direction:column;gap:5px}
+.flbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g2)}
+.finp,.fsel,.ftxt{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:500;color:var(--text);background:#fafdf9;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+.finp:focus,.fsel:focus,.ftxt:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(22,163,74,.10);background:#fff}
+.finp.err,.fsel.err{border-color:var(--red)}
+.ftxt{resize:vertical;min-height:72px;line-height:1.5}
+.fsel-wrap{position:relative}.fsel-wrap::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:13px}
+.fsel{padding-right:32px;cursor:pointer}
+
+/* SLOTS MINI GRID */
+.slots-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+@media(max-width:500px){.slots-mini{grid-template-columns:repeat(3,1fr)}}
+.sm-slot{padding:9px 4px;border:1.5px solid var(--border);border-radius:8px;text-align:center;cursor:pointer;transition:all .15s;background:var(--surf)}
+.sm-slot .smt{font-size:12px;font-weight:800;color:var(--text)}
+.sm-slot .sme{font-size:10px;color:var(--muted)}
+.sm-slot.booked{background:var(--redbg);border-color:var(--redbdr);cursor:not-allowed}
+.sm-slot.booked .smt{color:var(--red)}
+.sm-slot.tent{background:var(--tent-bg);border-color:var(--tent-bdr);cursor:not-allowed}
+.sm-slot.tent .smt{color:var(--tent)}
+.sm-slot.selected{border-color:var(--g2);background:var(--gbg)}
+.sm-slot.selected .smt{color:var(--g1)}
+.sm-slot:hover:not(.booked):not(.tent):not(.selected){border-color:var(--g3);background:var(--gbg)}
+
+/* PAYMENT MODE */
+.pay-mode{display:flex;gap:8px;margin-bottom:0}
+.pm-btn{flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:12.5px;font-weight:700;cursor:pointer;background:var(--surf);color:var(--muted);transition:all .15s;text-align:center;-webkit-tap-highlight-color:transparent}
+.pm-btn.sel{border-color:var(--g2);background:var(--gbg);color:var(--g1)}
+
+/* PRICE OVERRIDE */
+.price-row{display:flex;align-items:center;gap:8px}
+.price-base{font-size:13px;font-weight:700;color:var(--muted)}
+.discount-note{font-size:11px;color:var(--red);font-weight:600;margin-top:3px}
+
+/* BUTTONS */
+.btn{padding:13px 20px;border:none;border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:opacity .2s,transform .15s;-webkit-tap-highlight-color:transparent}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--g1),var(--g3));color:#fff;box-shadow:0 4px 14px rgba(22,163,74,.28);width:100%;padding:16px;font-size:15px}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-gold{background:var(--goldb);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--g2);color:var(--g2)}
+.btn-sm{padding:8px 14px;font-size:12.5px}
+.btn-ghost{background:var(--gbg);color:var(--g2);border:1.5px solid var(--border)}
+
+/* SPINNER */
+.spinner{display:inline-block;width:15px;height:15px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── COURT GRID (same as courts.html) ──────────── */
+.date-nav{display:flex;align-items:center;gap:8px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.date-nav::-webkit-scrollbar{display:none}
+.dnb{background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-family:var(--font);font-size:12.5px;font-weight:700;cursor:pointer;color:var(--muted);white-space:nowrap;transition:all .15s}
+.dnb.active{background:var(--g2);border-color:var(--g2);color:#fff}
+.grid-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.schedule{border-collapse:collapse;width:100%;min-width:720px}
+.schedule th{padding:8px 10px;background:var(--g1);color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:center;white-space:nowrap}
+.schedule th:first-child{width:56px;background:#050f08}
+.schedule td{padding:2px;border:1px solid var(--border);vertical-align:top}
+.schedule td:first-child{padding:5px 8px;background:var(--surf);font-size:11px;font-weight:700;color:var(--muted);text-align:right;white-space:nowrap;position:sticky;left:0;z-index:10;border-right:2px solid var(--border)}
+.slot-cell{border-radius:5px;padding:4px 6px;min-height:36px;cursor:pointer;transition:opacity .15s;display:flex;flex-direction:column;justify-content:center}
+.slot-cell:active{opacity:.7}
+.slot-cell.avail{background:var(--avail-bg);border:1px solid var(--g4)}
+.slot-cell.avail:hover{background:#bbf7d0}
+.slot-cell.booked{background:var(--booked-bg);border:1px solid var(--redbdr)}
+.slot-cell.grace{background:var(--grace-bg);border:1px solid var(--goldbdr)}
+.slot-cell.tent{background:var(--tent-bg);border:1px solid var(--tent-bdr)}
+.slot-cell.past{background:var(--past-bg);border:1px solid #e2e8f0;cursor:default;opacity:.55}
+.sc-name{font-size:10px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-time{font-size:9px;font-weight:500;opacity:.75;margin-top:1px}
+.sc-src{font-size:8.5px;font-weight:700;opacity:.65;margin-top:1px}
+.slot-cell.avail .sc-name{color:var(--avail)}
+.slot-cell.booked .sc-name{color:var(--booked)}
+.slot-cell.grace .sc-name{color:var(--grace)}
+.slot-cell.tent .sc-name{color:var(--tent)}
+.slot-cell.past .sc-name{color:var(--past)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--muted)}
+.leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+
+/* ── MODAL ──────────────────────────────────────── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:flex-end;justify-content:center}
+.overlay.hidden{display:none}
+.modal{background:var(--surf);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:14px auto 18px}
+.modal-inner{padding:0 18px 28px}
+.modal-title{font-size:16px;font-weight:900;color:var(--text);margin-bottom:16px}
+.dr{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.dr:last-of-type{border-bottom:none}
+.dk{color:var(--muted);font-weight:500;flex-shrink:0;margin-right:12px}
+.dv{font-weight:700;color:var(--text);text-align:right;word-break:break-all}
+.modal-acts{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.modal-note-area{margin-top:10px}
+
+/* SOURCE TAGS */
+.src-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:10.5px;font-weight:700}
+.src-online{background:#dbeafe;color:#1d4ed8}
+.src-manager{background:var(--goldbg);color:var(--gold)}
+.src-call{background:var(--tent-bg);color:var(--tent)}
+
+/* ── CASH REGISTER ──────────────────────────────── */
+.cash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:480px){.cash-stats{grid-template-columns:1fr 1fr}}
+.cs-card{background:var(--surf);border-radius:var(--rlg);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px;text-align:center}
+.cs-val{font-size:28px;font-weight:900;color:var(--g1);letter-spacing:-1px;line-height:1}
+.cs-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.cash-list{background:var(--surf);border-radius:var(--rlg);border:1px solid var(--border);overflow:hidden;margin-bottom:14px}
+.cash-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px}
+.cash-row:last-child{border-bottom:none}
+.cash-row .cr-time{font-size:11px;color:var(--muted);font-weight:600;min-width:44px}
+.cash-row .cr-court{font-weight:700;color:var(--text);flex:1}
+.cash-row .cr-cust{color:var(--muted);font-size:12px;flex:1}
+.cash-row .cr-amt{font-weight:900;color:var(--g1);font-size:15px;white-space:nowrap}
+.submit-box{background:var(--goldbg);border:2px solid var(--goldbdr);border-radius:var(--rlg);padding:18px;text-align:center}
+.submit-box h3{font-size:15px;font-weight:800;color:var(--gold);margin-bottom:6px}
+.submit-box p{font-size:13px;color:var(--gold);opacity:.8;margin-bottom:16px}
+.diff-flag{background:var(--redbg);border:1px solid var(--redbdr);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--red);font-weight:700;margin-top:10px;display:none}
+.diff-flag.show{display:block}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 22px;border-radius:999px;font-size:13.5px;font-weight:700;z-index:9999;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s;opacity:0;pointer-events:none;max-width:90vw;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{background:var(--g2);color:#fff}
+.toast.err{background:var(--red);color:#fff}
+.toast.info{background:#1d4ed8;color:#fff}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:32px 20px;color:var(--muted)}
+.empty-state .ei{font-size:36px;margin-bottom:8px;opacity:.4}
+.empty-state p{font-size:13px}
+
+/* TENTATIVE TIMER */
+.tent-timer{background:var(--tent-bg);border:1px solid var(--tent-bdr);border-radius:var(--r);padding:8px 12px;font-size:12px;font-weight:700;color:var(--tent);margin-top:6px;display:none}
+.tent-timer.show{display:block}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="loginScreen">
+  <div class="lcard">
+    <div class="lbadge">🏟️</div>
+    <div class="ltitle">Manager Panel</div>
+    <div class="lsub">Mansa Sports Park — Authorised Staff Only</div>
+    <input type="password" class="linp" id="mgrPass" placeholder="Manager password" maxlength="30" autocomplete="current-password">
+    <div class="lerr" id="loginErr"></div>
+    <button class="btn-login" id="btnLogin">🔐 Login</button>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="appScreen" style="display:none">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="tb-left">
+      <div>
+        <div class="tb-title">🏟️ Manager Panel</div>
+        <div class="tb-sub" id="topDate"></div>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-stat">Cash <span id="tbCash">₹0</span></div>
+      <div class="tb-stat">Bookings <span id="tbBookings">0</span></div>
+      <div class="tb-stat" id="tbClock">—</div>
+      <button class="btn-tb" id="btnRefresh">↻ Refresh</button>
+      <button class="btn-tb" id="btnLogout">Exit</button>
+    </div>
+  </div>
+
+  <!-- TAB NAV -->
+  <div class="tabnav">
+    <button class="tab-btn active" data-tab="booking">📋 Quick Book</button>
+    <button class="tab-btn" data-tab="grid">📊 Court Grid</button>
+    <button class="tab-btn" data-tab="cash">💵 Cash Register</button>
+    <button class="tab-btn" data-tab="call">📞 Call Booking</button>
+  </div>
+
+  <!-- ══════════ TAB 1: QUICK BOOKING ══════════ -->
+  <div class="panel active" id="tab-booking">
+
+    <div class="fcard" style="margin-top:14px">
+      <div class="fcard-head green">
+        <div class="fhi green">📋</div>
+        <div class="fht"><h3>Quick Walk-in Booking</h3><p>Book a slot immediately for today</p></div>
+      </div>
+      <div class="fbody">
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">Court</label>
+            <div class="fsel-wrap">
+              <select class="fsel" id="qCourt">
+                <option value="">— Select court —</option>
+              </select>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="flbl">Duration</label>
+            <div class="fsel-wrap">
+              <select class="fsel" id="qDur">
+                <option value="60">60 minutes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="fg" style="margin-bottom:12px">
+          <label class="flbl">Available Time Slots — Today</label>
+          <div class="slots-mini" id="qSlots">
+            <div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:12px">Select a court to see slots</div>
+          </div>
+          <div class="tent-timer" id="tentTimer"></div>
+        </div>
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">Customer Name</label>
+            <input type="text" class="finp" id="qName" placeholder="Full name" autocapitalize="words" maxlength="60">
+          </div>
+          <div class="fg">
+            <label class="flbl">Customer Phone</label>
+            <input type="tel" class="finp" id="qPhone" placeholder="10-digit number" inputmode="numeric" maxlength="10">
+          </div>
+        </div>
+
+        <div class="frow three">
+          <div class="fg">
+            <label class="flbl">No. of Players</label>
+            <input type="number" class="finp" id="qPlayers" placeholder="e.g. 4" min="1" max="22" value="2">
+          </div>
+          <div class="fg">
+            <label class="flbl">Payment Mode</label>
+            <div class="pay-mode" id="qPayMode">
+              <button class="pm-btn sel" data-pm="Cash">💵 Cash</button>
+              <button class="pm-btn" data-pm="UPI">📱 UPI</button>
+              <button class="pm-btn" data-pm="Online">🌐 Online</button>
+            </div>
+          </div>
+          <div class="fg" id="upiRefWrap" style="display:none">
+            <label class="flbl">UPI Reference No.</label>
+            <input type="text" class="finp" id="qUpiRef" placeholder="e.g. 123456789" maxlength="30">
+          </div>
+        </div>
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">Amount Received (₹)</label>
+            <input type="number" class="finp" id="qAmount" placeholder="0" min="0">
+            <div class="price-base" id="qBasePrice"></div>
+            <div class="discount-note" id="qDiscountNote" style="display:none"></div>
+          </div>
+          <div class="fg">
+            <label class="flbl">Discount Reason <span style="font-weight:500;text-transform:none;color:var(--muted)">(if any)</span></label>
+            <input type="text" class="finp" id="qDiscReason" placeholder="e.g. Regular customer" maxlength="100">
+          </div>
+        </div>
+
+        <div class="fg" style="margin-bottom:16px">
+          <label class="flbl">Notes <span style="font-weight:500;text-transform:none;color:var(--muted)">(optional)</span></label>
+          <textarea class="ftxt" id="qNotes" placeholder="e.g. Regular customer, VIP, group booking..." maxlength="300"></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="btnQuickBook">✅ Confirm Booking</button>
+
+      </div>
+    </div>
+
+    <!-- Recent Manager Bookings Today -->
+    <div class="fcard">
+      <div class="fcard-head green">
+        <div class="fhi green">📋</div>
+        <div class="fht"><h3>My Bookings Today</h3><p>Bookings made by you this session</p></div>
+      </div>
+      <div id="myBookingsList">
+        <div class="empty-state"><div class="ei">📋</div><p>No bookings made yet today</p></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════ TAB 2: COURT GRID ══════════ -->
+  <div class="panel" id="tab-grid">
+    <div style="padding:14px 0 10px">
+      <div class="date-nav" id="gridDateNav"></div>
+    </div>
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--avail-bg);border:1px solid var(--g4)"></div>Available</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--booked-bg);border:1px solid var(--redbdr)"></div>Confirmed</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--grace-bg);border:1px solid var(--goldbdr)"></div>Grace 15min</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--tent-bg);border:1px solid var(--tent-bdr)"></div>Tentative</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--past-bg);border:1px solid #e2e8f0"></div>Past</div>
+    </div>
+    <div class="grid-scroll">
+      <table class="schedule" id="mgGrid">
+        <thead id="mgGridHead"></thead>
+        <tbody id="mgGridBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 3: CASH REGISTER ══════════ -->
+  <div class="panel" id="tab-cash">
+    <div style="padding-top:14px">
+      <div class="cash-stats">
+        <div class="cs-card"><div class="cs-val" id="crCashTotal">₹0</div><div class="cs-lbl">Cash Collected</div></div>
+        <div class="cs-card"><div class="cs-val" id="crUpiTotal">₹0</div><div class="cs-lbl">UPI Collected</div></div>
+        <div class="cs-card"><div class="cs-val" id="crBookCount">0</div><div class="cs-lbl">Your Bookings</div></div>
+      </div>
+
+      <div class="cash-list" id="cashList">
+        <div class="empty-state"><div class="ei">💵</div><p>No cash entries yet today</p></div>
+      </div>
+
+      <div class="submit-box">
+        <h3>💼 Submit Cash at End of Shift</h3>
+        <p>Enter the physical cash you're handing over to the owner</p>
+        <div class="fg" style="margin-bottom:12px">
+          <label class="flbl" style="text-align:left;display:block;margin-bottom:5px">Physical Cash Amount (₹)</label>
+          <input type="number" class="finp" id="submitCashAmt" placeholder="Enter cash amount in hand" min="0">
+        </div>
+        <button class="btn btn-gold" style="width:100%;padding:14px;font-size:15px" id="btnSubmitCash">💼 Submit Cash Handover</button>
+        <div class="diff-flag" id="diffFlag"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 4: CALL BOOKING (ADVANCE) ══════════ -->
+  <div class="panel" id="tab-call">
+    <div class="fcard" style="margin-top:14px">
+      <div class="fcard-head blue">
+        <div class="fhi blue">📞</div>
+        <div class="fht"><h3>Call / Advance Booking</h3><p>Book up to 7 days ahead · Slot held tentatively for 2 hours</p></div>
+      </div>
+      <div class="fbody">
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">Court</label>
+            <div class="fsel-wrap">
+              <select class="fsel" id="cCourt">
+                <option value="">— Select court —</option>
+              </select>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="flbl">Duration</label>
+            <div class="fsel-wrap">
+              <select class="fsel" id="cDur">
+                <option value="60">60 minutes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="fg" style="margin-bottom:12px">
+          <label class="flbl">Select Date (up to 7 days ahead)</label>
+          <div class="date-nav" id="callDateNav" style="margin-top:6px"></div>
+        </div>
+
+        <div class="fg" style="margin-bottom:12px">
+          <label class="flbl">Available Time Slots</label>
+          <div class="slots-mini" id="cSlots">
+            <div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:12px">Select a court and date to see slots</div>
+          </div>
+        </div>
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">Customer Name</label>
+            <input type="text" class="finp" id="cName" placeholder="Full name" autocapitalize="words" maxlength="60">
+          </div>
+          <div class="fg">
+            <label class="flbl">Customer Phone</label>
+            <input type="tel" class="finp" id="cPhone" placeholder="10-digit number" inputmode="numeric" maxlength="10">
+          </div>
+        </div>
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">No. of Players</label>
+            <input type="number" class="finp" id="cPlayers" placeholder="e.g. 4" min="1" max="22" value="2">
+          </div>
+          <div class="fg">
+            <label class="flbl">Amount (₹) <span style="font-weight:500;text-transform:none;color:var(--muted)">— paid later</span></label>
+            <input type="number" class="finp" id="cAmount" placeholder="Auto-filled" min="0">
+          </div>
+        </div>
+
+        <div class="fg" style="margin-bottom:16px">
+          <label class="flbl">Notes</label>
+          <textarea class="ftxt" id="cNotes" placeholder="e.g. Called at 3PM, wants to pay on arrival..." maxlength="300"></textarea>
+        </div>
+
+        <div style="background:var(--tent-bg);border:1px solid var(--tent-bdr);border-radius:var(--r);padding:12px 14px;font-size:12.5px;color:var(--tent);margin-bottom:14px;line-height:1.5;font-weight:600">
+          ⏰ Slot will be marked <strong>Tentative</strong> (orange) for 2 hours.<br>
+          Customer will receive a WhatsApp payment link.<br>
+          If unpaid after 2 hours, slot auto-releases.
+        </div>
+
+        <button class="btn btn-blue" style="width:100%;padding:16px;font-size:15px" id="btnCallBook">📞 Hold Slot (Tentative)</button>
+
+      </div>
+    </div>
+
+    <!-- Tentative Bookings List -->
+    <div class="fcard">
+      <div class="fcard-head blue">
+        <div class="fhi blue">⏰</div>
+        <div class="fht"><h3>Pending Tentative Bookings</h3><p>Slots held awaiting payment</p></div>
+      </div>
+      <div id="tentativeList">
+        <div class="empty-state"><div class="ei">⏰</div><p>No pending tentative bookings</p></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /appScreen -->
+
+<!-- BOOKING DETAIL MODAL -->
+<div class="overlay hidden" id="overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-inner">
+      <div class="modal-title" id="modalTitle">Booking Details</div>
+      <div id="modalBody"></div>
+      <div class="modal-acts" id="modalActs"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs, updateDoc, doc,
+  query, where, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ══ CONFIG — same as all other modules ══ */
+const FIREBASE_CONFIG = {
+  apiKey:"YOUR_FIREBASE_API_KEY", authDomain:"YOUR_PROJECT.firebaseapp.com",
+  projectId:"YOUR_PROJECT_ID",    storageBucket:"YOUR_PROJECT.appspot.com",
+  messagingSenderId:"YOUR_SENDER_ID", appId:"YOUR_APP_ID"
+};
+const TWILIO_FN_URL = "YOUR_TWILIO_CLOUD_FUNCTION_URL";
+/* ════════════════════════════════════════ */
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+window.__mgDb  = { db, collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy };
+window.__mgCfg = { TWILIO_FN_URL };
+window.dispatchEvent(new Event('mg-ready'));
+</script>
+
+<script>
+'use strict';
+/* ══ CONSTANTS ══════════════════════════════════ */
+const MGR_PASS = 'mansaManager2024'; // Change this
+
+const COURTS = [
+  {id:'tennis',    name:'Tennis',            icon:'🎾', price60:350, price30:null, durations:[60]},
+  {id:'badminton_in', name:'Badminton Indoor', icon:'🏸', price60:175, price30:null, durations:[60]},
+  {id:'badminton_out',name:'Badminton Outdoor',icon:'🏸', price60:90,  price30:null, durations:[60]},
+  {id:'pickleball',name:'Pickleball',        icon:'🏓', price60:175, price30:null, durations:[60]},
+  {id:'box_cricket',name:'Box Cricket Turf', icon:'🏏', price60:500, price30:null, durations:[60]},
+  {id:'cricket_net',name:'Cricket Net',      icon:'🏏', price60:250, price30:125,  durations:[30,60]},
+  {id:'table_tennis',name:'Table Tennis',    icon:'🏓', price60:140, price30:70,   durations:[30,60]},
+  {id:'basketball', name:'Basketball',        icon:'🏀', price60:180, price30:100,  durations:[30,60]},
+];
+
+const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const $      = id => document.getElementById(id);
+
+/* ══ STATE ══════════════════════════════════════ */
+let S = {
+  fbReady:false, mgrName:'Manager',
+  bookings:[], myBookings:[],
+  qCourt:null, qSlot:null, qPayMode:'Cash', qDate:null,
+  cCourt:null, cSlot:null, cDate:null, // [NOTE] cDate set by date nav clicks
+  gridDate: new Date(), gridDate2: new Date(),
+};
+S.gridDate.setHours(0,0,0,0);
+S.qDate = new Date(); S.qDate.setHours(0,0,0,0);
+
+window.addEventListener('mg-ready', () => { S.fbReady=true; loadData(); });
+
+/* ══ UTILITIES ══════════════════════════════════ */
+function toast(msg, type='ok') {
+  const t=$('toast'); t.textContent=msg; t.className=`toast show ${type}`;
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),4000);
+}
+function san(s){ return String(s||'').replace(/[<>"'`]/g,'').replace(/[\x00-\x1F]/g,'').trim().slice(0,300); }
+function fmtDate(d){ return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; }
+function fmtTime(d){ return d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+function slotKey(hm,dur){ return `${hm}_${dur}`; }
+function addMin(min){ const hh=String(Math.floor(min/60)).padStart(2,'0'); const mm=String(min%60).padStart(2,'0'); return `${hh}:${mm}`; }
+
+/* ══ LOGIN ══════════════════════════════════════ */
+function doLogin() {
+  const pass = $('mgrPass').value;
+  if (pass === MGR_PASS) {
+    $('loginScreen').style.display='none';
+    $('appScreen').style.display='block';
+    sessionStorage.setItem('msp_mgr','1');
+    init();
+  } else {
+    $('loginErr').textContent='Incorrect password.';
+    $('mgrPass').classList.add('shake');
+    $('mgrPass').value='';
+    setTimeout(()=>$('mgrPass').classList.remove('shake'),400);
+  }
+}
+if(sessionStorage.getItem('msp_mgr')==='1'){ $('loginScreen').style.display='none'; $('appScreen').style.display='block'; init(); }
+$('btnLogin').addEventListener('click', doLogin);
+$('mgrPass').addEventListener('keydown', e=>e.key==='Enter'&&doLogin());
+$('btnLogout').addEventListener('click', ()=>{ sessionStorage.removeItem('msp_mgr'); location.reload(); });
+
+/* ══ INIT ════════════════════════════════════════ */
+function init() {
+  buildCourtDropdowns();
+  buildGridDateNav();
+  buildCallDateNav();
+  buildTabNav();
+  startClock();
+  if(S.fbReady) loadData();
+}
+
+/* ══ CLOCK ══════════════════════════════════════ */
+function startClock() {
+  function tick() {
+    const now=new Date();
+    $('topDate').textContent = `${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+    $('tbClock').textContent = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    checkTentativeExpiry();
+  }
+  tick(); setInterval(tick,30000);
+}
+
+/* ══ TABS ════════════════════════════════════════ */
+function buildTabNav() {
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      $('tab-'+btn.dataset.tab).classList.add('active');
+      if(btn.dataset.tab==='grid')   renderGrid();
+      if(btn.dataset.tab==='cash')   renderCashRegister();
+      if(btn.dataset.tab==='call')   renderTentativeList();
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+}
+
+/* ══ COURT DROPDOWNS ════════════════════════════ */
+function buildCourtDropdowns() {
+  ['qCourt','cCourt'].forEach(id=>{
+    const sel=$( id );
+    sel.innerHTML='<option value="">— Select court —</option>';
+    COURTS.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c.id; o.textContent=`${c.icon} ${c.name} — ₹${c.price60}/hr`;
+      sel.appendChild(o);
+    });
+  });
+
+  // Quick booking court change
+  $('qCourt').addEventListener('change', ()=>{
+    const c = COURTS.find(x=>x.id===$('qCourt').value);
+    S.qCourt = c||null; S.qSlot=null;
+    buildDurSelect('qDur', c);
+    updateBasePrice('q');
+    if(c) loadQuickSlots();
+    else { $('qSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:12px">Select a court to see slots</div>'; }
+  });
+  $('qDur').addEventListener('change', ()=>{
+    S.qSlot=null; updateBasePrice('q');
+    if(S.qCourt) loadQuickSlots();
+  });
+
+  // Call booking court change
+  $('cCourt').addEventListener('change', ()=>{
+    const c = COURTS.find(x=>x.id===$('cCourt').value);
+    S.cCourt = c||null; S.cSlot=null;
+    buildDurSelect('cDur', c);
+    updateBasePrice('c');
+    if(c&&S.cDate) loadCallSlots();
+  });
+  $('cDur').addEventListener('change', ()=>{
+    S.cSlot=null; updateBasePrice('c');
+    if(S.cCourt&&S.cDate) loadCallSlots();
+  });
+}
+
+function buildDurSelect(selId, court) {
+  const sel=$(selId); sel.innerHTML='';
+  if(!court){ sel.innerHTML='<option value="60">60 minutes</option>'; return; }
+  court.durations.forEach(d=>{
+    const o=document.createElement('option');
+    o.value=d; o.textContent=`${d} minutes`;
+    sel.appendChild(o);
+  });
+}
+
+function getPrice(court, dur) {
+  if(!court) return 0;
+  return dur===30 ? (court.price30||court.price60) : court.price60;
+}
+
+function updateBasePrice(prefix) {
+  const court = prefix==='q' ? S.qCourt : S.cCourt;
+  const dur   = parseInt($(prefix+'Dur').value)||60;
+  const price = getPrice(court, dur);
+  const amtEl = $(prefix+'Amount');
+  if(price) {
+    amtEl.value = price;
+    if(prefix==='q') $('qBasePrice').textContent = `Standard rate: ₹${price}`;
+  }
+}
+
+/* ══ PAYMENT MODE ═══════════════════════════════ */
+document.querySelectorAll('#qPayMode .pm-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#qPayMode .pm-btn').forEach(b=>b.classList.remove('sel'));
+    btn.classList.add('sel');
+    S.qPayMode = btn.dataset.pm;
+    $('upiRefWrap').style.display = S.qPayMode==='UPI' ? 'flex' : 'none';
+  });
+});
+
+/* ══ PHONE GUARD ════════════════════════════════ */
+['qPhone','cPhone'].forEach(id=>{
+  const el=$(id);
+  el.addEventListener('input',()=>{ el.value=el.value.replace(/[^0-9]/g,'').slice(0,10); });
+  el.addEventListener('keydown',e=>{ if(!e.key||e.key==='Unidentified')return; const ok=['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Enter','Home','End']; if(!ok.includes(e.key)&&!/^[0-9]$/.test(e.key))e.preventDefault(); });
+  el.addEventListener('paste',e=>{ e.preventDefault(); el.value=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,10); });
+});
+['qName','cName'].forEach(id=>{ $(id).addEventListener('input',()=>{ $(id).value=$(id).value.replace(/[^a-zA-Z\u00C0-\u024F\s\-'.]/g,''); }); });
+
+/* ══ AMOUNT OVERRIDE (discount detection) ═══════ */
+$('qAmount').addEventListener('input',()=>{
+  const court=S.qCourt; const dur=parseInt($('qDur').value)||60;
+  const base=getPrice(court,dur); const entered=parseFloat($('qAmount').value)||0;
+  const note=$('qDiscountNote');
+  if(court&&entered>0&&entered<base){
+    const disc=base-entered; const pct=Math.round(disc/base*100);
+    note.textContent=`⚠️ Discount of ₹${disc} (${pct}%) — reason required`;
+    note.style.display='block';
+    $('qDiscReason').style.borderColor='var(--goldb)';
+  } else { note.style.display='none'; $('qDiscReason').style.borderColor=''; }
+});
+
+/* ══ LOAD DATA ══════════════════════════════════ */
+async function loadData() {
+  if(!window.__mgDb) return;
+  const { db, collection, getDocs } = window.__mgDb;
+  try {
+    const snap = await getDocs(collection(db,'court_bookings'));
+    S.bookings = [];
+    let cashToday=0, bookingsToday=0;
+    const todayStart=new Date(); todayStart.setHours(0,0,0,0);
+    snap.forEach(d=>{ const data={id:d.id,...d.data()}; S.bookings.push(data); });
+    S.bookings.forEach(b=>{
+      if((b.createdAt||0)>=todayStart.getTime()&&b.bookingSource==='Manager/Walk-in'&&b.status==='Confirmed'){
+        if(b.paymentMode==='Cash') cashToday+=b.amount||0;
+        bookingsToday++;
+      }
+    });
+    $('tbCash').textContent  = '₹'+cashToday.toLocaleString('en-IN');
+    $('tbBookings').textContent = bookingsToday;
+    S.myBookings = S.bookings.filter(b=>b.bookingSource==='Manager/Walk-in'&&(b.createdAt||0)>=todayStart.getTime());
+    renderMyBookings();
+    renderGrid();
+    renderCashRegister();
+    renderTentativeList();
+  } catch(e){ toast('Load error: '+e.message,'err'); }
+}
+
+$('btnRefresh').addEventListener('click', ()=>{ loadData(); toast('Refreshed','info'); });
+
+/* ══ QUICK SLOTS ════════════════════════════════ */
+async function loadQuickSlots() {
+  const c=S.qCourt; if(!c) return;
+  const dur=parseInt($('qDur').value)||60;
+  $('qSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:10px">Loading…</div>';
+  S.qSlot=null;
+
+  const dateStr=S.qDate.toISOString().split('T')[0];
+  const booked=getBookedMinutes(c.id, dateStr);
+
+  const now=new Date(); const nowMin=now.getHours()*60+now.getMinutes();
+  const isToday=S.qDate.toDateString()===now.toDateString();
+  $('qSlots').innerHTML='';
+
+  let any=false;
+  for(let sm=6*60;sm+dur<=20*60+31;sm+=30){
+    if(sm>20*60+30) break;
+    const endMin=sm+dur;
+    const blocked=[...Array(dur).keys()].some(i=>booked.has(sm+i));
+    const past=isToday&&sm<nowMin+10;
+    if(blocked||past) continue;
+    any=true;
+    const btn=document.createElement('div');
+    btn.className='sm-slot'; btn.dataset.sm=sm;
+    btn.innerHTML=`<div class="smt">${addMin(sm)}</div><div class="sme">→${addMin(endMin)}</div>`;
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('#qSlots .sm-slot').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      S.qSlot={time:addMin(sm),end:addMin(endMin),startMin:sm};
+    });
+    $('qSlots').appendChild(btn);
+  }
+  if(!any) $('qSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:10px">No available slots for today</div>';
+}
+
+/* ══ CALL BOOKING SLOTS ════════════════════════ */
+async function loadCallSlots() {
+  const c=S.cCourt; if(!c||!S.cDate) return;
+  const dur=parseInt($('cDur').value)||60;
+  $('cSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:10px">Loading…</div>';
+  S.cSlot=null;
+
+  const dateStr=S.cDate.toISOString().split('T')[0];
+  const booked=getBookedMinutes(c.id, dateStr);
+  const now=new Date(); const nowMin=now.getHours()*60+now.getMinutes();
+  const isToday=S.cDate.toDateString()===now.toDateString();
+
+  $('cSlots').innerHTML='';
+  let any=false;
+  for(let sm=6*60;sm+dur<=20*60+31;sm+=30){
+    if(sm>20*60+30) break;
+    const blocked=[...Array(dur).keys()].some(i=>booked.has(sm+i));
+    const past=isToday&&sm<nowMin+10;
+    if(blocked||past) continue;
+    any=true;
+    const btn=document.createElement('div');
+    btn.className='sm-slot'; btn.dataset.sm=sm;
+    btn.innerHTML=`<div class="smt">${addMin(sm)}</div><div class="sme">→${addMin(sm+dur)}</div>`;
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('#cSlots .sm-slot').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      S.cSlot={time:addMin(sm),end:addMin(sm+dur),startMin:sm};
+      $('cAmount').value=getPrice(c,dur);
+    });
+    $('cSlots').appendChild(btn);
+  }
+  if(!any) $('cSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:10px">No available slots for this date</div>';
+}
+
+/* Helper: get booked minute-sets for a court on a date */
+function getBookedMinutes(courtId, dateStr) {
+  const s=new Set();
+  S.bookings.forEach(b=>{
+    if(b.courtId!==courtId||b.date!==dateStr) return;
+    if(['Released','Cancelled'].includes(b.status)) return;
+    const [h,m]=b.timeSlot.split(':').map(Number);
+    const start=h*60+m;
+    for(let i=0;i<b.duration;i++) s.add(start+i);
+  });
+  return s;
+}
+
+/* ══ CONFIRM QUICK BOOKING ═══════════════════════ */
+$('btnQuickBook').addEventListener('click', async ()=>{
+  if(!S.qCourt){ toast('Select a court first','err'); $('qCourt').focus(); return; }
+  if(!S.qSlot) { toast('Tap a time slot to select it','err'); $('qSlots').scrollIntoView({behavior:'smooth',block:'nearest'}); return; } // [FIXED] better feedback + scroll to slots
+  const name  = $('qName').value.trim();
+  const phone = $('qPhone').value.replace(/\D/g,'');
+  const amt   = parseFloat($('qAmount').value)||0;
+  if(!name||name.length<2){ toast('Enter customer name','err'); $('qName').classList.add('err'); return; }
+  if(!/^[6-9]\d{9}$/.test(phone)){ toast('Enter valid 10-digit phone','err'); $('qPhone').classList.add('err'); return; }
+  if(amt<=0){ toast('Enter amount received','err'); return; }
+
+  const dur      = parseInt($('qDur').value)||60;
+  const base     = getPrice(S.qCourt, dur);
+  const disc     = base - amt;
+  const discReas = $('qDiscReason').value.trim();
+  if(disc>0&&!discReas){ toast('Please enter a discount reason','err'); $('qDiscReason').style.borderColor='var(--red)'; return; }
+
+  const upiRef = S.qPayMode==='UPI' ? $('qUpiRef').value.trim() : '';
+  if(S.qPayMode==='UPI'&&!upiRef){ toast('Enter UPI reference number','err'); return; }
+
+  const btn=$('btnQuickBook'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Booking…';
+
+  const dateStr=S.qDate.toISOString().split('T')[0];
+  const d=new Date(S.qDate);
+  const dateStr2=`${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+
+  try {
+    const {db,collection,addDoc}=window.__mgDb;
+    const booking = {
+      name:san(name), phone, court:S.qCourt.name, courtId:S.qCourt.id,
+      date:dateStr, dateStr:dateStr2,
+      timeSlot:S.qSlot.time, slotEnd:S.qSlot.end, duration:dur,
+      amount:amt, baseAmount:base,
+      discount:disc>0?disc:0, discountReason:san(discReas),
+      paymentMode:S.qPayMode, upiRef:san(upiRef),
+      players:parseInt($('qPlayers').value)||2,
+      notes:san($('qNotes').value),
+      bookingSource:'Manager/Walk-in',
+      status:'Confirmed', managerName:'Manager',
+      createdAt:Date.now(),
+    };
+    await addDoc(collection(db,'court_bookings'), booking);
+
+    // WhatsApp
+    await sendWhatsApp('+91'+phone,
+      `✅ Court Booked - Mansa Sports Park\nName: ${name}\nCourt: ${S.qCourt.name}\nDate: ${dateStr2}\nTime: ${S.qSlot.time} – ${S.qSlot.end}\nAmount: ₹${amt}\nPayment: ${S.qPayMode}\nBooked by: Manager\nSee you at the park!`
+    );
+
+    toast(`✅ ${name} booked for ${S.qSlot.time}!`,'ok');
+    await loadData();
+    resetQuickForm();
+  } catch(e){ toast('Failed: '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.innerHTML='✅ Confirm Booking'; }
+});
+
+function resetQuickForm() {
+  $('qCourt').value=''; $('qName').value=''; $('qPhone').value='';
+  $('qPlayers').value='2'; $('qAmount').value=''; $('qDiscReason').value='';
+  $('qNotes').value=''; $('qUpiRef').value=''; $('qBasePrice').textContent='';
+  $('qDiscountNote').style.display='none';
+  S.qCourt=null; S.qSlot=null; S.qPayMode='Cash';
+  document.querySelectorAll('#qPayMode .pm-btn').forEach((b,i)=>b.classList.toggle('sel',i===0));
+  $('upiRefWrap').style.display='none';
+  $('qSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:12px">Select a court to see slots</div>';
+}
+
+/* ══ CALL BOOKING ════════════════════════════════ */
+$('btnCallBook').addEventListener('click', async ()=>{
+  if(!S.cCourt){ toast('Select a court','err'); return; }
+  if(!S.cSlot) { toast('Select a time slot','err'); return; }
+  if(!S.cDate) { toast('Select a date','err'); return; }
+  const name  = $('cName').value.trim();
+  const phone = $('cPhone').value.replace(/\D/g,'');
+  if(!name||name.length<2){ toast('Enter customer name','err'); return; }
+  if(!/^[6-9]\d{9}$/.test(phone)){ toast('Enter valid phone','err'); return; }
+  const dur   = parseInt($('cDur').value)||60;
+  const amt   = parseFloat($('cAmount').value)||getPrice(S.cCourt,dur);
+  const dateStr=S.cDate.toISOString().split('T')[0];
+  const dateStr2=`${DAYS[S.cDate.getDay()]}, ${fmtDate(S.cDate)}`;
+
+  const btn=$('btnCallBook'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Holding…';
+
+  try {
+    const {db,collection,addDoc}=window.__mgDb;
+    const expiry=new Date(Date.now()+2*60*60*1000); // 2 hours
+    const payLink=`${location.origin}/mansa-sports-park/book.html`;
+    await addDoc(collection(db,'court_bookings'),{
+      name:san(name), phone, court:S.cCourt.name, courtId:S.cCourt.id,
+      date:dateStr, dateStr:dateStr2,
+      timeSlot:S.cSlot.time, slotEnd:S.cSlot.end, duration:dur,
+      amount:amt, paymentMode:'Pending',
+      players:parseInt($('cPlayers').value)||2,
+      notes:san($('cNotes').value),
+      bookingSource:'Manager/Call',
+      status:'Tentative',
+      tentativeExpiry:expiry.toISOString(),
+      tentativeExpiryTs:expiry.getTime(),
+      managerName:'Manager',
+      createdAt:Date.now(),
+    });
+    await sendWhatsApp('+91'+phone,
+      `⏰ Court Slot Reserved - Mansa Sports Park\nName: ${name}\nCourt: ${S.cCourt.name}\nDate: ${dateStr2}\nTime: ${S.cSlot.time} – ${S.cSlot.end}\nAmount: ₹${amt}\n\n⚠️ This slot is held for 2 hours. Complete payment here:\n${payLink}\n\nSlot auto-releases if unpaid by ${fmtTime(expiry)}.`
+    );
+    toast(`📞 Slot held tentatively for ${name} until ${fmtTime(expiry)}`,'ok');
+    await loadData();
+    resetCallForm();
+  } catch(e){ toast('Failed: '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.innerHTML='📞 Hold Slot (Tentative)'; }
+});
+
+function resetCallForm() {
+  $('cCourt').value=''; $('cName').value=''; $('cPhone').value='';
+  $('cPlayers').value='2'; $('cAmount').value=''; $('cNotes').value='';
+  S.cCourt=null; S.cSlot=null;
+  $('cSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:12px">Select a court and date to see slots</div>';
+  document.querySelectorAll('#callDateNav .dnb').forEach(b=>b.classList.remove('active'));
+}
+
+/* ══ CHECK TENTATIVE EXPIRY ═════════════════════ */
+async function checkTentativeExpiry() {
+  if(!window.__mgDb) return;
+  const {db,doc,updateDoc}=window.__mgDb;
+  const now=Date.now();
+  const expired=S.bookings.filter(b=>b.status==='Tentative'&&b.tentativeExpiryTs&&b.tentativeExpiryTs<now);
+  for(const b of expired){
+    try{ await updateDoc(doc(db,'court_bookings',b.id),{status:'Released',autoReleasedAt:now}); }
+    catch(e){ console.warn('Auto-release failed',e); }
+  }
+  if(expired.length){ await loadData(); toast(`${expired.length} tentative slot(s) auto-released`,'info'); }
+}
+
+/* ══ DATE NAVS ══════════════════════════════════ */
+function buildGridDateNav() {
+  const nav=$('gridDateNav'); nav.innerHTML='';
+  const today=new Date(); today.setHours(0,0,0,0);
+  for(let i=-1;i<=3;i++){
+    const d=new Date(today); d.setDate(today.getDate()+i);
+    const btn=document.createElement('button'); btn.className='dnb'+(i===0?' active':'');
+    btn.textContent=i===0?'Today':i===-1?'Yesterday':`${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+    btn.addEventListener('click',()=>{
+      nav.querySelectorAll('.dnb').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); S.gridDate=d; renderGrid();
+    });
+    nav.appendChild(btn);
+  }
+}
+
+function buildCallDateNav() {
+  const nav=$('callDateNav'); nav.innerHTML='';
+  const today=new Date(); today.setHours(0,0,0,0);
+  for(let i=0;i<=6;i++){
+    const d=new Date(today); d.setDate(today.getDate()+i);
+    const btn=document.createElement('button'); btn.className='dnb';
+    btn.textContent=i===0?'Today':`${DAYS[d.getDay()]} ${d.getDate()}`;
+    btn.addEventListener('click',()=>{
+      nav.querySelectorAll('.dnb').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); S.cDate=d;
+      if(S.cCourt) loadCallSlots();
+    });
+    nav.appendChild(btn);
+  }
+}
+
+/* ══ COURT GRID ══════════════════════════════════ */
+function renderGrid() {
+  const head=$('mgGridHead'); const body=$('mgGridBody');
+  head.innerHTML=''; body.innerHTML='';
+  const hr=document.createElement('tr');
+  const th0=document.createElement('th'); th0.textContent='Time'; hr.appendChild(th0);
+  COURTS.forEach(c=>{ const th=document.createElement('th'); th.textContent=c.name; hr.appendChild(th); });
+  head.appendChild(hr);
+  const now=new Date(); const isToday=S.gridDate.toDateString()===now.toDateString();
+  const nowMin=now.getHours()*60+now.getMinutes();
+  const dateStr=S.gridDate.toISOString().split('T')[0];
+  for(let sm=6*60;sm<21*60;sm+=30){
+    const row=document.createElement('tr');
+    const td0=document.createElement('td'); td0.textContent=addMin(sm); row.appendChild(td0);
+    COURTS.forEach(c=>{
+      const td=document.createElement('td');
+      td.appendChild(buildGridCell(c,sm,dateStr,nowMin,isToday));
+      row.appendChild(td);
+    });
+    body.appendChild(row);
+  }
+}
+
+function buildGridCell(court, sm, dateStr, nowMin, isToday) {
+  const div=document.createElement('div');
+  const b=S.bookings.find(bk=>{
+    if(bk.courtId!==court.id||bk.date!==dateStr) return false;
+    if(['Released'].includes(bk.status)) return false;
+    const [h,m]=bk.timeSlot.split(':').map(Number);
+    const bs=h*60+m; const be=bs+(bk.duration||60);
+    return sm>=bs&&sm<be;
+  });
+  const isPast=isToday&&sm<nowMin;
+  if(b){
+    const [bh,bm]=b.timeSlot.split(':').map(Number);
+    const bs=bh*60+bm; const be=bs+(b.duration||60); const ge=be+15;
+    const isGrace=isToday&&nowMin>=be&&nowMin<ge;
+    const isTent=b.status==='Tentative';
+    div.className=`slot-cell ${isTent?'tent':isGrace?'grace':'booked'}`;
+    if(sm===bs){
+      const src=b.bookingSource==='Manager/Walk-in'?'MGR':b.bookingSource==='Manager/Call'?'CALL':'WEB';
+      const scName=(b.name||'').replace(/[<>&"]/g,''); // [FIXED] XSS: sanitize name in grid cell
+      div.innerHTML=`<div class="sc-name">${scName}</div><div class="sc-time">${b.timeSlot}–${b.slotEnd}</div><div class="sc-src">${src}${b.paymentMode==='Cash'?' 💵':b.paymentMode==='UPI'?' 📱':' 🌐'}</div>`;
+    } else {
+      div.innerHTML='<div class="sc-time" style="text-align:center;font-size:9px">▓</div>';
+    }
+    div.addEventListener('click',()=>openBookingModal(b,isGrace,isTent));
+  } else if(isPast){
+    div.className='slot-cell past';
+    div.innerHTML='<div class="sc-time" style="text-align:center;font-size:10px">—</div>';
+  } else {
+    div.className='slot-cell avail';
+    div.innerHTML='<div class="sc-name" style="font-size:10px">Free</div>';
+  }
+  return div;
+}
+
+/* ══ GRID MODAL ══════════════════════════════════ */
+function openBookingModal(b, isGrace, isTent) {
+  const now=new Date(); const nowMin=now.getHours()*60+now.getMinutes();
+  const [sh,sm_]=b.timeSlot.split(':').map(Number);
+  const slotEndMin=sh*60+sm_+(b.duration||60);
+  const isAfter=nowMin>slotEndMin;
+  const slotDate=new Date(b.date);
+  const slotStart=new Date(slotDate); slotStart.setHours(sh,sm_,0,0);
+  const diffHrs=(slotStart-now)/3600000;
+  const srcTag=b.bookingSource==='Manager/Walk-in'?`<span class="src-tag src-manager">Manager</span>`:
+    b.bookingSource==='Manager/Call'?`<span class="src-tag src-call">Call Booking</span>`:
+    `<span class="src-tag src-online">Online</span>`;
+
+  $('modalTitle').textContent=`${b.court} — ${b.timeSlot}`;
+  $('modalBody').innerHTML=`
+    <div class="dr"><span class="dk">Customer</span><span class="dv">${b.name}</span></div>
+    <div class="dr"><span class="dk">Phone</span><span class="dv">+91 ${b.phone||'—'}</span></div>
+    <div class="dr"><span class="dk">Date</span><span class="dv">${b.dateStr||b.date}</span></div>
+    <div class="dr"><span class="dk">Time</span><span class="dv">${b.timeSlot} – ${b.slotEnd}</span></div>
+    <div class="dr"><span class="dk">Duration</span><span class="dv">${b.duration} min</span></div>
+    <div class="dr"><span class="dk">Amount</span><span class="dv">₹${b.amount}${b.discount>0?` <span style="color:var(--red);font-size:11px">(₹${b.discount} disc.)</span>`:''}</span></div>
+    <div class="dr"><span class="dk">Payment</span><span class="dv">${b.paymentMode||'Online'}${b.upiRef?` · ${b.upiRef}`:''}</span></div>
+    <div class="dr"><span class="dk">Players</span><span class="dv">${b.players||'—'}</span></div>
+    <div class="dr"><span class="dk">Source</span><span class="dv">${srcTag}</span></div>
+    <div class="dr"><span class="dk">Status</span><span class="dv">${isTent?'⏰ Tentative':isGrace?'⚠️ Grace Period':'✅ Confirmed'}</span></div>
+    ${b.discount>0?`<div class="dr"><span class="dk">Disc. Reason</span><span class="dv">${b.discountReason||'—'}</span></div>`:''}
+    ${b.notes?`<div class="dr"><span class="dk">Notes</span><span class="dv">${b.notes}</span></div>`:''}
+    ${isTent&&b.tentativeExpiry?`<div class="dr"><span class="dk">Expires</span><span class="dv" style="color:var(--tent)">${new Date(b.tentativeExpiry).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span></div>`:''}
+    <div class="modal-note-area">
+      <label class="flbl" style="margin-bottom:5px;display:block">Add / Update Note</label>
+      <textarea class="ftxt" id="modalNoteInput" rows="2" placeholder="Add a note…" maxlength="300">${b.notes||''}</textarea>
+    </div>`;
+
+  const acts=$('modalActs'); acts.innerHTML='';
+  const mkBtn=(label,cls,fn)=>{ const b=document.createElement('button'); b.className=`btn ${cls} btn-sm`; b.textContent=label; b.style.padding='11px 16px'; b.addEventListener('click',fn); acts.appendChild(b); };
+
+  mkBtn('💾 Save Note','btn-outline btn-sm',()=>saveNote(b));
+  if((isGrace||isAfter)&&!isTent) mkBtn('❌ Mark No-show','btn-red btn-sm',()=>markNoshow(b));
+  if(isTent) mkBtn('✅ Confirm (Cash received)','btn-primary btn-sm',()=>confirmTentative(b));
+  mkBtn('🚫 Cancel Booking','btn-ghost btn-sm',()=>cancelBooking(b,diffHrs));
+  mkBtn('Close','btn-ghost btn-sm',closeModal);
+
+  $('overlay').classList.remove('hidden');
+}
+
+function closeModal(){ $('overlay').classList.add('hidden'); }
+$('overlay').addEventListener('click', e=>{ if(e.target===$('overlay'))closeModal(); });
+window.closeModal=closeModal;
+
+async function saveNote(b) {
+  const note=san($('modalNoteInput').value);
+  try{
+    const {db,doc,updateDoc}=window.__mgDb;
+    await updateDoc(doc(db,'court_bookings',b.id),{notes:note,noteUpdatedAt:Date.now()});
+    toast('Note saved','ok'); closeModal(); await loadData();
+  }catch(e){toast('Failed: '+e.message,'err');}
+}
+
+async function markNoshow(b) {
+  if(!confirm(`Mark ${b.name} as no-show? Amount ₹${b.amount} is forfeited.`)) return;
+  try{
+    const {db,doc,updateDoc}=window.__mgDb;
+    await updateDoc(doc(db,'court_bookings',b.id),{status:'No-show',noshowAt:Date.now(),noshowBy:'Manager'});
+    toast('Marked as no-show','ok'); closeModal(); await loadData();
+  }catch(e){toast('Failed: '+e.message,'err');}
+}
+
+async function confirmTentative(b) {
+  try{
+    const {db,doc,updateDoc}=window.__mgDb;
+    await updateDoc(doc(db,'court_bookings',b.id),{status:'Confirmed',paymentMode:'Cash',confirmedAt:Date.now()});
+    toast('Booking confirmed ✅','ok'); closeModal(); await loadData();
+  }catch(e){toast('Failed: '+e.message,'err');}
+}
+
+async function cancelBooking(b, diffHrs) {
+  const reason=prompt(`Cancel booking for ${b.name}?\nEnter reason for cancellation:`);
+  if(reason===null) return;
+  if(!reason.trim()){ toast('Reason required to cancel','err'); return; }
+  const refund=diffHrs>=4;
+  try{
+    const {db,doc,updateDoc}=window.__mgDb;
+    await updateDoc(doc(db,'court_bookings',b.id),{
+      status:'Cancelled',cancelledAt:Date.now(),cancelReason:san(reason),
+      refundEligible:refund,refundAmount:refund?b.amount:0,cancelledBy:'Manager'
+    });
+    toast(refund?`Cancelled · Process refund of ₹${b.amount}`:'Cancelled · No refund applicable','ok');
+    closeModal(); await loadData();
+  }catch(e){toast('Failed: '+e.message,'err');}
+}
+
+/* ══ CASH REGISTER ═══════════════════════════════ */
+function renderCashRegister() {
+  const todayStart=new Date(); todayStart.setHours(0,0,0,0);
+  const mgrBookings=S.bookings.filter(b=>b.bookingSource==='Manager/Walk-in'&&(b.createdAt||0)>=todayStart.getTime()&&b.status==='Confirmed');
+  const cashEntries=mgrBookings.filter(b=>b.paymentMode==='Cash');
+  const upiEntries =mgrBookings.filter(b=>b.paymentMode==='UPI');
+  const cashTotal  =cashEntries.reduce((s,b)=>s+(b.amount||0),0);
+  const upiTotal   =upiEntries.reduce((s,b)=>s+(b.amount||0),0);
+
+  $('crCashTotal').textContent = '₹'+cashTotal.toLocaleString('en-IN');
+  $('crUpiTotal').textContent  = '₹'+upiTotal.toLocaleString('en-IN');
+  $('crBookCount').textContent = mgrBookings.length;
+  $('tbCash').textContent      = '₹'+cashTotal.toLocaleString('en-IN');
+
+  const list=$('cashList');
+  if(!cashEntries.length){ list.innerHTML='<div class="empty-state"><div class="ei">💵</div><p>No cash bookings today</p></div>'; return; }
+  list.innerHTML=cashEntries.map(b=>{
+    const t=new Date(b.createdAt); const tStr=t.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    const crCourt=(b.court||'').replace(/[<>&"]/g,''); const crName=(b.name||'').replace(/[<>&"]/g,''); // [FIXED] XSS
+    return `<div class="cash-row"><span class="cr-time">${tStr}</span><span class="cr-court">${crCourt}<br><span style="font-size:10px;font-weight:500;color:var(--muted)">${b.timeSlot}–${b.slotEnd}</span></span><span class="cr-cust">${crName}<br><span style="font-size:10px">+91 ${b.phone}</span></span><span class="cr-amt">₹${b.amount}</span></div>`;
+  }).join('');
+
+  // Submit handler
+  $('btnSubmitCash').onclick=async()=>{
+    const submitted=parseFloat($('submitCashAmt').value)||0;
+    if(submitted<=0){ toast('Enter amount to submit','err'); return; }
+    const diff=cashTotal-submitted;
+    const flag=$('diffFlag');
+    if(Math.abs(diff)>0){
+      flag.textContent=diff>0?`⚠️ Short by ₹${diff} — ${diff} missing from expected ₹${cashTotal}`:`ℹ️ Over by ₹${Math.abs(diff)} — submitted more than expected`;
+      flag.classList.add('show');
+    } else {
+      flag.classList.remove('show');
+    }
+    try{
+      const {db,collection,addDoc}=window.__mgDb;
+      await addDoc(collection(db,'cash_submissions'),{
+        managerName:'Manager', date:new Date().toISOString().split('T')[0],
+        expectedCash:cashTotal, submittedCash:submitted,
+        difference:diff, mgrBookings:mgrBookings.length,
+        submittedAt:Date.now()
+      });
+      toast(Math.abs(diff)===0?'Cash submitted — balanced ✅':`Cash submitted — ₹${Math.abs(diff)} difference flagged to owner`,'ok');
+    }catch(e){toast('Failed: '+e.message,'err');}
+  };
+}
+
+/* ══ MY BOOKINGS LIST ════════════════════════════ */
+function renderMyBookings() {
+  const list=$('myBookingsList');
+  if(!S.myBookings.length){ list.innerHTML='<div class="empty-state"><div class="ei">📋</div><p>No bookings made yet today</p></div>'; return; }
+  list.innerHTML=S.myBookings.slice().reverse().map(b=>{
+    const src=b.bookingSource==='Manager/Call'?'📞 Call':'🚶 Walk-in';
+    const pm=b.paymentMode==='Cash'?'💵':b.paymentMode==='UPI'?'📱':'🌐';
+    return `<div class="cash-row">
+      <span class="cr-time">${new Date(b.createdAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span>
+      <span class="cr-court">${b.court}<br><span style="font-size:10px;color:var(--muted)">${b.timeSlot}–${b.slotEnd} · ${b.date}</span></span>
+      <span class="cr-cust">${b.name}<br><span style="font-size:10px">${src} · ${pm} ₹${b.amount}</span></span>
+      <span class="cr-amt" style="font-size:12px;color:${b.status==='Tentative'?'var(--tent)':b.status==='Cancelled'?'var(--red)':'var(--g2)'}">${b.status}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ══ TENTATIVE LIST ══════════════════════════════ */
+function renderTentativeList() {
+  const list=$('tentativeList');
+  const tents=S.bookings.filter(b=>b.status==='Tentative');
+  if(!tents.length){ list.innerHTML='<div class="empty-state"><div class="ei">⏰</div><p>No pending tentative bookings</p></div>'; return; }
+  list.innerHTML=tents.map(b=>{
+    const exp=b.tentativeExpiry?new Date(b.tentativeExpiry):null;
+    const rem=exp?Math.max(0,Math.round((exp-Date.now())/60000)):0;
+    const remStr=rem>0?`${Math.floor(rem/60)}h ${rem%60}m remaining`:'EXPIRED';
+    return `<div class="cash-row">
+      <span class="cr-time" style="color:var(--tent);min-width:56px">${b.timeSlot}</span>
+      <span class="cr-court">${(b.court||'').replace(/[<>&"]/g,'')} · ${(b.dateStr||b.date||'').replace(/[<>&"]/g,'')}<br> <!-- [FIXED] XSS --><span style="font-size:10px;color:var(--muted)">${b.timeSlot}–${b.slotEnd}</span></span>
+      <span class="cr-cust">${b.name}<br><span style="font-size:10px">+91 ${b.phone}</span></span>
+      <span class="cr-amt" style="font-size:11px;color:var(--tent);text-align:right">⏰ ${remStr}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ══ WHATSAPP ════════════════════════════════ */
+async function sendWhatsApp(to, body) {
+  const url=window.__mgCfg?.TWILIO_FN_URL;
+  if(!url||url==='YOUR_TWILIO_CLOUD_FUNCTION_URL') return;
+  try{ await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,body})}); }
+  catch(e){ console.warn('WhatsApp failed',e); }
+}
+</script>
+</body>
+</html>

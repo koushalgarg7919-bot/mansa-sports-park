@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Mansa Sports Park — Staff member enrollment portal.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mansa Sports Park — Staff Enrollment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:      #1A6B3C;
+  --green-mid:  #23904F;
+  --green-lite: #7ED348;
+  --green-glow: #D4F5C0;
+  --purple:     #7C3AED;
+  --purple-lite:#EDE9FE;
+  --bg:         #F0F7F3;
+  --surface:    #FFFFFF;
+  --text:       #0D1F16;
+  --muted:      #5A7067;
+  --border:     #C8E0D2;
+  --error:      #DC2626;
+  --radius:     14px;
+  --radius-lg:  22px;
+  --shadow:     0 4px 24px rgba(26,107,60,0.10);
+  --font:       'Inter', system-ui, sans-serif;
+}
+
+html, body {
+  min-height: 100vh;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── LOGIN SCREEN ─────────────────────────────────────────────────────── */
+#loginScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(145deg, #0D3320 0%, #1A6B3C 50%, #23904F 100%);
+}
+
+.login-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+  text-align: center;
+}
+
+.login-badge {
+  width: 72px; height: 72px;
+  background: var(--green-glow);
+  border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+  margin: 0 auto 20px;
+  border: 2px solid rgba(26,107,60,0.15);
+}
+
+.login-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--green);
+  margin-bottom: 4px;
+  letter-spacing: -0.4px;
+}
+
+.login-sub {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+
+.login-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--green);
+  text-align: left;
+  margin-bottom: 7px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 15px 18px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.login-input:focus {
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 4px rgba(35,144,79,0.12);
+}
+.login-input.shake { animation: shake 0.4s ease; border-color: var(--error); }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%,60%  { transform: translateX(-8px); }
+  40%,80%  { transform: translateX(8px); }
+}
+
+.login-err {
+  font-size: 12.5px;
+  color: var(--error);
+  font-weight: 600;
+  margin-bottom: 18px;
+  min-height: 18px;
+  text-align: left;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 17px;
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-mid) 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 4px 16px rgba(26,107,60,0.30);
+}
+.btn-login:active { transform: scale(0.98); }
+
+/* ── MAIN APP ─────────────────────────────────────────────────────────── */
+#appScreen { display: none; min-height: 100vh; }
+
+/* Top Bar */
+.topbar {
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-mid) 100%);
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-icon { font-size: 24px; }
+.topbar-title { color: #fff; font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+.topbar-sub   { color: rgba(255,255,255,0.65); font-size: 12px; font-weight: 500; }
+
+/* Stats Row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  padding: 20px 24px 0;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.stat-num  { font-size: 32px; font-weight: 900; color: var(--green); letter-spacing: -1px; line-height: 1; }
+.stat-label{ font-size: 11.5px; font-weight: 600; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+/* [FIXED] removed orphaned .stat-card.purple rule — purple wristband removed */
+
+/* Main layout */
+.main {
+  max-width: 960px;
+  margin: 20px auto;
+  padding: 0 24px 40px;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .main { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: repeat(3,1fr); gap: 10px; padding: 16px 16px 0; }
+  .topbar { padding: 0 16px; }
+}
+
+/* ── FORM CARD ────────────────────────────────────────────────────────── */
+.form-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.form-header {
+  background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.form-header-icon {
+  width: 40px; height: 40px;
+  background: var(--green-glow);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  border: 1px solid rgba(26,107,60,0.15);
+}
+.form-header-text h2 { font-size: 16px; font-weight: 800; color: var(--green); }
+.form-header-text p  { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+
+.form-body { padding: 24px 28px; }
+
+/* Fields */
+.field { margin-bottom: 18px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+
+.flabel {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--green);
+  margin-bottom: 7px;
+}
+
+.finput, .fselect {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.finput:focus, .fselect:focus {
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(35,144,79,0.12);
+  background: #fff;
+}
+.finput.error, .fselect.error { border-color: var(--error); }
+
+/* Select arrow */
+.select-wrap { position: relative; }
+.select-wrap::after {
+  content: '▾';
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); pointer-events: none; font-size: 14px;
+}
+.fselect { padding-right: 36px; cursor: pointer; }
+
+/* Phone row */
+.phone-prefix-box {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.phone-pfx {
+  padding: 13px 14px;
+  background: var(--green-glow);
+  border: 1.5px solid var(--border);
+  border-right: none;
+  border-radius: var(--radius) 0 0 var(--radius);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--green);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.phone-prefix-box .finput {
+  border-radius: 0 var(--radius) var(--radius) 0;
+  flex: 1;
+}
+
+/* ── CAMERA SECTION ───────────────────────────────────────────────────── */
+.camera-section {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.camera-placeholder {
+  padding: 28px 20px;
+  text-align: center;
+  background: var(--bg);
+}
+.camera-placeholder .cam-icon { font-size: 40px; margin-bottom: 8px; }
+.camera-placeholder p { font-size: 13px; color: var(--muted); font-weight: 500; }
+
+#enrollVideo {
+  width: 100%;
+  display: block;
+  min-height: 220px;
+  max-height: 300px;
+  object-fit: cover;
+  background: #000;
+}
+
+#enrollPreview {
+  width: 100%;
+  display: none;
+  border-radius: 0;
+  max-height: 260px;
+  object-fit: cover;
+}
+#enrollPreview.show { display: block; }
+
+#enrollCanvas { display: none; }
+
+.camera-controls {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  background: #f8fdf9;
+  border-top: 1px solid var(--border);
+}
+
+.btn-cam {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-cam:active { transform: scale(0.97); }
+.btn-cam-open   { background: var(--green-glow); color: var(--green); border: 1.5px solid rgba(26,107,60,0.20); }
+.btn-cam-shoot  { background: var(--green); color: #fff; display: none; }
+.btn-cam-shoot.show { display: flex; }
+.btn-cam-retake { background: #FEF2F2; color: var(--error); border: 1.5px solid #FECACA; display: none; }
+.btn-cam-retake.show { display: flex; }
+
+.photo-badge {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--green-glow);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green);
+}
+.photo-badge.show { display: flex; }
+
+/* ── ENROLL BUTTON ────────────────────────────────────────────────────── */
+.btn-enroll {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-lite) 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 6px 20px rgba(26,107,60,0.30);
+  letter-spacing: -0.2px;
+}
+.btn-enroll:active:not(:disabled) { transform: scale(0.98); }
+.btn-enroll:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── SUCCESS FLASH ────────────────────────────────────────────────────── */
+.success-flash {
+  display: none;
+  background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
+  border: 2px solid #4ADE80;
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-top: 14px;
+  text-align: center;
+}
+.success-flash.show { display: block; animation: popIn 0.4s cubic-bezier(.4,0,.2,1); }
+@keyframes popIn {
+  0%   { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+.success-flash .sf-icon { font-size: 32px; margin-bottom: 6px; }
+.success-flash .sf-msg  { font-size: 15px; font-weight: 700; color: #166534; }
+.success-flash .sf-sub  { font-size: 12.5px; color: #4B7C5A; margin-top: 3px; }
+
+/* ── SIDE PANEL ───────────────────────────────────────────────────────── */
+.side-panel { display: flex; flex-direction: column; gap: 16px; }
+
+/* Wristband info */
+.wristband-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+.wristband-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 14px; }
+.wristband-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--green-glow);
+  border-radius: 999px;
+  padding: 10px 16px;
+  margin-bottom: 10px;
+}
+.wristband-dot { width: 20px; height: 20px; border-radius: 50%; background: var(--green-mid); flex-shrink: 0; box-shadow: 0 2px 8px rgba(35,144,79,0.30); }
+.wristband-info { font-size: 14px; font-weight: 700; color: var(--green-dark); }
+.wristband-note { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* Recent enrollments */
+.recent-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.recent-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.recent-header h3 { font-size: 13px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.5px; }
+.recent-list { max-height: 420px; overflow-y: auto; }
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.recent-item:last-child { border-bottom: none; }
+.recent-item:hover { background: var(--bg); }
+.recent-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--green-lite);
+  flex-shrink: 0;
+  background: var(--green-glow);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  overflow: hidden;
+}
+.recent-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.recent-info { flex: 1; min-width: 0; }
+.recent-name { font-size: 13.5px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recent-meta { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.recent-badge {
+  background: var(--green-glow);
+  color: var(--green-dark);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.recent-empty {
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Logout */
+.btn-logout {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.75);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.btn-logout:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2.5px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #1A1A1A;
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  z-index: 9999;
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1), opacity 0.3s;
+  opacity: 0;
+  pointer-events: none;
+  max-width: 88vw;
+  text-align: center;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.err  { background: var(--error); }
+.toast.ok   { background: var(--green); }
+
+/* Field error msg */
+.ferr { font-size: 12px; color: var(--error); font-weight: 600; margin-top: 4px; display: none; }
+.ferr.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-badge">🏟️</div>
+    <div class="login-title">Staff Portal</div>
+    <div class="login-sub">Mansa Sports Park — Member Enrollment</div>
+
+    <label class="login-label" for="staffPass">Staff Password</label>
+    <input
+      type="password"
+      id="staffPass"
+      class="login-input"
+      placeholder="Enter password"
+      autocomplete="current-password"
+      maxlength="30"
+    >
+    <div class="login-err" id="loginErr"></div>
+    <button class="btn-login" id="btnLogin">🔐 Login</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════════════════════════════════════ -->
+<div id="appScreen">
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-icon">🏟️</div>
+      <div>
+        <div class="topbar-title">Mansa Sports Park</div>
+        <div class="topbar-sub">Society Member Enrollment</div>
+      </div>
+    </div>
+    <button class="btn-logout" id="btnLogout">Logout ↗</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="statToday">0</div>
+      <div class="stat-label">Enrolled Today</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statTotal">0</div>
+      <div class="stat-label">Total Members</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">🟢</div>
+      <div class="stat-label">Same Daily Band</div>
+    </div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="main">
+
+    <!-- ── ENROLLMENT FORM ─────────────────────────────────────────────── -->
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-header-icon">📋</div>
+        <div class="form-header-text">
+          <h2>New Member Enrollment</h2>
+          <p>Fill all fields and capture face photo</p>
+        </div>
+      </div>
+
+      <div class="form-body">
+
+        <!-- Name + House Number -->
+        <div class="field-row">
+          <div class="field" style="margin-bottom:0">
+            <label class="flabel" for="fName">Full Name</label>
+            <input type="text" id="fName" class="finput" placeholder="e.g. Rahul Sharma"
+              autocomplete="name" autocapitalize="words" autocorrect="off" maxlength="60">
+            <div class="ferr" id="fNameErr">Enter full name</div>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label class="flabel" for="fHouse">House Number</label>
+            <input type="text" id="fHouse" class="finput" placeholder="e.g. A-204"
+              autocapitalize="characters" autocorrect="off" maxlength="20">
+            <div class="ferr" id="fHouseErr">Enter house number</div>
+          </div>
+        </div>
+
+        <!-- Society -->
+        <div class="field" style="margin-top:18px;">
+          <label class="flabel" for="fSociety">Society Name</label>
+          <input type="text" id="fSociety" class="finput" value="Mansa Society"
+            autocomplete="off" maxlength="80">
+          <div class="ferr" id="fSocietyErr">Enter society name</div>
+        </div>
+
+        <!-- Phone -->
+        <div class="field">
+          <label class="flabel">Mobile Number</label>
+          <div class="phone-prefix-box">
+            <div class="phone-pfx">🇮🇳 +91</div>
+            <input type="tel" id="fPhone" class="finput" placeholder="10-digit number"
+              inputmode="numeric" maxlength="10" autocomplete="tel-national">
+          </div>
+          <div class="ferr" id="fPhoneErr">Enter valid 10-digit mobile number (starts with 6–9)</div>
+        </div>
+
+        <!-- Relation -->
+        <div class="field">
+          <label class="flabel" for="fRelation">Relation to House Owner</label>
+          <div class="select-wrap">
+            <select id="fRelation" class="fselect">
+              <option value="">— Select relation —</option>
+              <option value="Owner">Owner</option>
+              <option value="Spouse">Spouse</option>
+              <option value="Child">Child</option>
+              <option value="Parent">Parent</option>
+            </select>
+          </div>
+          <div class="ferr" id="fRelationErr">Select a relation</div>
+        </div>
+
+        <!-- Camera -->
+        <div class="field">
+          <label class="flabel">Face Photo</label>
+          <div class="camera-section" id="cameraSection">
+
+            <div id="camPlaceholder" class="camera-placeholder">
+              <div class="cam-icon">📸</div>
+              <p>Tap "Open Camera" to capture member's face</p>
+            </div>
+
+            <video id="enrollVideo" autoplay playsinline muted style="display:none;"></video>
+            <canvas id="enrollCanvas"></canvas>
+            <img id="enrollPreview" alt="Face photo">
+
+            <div class="photo-badge" id="photoBadge">
+              ✅ Photo captured — ready to enroll
+            </div>
+
+            <div class="camera-controls">
+              <button class="btn-cam btn-cam-open" id="btnCamOpen" type="button">
+                📷 Open Camera
+              </button>
+              <button class="btn-cam btn-cam-shoot" id="btnCamShoot" type="button">
+                🔴 Capture Photo
+              </button>
+              <button class="btn-cam btn-cam-retake" id="btnCamRetake" type="button">
+                🔄 Retake
+              </button>
+            </div>
+
+          </div>
+          <div class="ferr" id="fPhotoErr">Please capture a face photo</div>
+        </div>
+
+        <!-- Enroll Button -->
+        <button class="btn-enroll" id="btnEnroll" type="button">
+          ✅ Enroll Member
+        </button>
+
+        <!-- Success Flash -->
+        <div class="success-flash" id="successFlash">
+          <div class="sf-icon">🎉</div>
+          <div class="sf-msg" id="sfMsg">Member enrolled successfully!</div>
+          <div class="sf-sub" id="sfSub">Daily wristband assigned</div>
+        </div>
+
+      </div><!-- /form-body -->
+    </div><!-- /form-card -->
+
+    <!-- ── SIDE PANEL ──────────────────────────────────────────────────── -->
+    <div class="side-panel">
+
+      <!-- Wristband Info -->
+      <div class="wristband-card">
+        <div class="wristband-title">Wristband Assignment</div>
+        <div class="wristband-pill" style="background:#f0fdf4; border-radius:999px; padding:10px 16px;">
+          <div class="wristband-dot" style="background:#22c55e;"></div>
+          <div class="wristband-info" style="color:#166534;">Same Daily Color — All Members</div>
+        </div>
+        <div class="wristband-note">
+          Society members receive the <strong>same daily wristband color</strong> as regular visitors.
+          The system identifies them — the wristband color does not. This prevents tampering.
+        </div>
+      </div>
+
+      <!-- Recent Enrollments -->
+      <div class="recent-card">
+        <div class="recent-header">
+          <h3>📋 Recent Enrollments</h3>
+          <span style="font-size:11px;color:var(--muted);font-weight:600;">Today</span>
+        </div>
+        <div class="recent-list" id="recentList">
+          <div class="recent-empty">No enrollments yet today</div>
+        </div>
+      </div>
+
+    </div><!-- /side-panel -->
+  </div><!-- /main -->
+</div><!-- /appScreen -->
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp }                                       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage, ref, uploadString, getDownloadURL }      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+  /* ══════════════════════════════════════════════════════════════
+     ⚙️  SAME FIREBASE CONFIG AS MODULE 1 — paste your values here
+  ══════════════════════════════════════════════════════════════ */
+  const FIREBASE_CONFIG = {
+    apiKey:            "YOUR_FIREBASE_API_KEY",
+    authDomain:        "YOUR_PROJECT.firebaseapp.com",
+    projectId:         "YOUR_PROJECT_ID",
+    storageBucket:     "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId:             "YOUR_APP_ID"
+  };
+  /* ══════════════════════════════════════════════════════════════ */
+
+  const app     = initializeApp(FIREBASE_CONFIG);
+  const db      = getFirestore(app);
+  const storage = getStorage(app);
+
+  window.__fb2 = { db, storage, collection, addDoc, getDocs, query, where, orderBy, Timestamp, ref, uploadString, getDownloadURL };
+  window.dispatchEvent(new Event('fb2-ready'));
+</script>
+
+<script>
+'use strict';
+
+/* ── CONSTANTS ─────────────────────────────────────────────────────────── */
+const STAFF_PASSWORD = 'mansaadmin';
+
+/* ── HELPERS ───────────────────────────────────────────────────────────── */
+const $  = id => document.getElementById(id);
+let fbReady = false;
+window.addEventListener('fb2-ready', () => { fbReady = true; loadStats(); loadRecent(); });
+
+function toast(msg, type = 'ok') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function sanitize(s) {
+  return String(s).replace(/[<>"'`]/g, '').replace(/[\x00-\x1F\x7F]/g, '').trim().slice(0, 200);
+}
+
+/* ── LOGIN ─────────────────────────────────────────────────────────────── */
+const passInput = $('staffPass');
+
+function doLogin() {
+  const val = passInput.value;
+  if (val === STAFF_PASSWORD) {
+    $('loginScreen').style.display = 'none';
+    $('appScreen').style.display   = 'block';
+    sessionStorage.setItem('msp_staff', '1');
+  } else {
+    $('loginErr').textContent = 'Incorrect password. Try again.';
+    passInput.classList.add('shake');
+    passInput.value = '';
+    setTimeout(() => passInput.classList.remove('shake'), 400);
+    passInput.focus();
+  }
+}
+
+// Auto-login if already logged in this session
+if (sessionStorage.getItem('msp_staff') === '1') {
+  $('loginScreen').style.display = 'none';
+  $('appScreen').style.display   = 'block';
+}
+
+$('btnLogin').addEventListener('click', doLogin);
+passInput.addEventListener('keydown', e => e.key === 'Enter' && doLogin());
+
+$('btnLogout').addEventListener('click', () => {
+  sessionStorage.removeItem('msp_staff');
+  location.reload();
+});
+
+/* ── PHONE INPUT GUARD ─────────────────────────────────────────────────── */
+const phoneInput = $('fPhone');
+phoneInput.addEventListener('input', () => {
+  let v = phoneInput.value.replace(/[^0-9]/g, '');
+  if (v.length > 10) v = v.slice(0, 10);
+  phoneInput.value = v;
+});
+phoneInput.addEventListener('keydown', e => {
+  if (!e.key || e.key === 'Unidentified') return;
+  const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Enter','Home','End'];
+  if (!allowed.includes(e.key) && !/^[0-9]$/.test(e.key)) e.preventDefault();
+});
+phoneInput.addEventListener('paste', e => {
+  e.preventDefault();
+  phoneInput.value = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,10);
+});
+
+/* ── NAME INPUT GUARD ──────────────────────────────────────────────────── */
+$('fName').addEventListener('input', () => {
+  $('fName').value = $('fName').value.replace(/[^a-zA-Z\u00C0-\u024F\s\-'.]/g, '');
+});
+
+/* ── CAMERA ────────────────────────────────────────────────────────────── */
+let camStream   = null;
+let camOpen     = false;
+let photoTaken  = false;
+let photoDataUrl = '';
+
+const video      = $('enrollVideo');
+const canvas     = $('enrollCanvas');
+const preview    = $('enrollPreview');
+const placeholder= $('camPlaceholder');
+const photoBadge = $('photoBadge');
+
+function stopCam() {
+  if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  camOpen = false;
+  video.style.display = 'none';
+}
+
+function resetCamera() {
+  stopCam();
+  photoTaken   = false;
+  photoDataUrl = '';
+  preview.classList.remove('show');
+  preview.src = '';
+  placeholder.style.display = 'block';
+  photoBadge.classList.remove('show');
+  $('btnCamOpen').style.display   = '';
+  $('btnCamShoot').classList.remove('show');
+  $('btnCamRetake').classList.remove('show');
+}
+
+$('btnCamOpen').addEventListener('click', async () => {
+  if (camOpen) return;
+  $('btnCamOpen').textContent = 'Starting…';
+  $('btnCamOpen').disabled = true;
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    toast('Camera not supported. Use Chrome or Safari.', 'err');
+    $('btnCamOpen').textContent = '📷 Open Camera';
+    $('btnCamOpen').disabled = false;
+    return;
+  }
+
+  try {
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'user' }, width: { ideal: 640 }, height: { ideal: 480 } },
+        audio: false
+      });
+    } catch(_) {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    }
+
+    camStream = stream;
+    video.srcObject = stream;
+    video.setAttribute('autoplay','');
+    video.setAttribute('playsinline','');
+    video.muted = true;
+    try { await video.play(); } catch(_) {}
+
+    video.style.display = 'block';
+    placeholder.style.display = 'none';
+    camOpen = true;
+
+    $('btnCamOpen').style.display = 'none';
+    $('btnCamShoot').classList.add('show');
+    $('btnCamOpen').textContent = '📷 Open Camera';
+    $('btnCamOpen').disabled = false;
+
+  } catch(err) {
+    $('btnCamOpen').textContent = '📷 Open Camera';
+    $('btnCamOpen').disabled = false;
+    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+      toast('Camera permission denied. Allow camera in browser settings.', 'err');
+    } else if (err.name === 'NotFoundError') {
+      toast('No camera found on this device.', 'err');
+    } else if (err.name === 'NotReadableError') {
+      toast('Camera in use by another app. Close it and retry.', 'err');
+    } else {
+      toast('Camera error: ' + (err.message || err.name), 'err');
+    }
+  }
+});
+
+$('btnCamShoot').addEventListener('click', () => {
+  if (!camOpen || !camStream) return;
+  canvas.width  = 480;
+  canvas.height = 360;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, 480, 360);
+  photoDataUrl = canvas.toDataURL('image/jpeg', 0.60);
+
+  preview.src = photoDataUrl;
+  preview.classList.add('show');
+  photoBadge.classList.add('show');
+  stopCam();
+
+  photoTaken = true;
+  $('btnCamShoot').classList.remove('show');
+  $('btnCamRetake').classList.add('show');
+  $('btnCamOpen').style.display = 'none';
+  $('fPhotoErr').classList.remove('show');
+});
+
+$('btnCamRetake').addEventListener('click', resetCamera);
+
+/* ── VALIDATION ────────────────────────────────────────────────────────── */
+function validate() {
+  let ok = true;
+
+  const name    = $('fName').value.trim();
+  const house   = $('fHouse').value.trim();
+  const society = $('fSociety').value.trim();
+  const phone   = phoneInput.value.replace(/\D/g,'');
+  const relation= $('fRelation').value;
+
+  const setErr = (id, show) => { $(id).classList.toggle('show', show); };
+
+  setErr('fNameErr',     !name);                          if (!name) ok = false;
+  setErr('fHouseErr',    !house);                         if (!house) ok = false;
+  setErr('fSocietyErr',  !society);                       if (!society) ok = false;
+  setErr('fPhoneErr',    !/^[6-9]\d{9}$/.test(phone));   if (!/^[6-9]\d{9}$/.test(phone)) ok = false;
+  setErr('fRelationErr', !relation);                      if (!relation) ok = false;
+  setErr('fPhotoErr',    !photoTaken);                    if (!photoTaken) ok = false;
+
+  return ok;
+}
+
+/* ── ENROLL ────────────────────────────────────────────────────────────── */
+let enrolling = false;
+
+$('btnEnroll').addEventListener('click', async () => {
+  if (enrolling) return;
+  if (!validate()) { toast('Please fill all fields and capture a photo.', 'err'); return; }
+  if (!fbReady) { toast('Firebase not ready. Wait a moment and retry.', 'err'); return; }
+
+  enrolling = true;
+  const btn = $('btnEnroll');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Enrolling…';
+  $('successFlash').classList.remove('show');
+
+  const name     = sanitize($('fName').value.trim());
+  const house    = sanitize($('fHouse').value.trim());
+  const society  = sanitize($('fSociety').value.trim());
+  const phone    = phoneInput.value.replace(/\D/g,'');
+  const relation = $('fRelation').value;
+  const now      = new Date();
+
+  try {
+    const fb = window.__fb2;
+
+    // 1. Upload face photo
+    const storageRef = fb.ref(fb.storage, `society_faces/${phone}_${Date.now()}.jpg`);
+    await fb.uploadString(storageRef, photoDataUrl, 'data_url');
+    const facePhotoURL = await fb.getDownloadURL(storageRef);
+
+    // 2. Save to Firestore
+    await fb.addDoc(fb.collection(fb.db, 'society_members'), {
+      Name:          name,
+      Phone:         phone,
+      HouseNumber:   house,
+      Society:       society,
+      Relation:      relation,
+      FacePhoto:     facePhotoURL,
+      EnrollDate:    now.toISOString(),
+      Status:        'Active',
+      WristbandColor:'Daily',  // Same color as all visitors — set at gate each day
+      createdAt:     Date.now()
+    });
+
+    // 3. Success UI
+    $('sfMsg').textContent = `${name} enrolled successfully — House ${house}`;
+    $('sfSub').textContent = `Daily wristband · ${relation} · ${now.toLocaleDateString('en-IN')}`;
+    $('successFlash').classList.add('show');
+
+    // 4. Update stats & recent list
+    await loadStats();
+    await loadRecent();
+
+    // 5. Reset form for next enrollment
+    setTimeout(() => {
+      resetForm();
+      btn.disabled = false;
+      btn.innerHTML = '✅ Enroll Member';
+      enrolling = false;
+    }, 2500);
+
+    toast(`${name} enrolled! 🎉`, 'ok');
+
+  } catch(err) {
+    console.error(err);
+    toast('Save failed: ' + err.message, 'err');
+    btn.disabled = false;
+    btn.innerHTML = '✅ Enroll Member';
+    enrolling = false;
+  }
+});
+
+function resetForm() {
+  $('fName').value     = '';
+  $('fHouse').value    = '';
+  $('fSociety').value  = 'Mansa Society';
+  phoneInput.value     = '';
+  $('fRelation').value = '';
+  resetCamera();
+  $('successFlash').classList.remove('show');
+  // Clear errors
+  ['fNameErr','fHouseErr','fSocietyErr','fPhoneErr','fRelationErr','fPhotoErr']
+    .forEach(id => $(id).classList.remove('show'));
+  ['fName','fHouse','fSociety','fPhone','fRelation']
+    .forEach(id => $(id).classList.remove('error'));
+}
+
+/* ── STATS & RECENT ────────────────────────────────────────────────────── */
+async function loadStats() {
+  if (!window.__fb2) return;
+  const fb = window.__fb2;
+  try {
+    // Total members
+    const allSnap = await fb.getDocs(fb.collection(fb.db, 'society_members'));
+    $('statTotal').textContent = allSnap.size;
+
+    // Today's enrollments
+    const todayStart = new Date();
+    todayStart.setHours(0,0,0,0);
+    let todayCount = 0;
+    allSnap.forEach(doc => {
+      const d = doc.data();
+      if (d.createdAt && d.createdAt >= todayStart.getTime()) todayCount++;
+    });
+    $('statToday').textContent = todayCount;
+  } catch(e) { console.warn('Stats error:', e); }
+}
+
+async function loadRecent() {
+  if (!window.__fb2) return;
+  const fb = window.__fb2;
+  try {
+    const snap = await fb.getDocs(fb.collection(fb.db, 'society_members'));
+    const members = [];
+    snap.forEach(doc => members.push(doc.data()));
+
+    // Sort by createdAt descending, take last 10
+    members.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    const recent = members.slice(0, 10);
+
+    const list = $('recentList');
+    if (recent.length === 0) {
+      list.innerHTML = '<div class="recent-empty">No enrollments yet today</div>';
+      return;
+    }
+
+    list.innerHTML = recent.map(m => {
+      const initials = (m.Name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const dateStr  = m.EnrollDate ? new Date(m.EnrollDate).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '';
+      const photoEl  = m.FacePhoto
+        ? `<img src="${m.FacePhoto}" alt="${initials}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+        : initials;
+      return `
+        <div class="recent-item">
+          <div class="recent-avatar">${photoEl}</div>
+          <div class="recent-info">
+            <div class="recent-name">${m.Name||'—'}</div>
+            <div class="recent-meta">House ${m.HouseNumber||'—'} · ${m.Relation||'—'} · ${dateStr}</div>
+          </div>
+          <div class="recent-badge" style="background:#dcfce7;color:#166534;">✅ Enrolled</div>
+        </div>`;
+    }).join('');
+
+  } catch(e) { console.warn('Recent error:', e); }
+}
+</script>
+</body>
+</html>

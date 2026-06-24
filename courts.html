@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Mansa Sports Park — Staff court schedule and booking dashboard.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Court Dashboard — Mansa Sports Park Staff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#0D4A26;--g2:#166534;--g3:#16a34a;--g4:#4ade80;--gbg:#f0fdf4;
+  --avail:#16a34a;--avail-bg:#dcfce7;
+  --booked:#dc2626;--booked-bg:#fee2e2;
+  --grace:#d97706;--grace-bg:#fef3c7;
+  --tent:#7c3aed;--tent-bg:#ede9fe;--tent-bdr:#c4b5fd;
+  --past:#94a3b8;--past-bg:#f1f5f9;
+  --bg:#f0f4f0;--surf:#fff;--text:#0a150d;--muted:#4b6358;--border:#d1e4d9;
+  --r:10px;--font:'Inter',system-ui,sans-serif;
+  --shadow:0 2px 12px rgba(13,74,38,.10);
+}
+html,body{min-height:100vh;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-size:14px}
+
+/* LOGIN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(145deg,#0D3320,var(--g2))}
+.login-card{background:var(--surf);border-radius:20px;padding:40px 32px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.25);text-align:center}
+.login-icon{font-size:40px;margin-bottom:14px}
+.login-title{font-size:20px;font-weight:800;color:var(--g1);margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.login-inp{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:16px;font-weight:600;color:var(--text);background:var(--gbg);outline:none;margin-bottom:8px;letter-spacing:2px;-webkit-appearance:none}
+.login-inp:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+.login-inp.shake{animation:shake .4s ease;border-color:var(--booked)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.login-err{font-size:12px;color:var(--booked);font-weight:600;min-height:16px;margin-bottom:12px;text-align:left}
+.btn-login{width:100%;padding:15px;background:linear-gradient(135deg,var(--g1),var(--g3));color:#fff;border:none;border-radius:var(--r);font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer}
+
+/* TOP BAR */
+.topbar{background:var(--g1);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-title{color:#fff;font-size:15px;font-weight:800}
+.topbar-date{color:rgba(255,255,255,.65);font-size:12px;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.rev-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:5px 12px;color:#fff;font-size:12px;font-weight:700;white-space:nowrap}
+.btn-logout{background:none;border:none;color:rgba(255,255,255,.6);font-size:12px;font-weight:600;cursor:pointer;padding:5px 8px}
+
+/* DATE NAV */
+.date-nav{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surf);border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.date-nav-btn{background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-family:var(--font);font-size:12.5px;font-weight:700;cursor:pointer;color:var(--muted);white-space:nowrap;transition:all .15s}
+.date-nav-btn.active{background:var(--g2);border-color:var(--g2);color:#fff}
+.date-nav-btn:hover:not(.active){border-color:var(--g3);color:var(--g2)}
+
+/* LEGEND */
+.legend{display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--surf);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--muted)}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+
+/* COURT GRID WRAPPER */
+.grid-scroll{overflow-x:auto;padding:12px 14px 24px;-webkit-overflow-scrolling:touch}
+
+/* SCHEDULE TABLE */
+.schedule{border-collapse:collapse;width:100%;min-width:700px}
+.schedule th{padding:8px 10px;background:var(--g1);color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:center;white-space:nowrap;position:sticky;top:52px;z-index:50}
+.schedule th:first-child{width:60px;background:#0a3a1c}
+.schedule td{padding:3px;border:1px solid var(--border);vertical-align:top}
+.schedule td:first-child{padding:6px 8px;background:var(--surf);font-size:11.5px;font-weight:700;color:var(--muted);text-align:right;white-space:nowrap;position:sticky;left:0;z-index:10;border-right:2px solid var(--border)}
+
+/* SLOT CELLS */
+.slot-cell{border-radius:6px;padding:5px 7px;min-height:40px;cursor:pointer;transition:opacity .15s;position:relative;display:flex;flex-direction:column;justify-content:center}
+.slot-cell:active{opacity:.8}
+.slot-cell.avail {background:var(--avail-bg);border:1.5px solid var(--g4)}
+.slot-cell.avail:hover{background:#bbf7d0}
+.slot-cell.booked{background:var(--booked-bg);border:1.5px solid #fca5a5;cursor:pointer}
+.slot-cell.grace {background:var(--grace-bg);border:1.5px solid #fde68a;cursor:pointer}
+.slot-cell.tent  {background:#ede9fe;border:1.5px solid #c4b5fd;cursor:pointer}
+.slot-cell.past  {background:var(--past-bg);border:1.5px solid #e2e8f0;cursor:default;opacity:.6}
+
+.sc-name{font-size:11px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-time{font-size:9.5px;font-weight:500;opacity:.8;margin-top:1px}
+.slot-cell.avail  .sc-name{color:var(--avail)}
+.slot-cell.booked .sc-name{color:var(--booked)}
+.slot-cell.grace  .sc-name{color:var(--grace)}
+.slot-cell.tent   .sc-name{color:#7c3aed}
+.slot-cell.past   .sc-name{color:var(--past)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--surf);border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;box-shadow:0 -8px 40px rgba(0,0,0,.2);max-height:85vh;overflow-y:auto}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 18px}
+.modal-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:16px}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.detail-row:last-of-type{border-bottom:none}
+.dr-k{color:var(--muted);font-weight:500}.dr-v{font-weight:700;color:var(--text);text-align:right;max-width:60%;word-break:break-all}
+.status-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700}
+.status-confirmed{background:var(--avail-bg);color:var(--avail)}
+.status-grace{background:var(--grace-bg);color:var(--grace)}
+.modal-actions{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.btn-modal{padding:13px;border:none;border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:opacity .15s,transform .15s;-webkit-tap-highlight-color:transparent}
+.btn-modal:active{transform:scale(.97)}
+.btn-release{background:#fee2e2;color:var(--booked);border:1.5px solid #fca5a5}
+/* btn-extend removed — slots end strictly at booked time */
+.btn-close  {background:var(--gbg);color:var(--muted);border:1.5px solid var(--border)}
+.cancel-info{background:#fef3c7;border:1px solid #fde68a;border-radius:var(--r);padding:10px 12px;font-size:12px;color:#92400e;margin-top:10px;line-height:1.5}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);padding:11px 22px;border-radius:999px;font-size:13px;font-weight:700;z-index:9999;transition:transform .3s,opacity .3s;opacity:0;pointer-events:none;max-width:90vw;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{background:var(--g2);color:#fff}.toast.err{background:var(--booked);color:#fff}.toast.info{background:#1d4ed8;color:#fff}
+
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.refresh-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:5px 10px;color:rgba(255,255,255,.8);font-size:12px;font-weight:600;cursor:pointer;transition:background .15s}
+.refresh-btn:hover{background:rgba(255,255,255,.2)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-icon">🏟️</div>
+    <div class="login-title">Court Dashboard</div>
+    <div class="login-sub">Mansa Sports Park — Staff Only</div>
+    <input type="password" class="login-inp" id="staffPass" placeholder="Enter staff password" maxlength="30">
+    <div class="login-err" id="loginErr"></div>
+    <button class="btn-login" id="btnLogin">🔐 Login</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="appScreen" style="display:none">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="topbar-title">🏟️ Court Dashboard</div>
+        <div class="topbar-date" id="topDate"></div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="rev-badge">💰 Today: <span id="revTotal">₹0</span></div>
+      <button class="refresh-btn" id="btnRefresh">↻</button>
+      <button class="btn-logout" id="btnLogout">Exit</button>
+    </div>
+  </div>
+
+  <div class="date-nav" id="dateNav"></div>
+
+  <div style="padding:8px 14px;background:var(--surf);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--avail-bg);border:1.5px solid var(--g4)"></div>Available</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--booked-bg);border:1.5px solid #fca5a5"></div>Booked</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--grace-bg);border:1.5px solid #fde68a"></div>Grace (15min)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#ede9fe;border:1px solid #c4b5fd"></div>Tentative</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--past-bg);border:1px solid #e2e8f0"></div>Past</div>
+    </div>
+    <div id="liveClockSmall" style="font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap"></div>
+  </div>
+
+  <div class="grid-scroll">
+    <table class="schedule" id="scheduleTable">
+      <thead id="scheduleHead"></thead>
+      <tbody id="scheduleBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- BOOKING DETAIL MODAL -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">Booking Details</div>
+    <div id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCr0ITLauBZY1tEvXZcbMilWbCGuOYJLrM",
+  authDomain:        "mansasportspark-e0f3d.firebaseapp.com",
+  projectId:         "mansasportspark-e0f3d",
+  storageBucket:     "mansasportspark-e0f3d.firebasestorage.app",
+  messagingSenderId: "521169146944",
+  appId:             "1:521169146944:web:9877d8f7be192c60993ba5",
+  measurementId:     "G-9ZSKTGTJRC"
+};
+const RAZORPAY_KEY = "YOUR_RAZORPAY_KEY_ID"; // For refunds via API
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+window.__dashDb = { db, collection, getDocs, addDoc, updateDoc, doc, query, where };
+window.dispatchEvent(new Event('dash-ready'));
+</script>
+
+<script>
+'use strict';
+const STAFF_PASS = 'mansaadmin';
+const COURTS_DEF = [
+  {id:'tennis',    name:'Tennis',            slot:60},
+  {id:'badminton_in', name:'Badmin. Indoor', slot:60},
+  {id:'badminton_out',name:'Badmin. Outdoor',slot:60},
+  {id:'pickleball',name:'Pickleball',        slot:60},
+  {id:'box_cricket',name:'Box Cricket',      slot:60},
+  {id:'cricket_net',name:'Cricket Net',      slot:30},
+  {id:'table_tennis',name:'Table Tennis',    slot:30},
+  {id:'basketball', name:'Basketball',        slot:30},
+];
+
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const $ = id => document.getElementById(id);
+
+let viewDate = new Date(); viewDate.setHours(0,0,0,0);
+let bookings = []; // all bookings for current viewDate
+let fbReady  = false;
+
+window.addEventListener('dash-ready', () => { fbReady = true; loadAndRender(); });
+
+/* ═══════════════ LOGIN ═══════════════ */
+function doLogin() {
+  if ($('staffPass').value === STAFF_PASS) {
+    $('loginScreen').style.display = 'none';
+    $('appScreen').style.display   = 'block';
+    sessionStorage.setItem('msp_staff','1');
+    buildDateNav();
+    startClock();
+    if (fbReady) loadAndRender();
+  } else {
+    $('loginErr').textContent = 'Incorrect password.';
+    const inp = $('staffPass');
+    inp.classList.add('shake');
+    inp.value = '';
+    setTimeout(() => inp.classList.remove('shake'), 400);
+  }
+}
+if (sessionStorage.getItem('msp_staff')==='1') { $('loginScreen').style.display='none'; $('appScreen').style.display='block'; buildDateNav(); startClock(); }
+$('btnLogin').addEventListener('click', doLogin);
+$('staffPass').addEventListener('keydown', e => e.key==='Enter' && doLogin());
+$('btnLogout').addEventListener('click', () => { sessionStorage.removeItem('msp_staff'); location.reload(); });
+$('btnRefresh').addEventListener('click', () => loadAndRender());
+
+/* ═══════════════ CLOCK ═══════════════ */
+function startClock() {
+  function tick() {
+    const now = new Date();
+    $('topDate').textContent = `${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+    $('liveClockSmall').textContent = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    renderGracePeriods();
+  }
+  tick(); setInterval(tick, 10000);
+}
+
+/* ═══════════════ DATE NAV ═══════════════ */
+function buildDateNav() {
+  const nav   = $('dateNav');
+  const today = new Date(); today.setHours(0,0,0,0);
+  nav.innerHTML = '';
+  for (let i = -1; i <= 3; i++) {
+    const d = new Date(today); d.setDate(today.getDate()+i);
+    const btn = document.createElement('button');
+    btn.className = 'date-nav-btn' + (i===0?' active':'');
+    btn.textContent = i===0 ? 'Today' : i===-1 ? 'Yesterday' : `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+    btn.dataset.date = d.toISOString().split('T')[0];
+    btn.addEventListener('click', () => {
+      nav.querySelectorAll('.date-nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      viewDate = d;
+      loadAndRender();
+    });
+    nav.appendChild(btn);
+  }
+}
+
+/* ═══════════════ LOAD FROM FIREBASE ═══════════════ */
+async function loadAndRender() {
+  if (!fbReady || !window.__dashDb) return;
+  const { db, collection, getDocs, query, where } = window.__dashDb;
+  const dateStr = viewDate.toISOString().split('T')[0];
+  try {
+    const q    = query(collection(db,'court_bookings'), where('date','==',dateStr));
+    const snap = await getDocs(q);
+    bookings   = [];
+    let rev    = 0;
+    snap.forEach(d => {
+      const data = {id:d.id, ...d.data()};
+      bookings.push(data);
+      if (data.status==='Confirmed') rev += (data.amount||0);
+    });
+    $('revTotal').textContent = '₹'+rev.toLocaleString('en-IN');
+    renderSchedule();
+  } catch(e) { console.error(e); toast('Load failed: '+e.message,'err'); }
+}
+
+/* ═══════════════ RENDER SCHEDULE ═══════════════ */
+function renderSchedule() {
+  const head = $('scheduleHead');
+  const body = $('scheduleBody');
+  head.innerHTML = ''; body.innerHTML = '';
+
+  // Header row
+  const headRow = document.createElement('tr');
+  const timeTh  = document.createElement('th');
+  timeTh.textContent = 'Time';
+  headRow.appendChild(timeTh);
+  COURTS_DEF.forEach(c => {
+    const th = document.createElement('th');
+    th.textContent = c.name;
+    headRow.appendChild(th);
+  });
+  head.appendChild(headRow);
+
+  // Time rows 06:00–21:00 in 30-min increments
+  const now      = new Date();
+  const isToday  = viewDate.toDateString() === now.toDateString();
+  const nowMin   = now.getHours()*60+now.getMinutes();
+
+  for (let sm = 6*60; sm < 21*60; sm += 30) {
+    const hh  = String(Math.floor(sm/60)).padStart(2,'0');
+    const mm  = String(sm%60).padStart(2,'0');
+    const row = document.createElement('tr');
+
+    const timeTd = document.createElement('td');
+    timeTd.textContent = `${hh}:${mm}`;
+    row.appendChild(timeTd);
+
+    COURTS_DEF.forEach(c => {
+      const td   = document.createElement('td');
+      const cell = buildCell(c, sm, nowMin, isToday);
+      td.appendChild(cell);
+      row.appendChild(td);
+    });
+    body.appendChild(row);
+  }
+}
+
+function getBookingForSlot(courtId, startMin) {
+  return bookings.find(b => {
+    if (b.courtId !== courtId) return false;
+    if (['Released','Cancelled'].includes(b.status)) return false;
+    const [h,m]  = b.timeSlot.split(':').map(Number);
+    const bStart = h*60+m;
+    const bEnd   = bStart + (b.duration||60);
+    return startMin >= bStart && startMin < bEnd;
+  });
+}
+
+function buildCell(court, sm, nowMin, isToday) {
+  const div     = document.createElement('div');
+  const booking = getBookingForSlot(court.id, sm);
+  const isPast  = isToday && sm < nowMin;
+
+  if (booking) {
+    const [bh,bm]   = booking.timeSlot.split(':').map(Number);
+    const bStartMin = bh*60+bm;
+    const bEndMin   = bStartMin + (booking.duration||60);
+    const graceEnd  = bEndMin + 15;
+    const isGrace   = isToday && nowMin >= bEndMin && nowMin < graceEnd;
+    const isTent   = booking.status === 'Tentative';
+    const cls      = isTent ? 'tent' : isGrace ? 'grace' : 'booked';
+
+    div.className = `slot-cell ${cls}`;
+    // Only show name in the first sub-slot of this booking
+    if (sm === bStartMin) {
+      div.innerHTML = `<div class="sc-name">${booking.name}</div><div class="sc-time">${booking.timeSlot}–${booking.slotEnd}</div>`;
+    } else {
+      div.innerHTML = `<div class="sc-time" style="text-align:center">▓</div>`;
+    }
+    div.addEventListener('click', () => openModal(booking, isGrace));
+  } else if (isPast) {
+    div.className = 'slot-cell past';
+    div.innerHTML = `<div class="sc-time" style="text-align:center">—</div>`;
+  } else {
+    div.className = 'slot-cell avail';
+    div.innerHTML = `<div class="sc-name">Free</div>`;
+    div.addEventListener('click', () => openAvailModal(court, sm));
+  }
+  return div;
+}
+
+function renderGracePeriods() {
+  // Lightweight re-render triggered every 10s to update grace markers
+  if (document.getElementById('scheduleBody')?.children.length) renderSchedule();
+}
+
+/* ═══════════════ MODAL ═══════════════ */
+function openModal(booking, isGrace) {
+  const now      = new Date();
+  const slotDate = new Date(booking.date);
+  const [sh,sm_]  = booking.timeSlot.split(':').map(Number);
+  const slotStart = new Date(slotDate); slotStart.setHours(sh,sm_,0,0);
+  const diffHrs   = (slotStart - now) / 3600000;
+
+  // Cancellation policy
+  let cancelMsg = '';
+  if (diffHrs >= 4)       cancelMsg = '✅ Eligible for full refund (4+ hours before slot)';
+  else if (diffHrs >= 2)  cancelMsg = '⚠️ Partial case — check with manager';
+  else                    cancelMsg = '❌ No refund — under 2 hours to slot';
+
+  const endMin    = sh*60+sm_+(booking.duration||60);
+  const nowMin    = now.getHours()*60+now.getMinutes();
+  const isViewToday = viewDate.toDateString()===now.toDateString();
+  const afterSlot   = isViewToday && nowMin >= sh*60+sm_+(booking.duration||60);
+  const nextFree    = !getBookingForSlot(booking.courtId, endMin);
+
+  $('modalTitle').textContent = `Booking — ${booking.court}`;
+  $('modalBody').innerHTML = `
+    <div class="detail-row"><span class="dr-k">Customer</span><span class="dr-v">${booking.name}</span></div>
+    <div class="detail-row"><span class="dr-k">Mobile</span><span class="dr-v">+91 ${booking.phone||'—'}</span></div>
+    <div class="detail-row"><span class="dr-k">Court</span><span class="dr-v">${booking.court}</span></div>
+    <div class="detail-row"><span class="dr-k">Date</span><span class="dr-v">${booking.dateStr||booking.date}</span></div>
+    <div class="detail-row"><span class="dr-k">Time</span><span class="dr-v">${booking.timeSlot} – ${booking.slotEnd}</span></div>
+    <div class="detail-row"><span class="dr-k">Duration</span><span class="dr-v">${booking.duration} min</span></div>
+    <div class="detail-row"><span class="dr-k">Amount</span><span class="dr-v">₹${booking.amount}</span></div>
+    <div class="detail-row"><span class="dr-k">Ref ID</span><span class="dr-v" style="font-size:11px">${booking.paymentId||'—'}</span></div>
+    <div class="detail-row"><span class="dr-k">Status</span><span class="dr-v"><span class="status-tag ${booking.status==='Tentative'?'status-grace':isGrace?'status-grace':'status-confirmed'}">${booking.status==='Tentative'?'⏰ Tentative':isGrace?'⏰ Grace Period':'✅ Confirmed'}</span></span></div><!-- [FIXED] show Tentative status correctly -->
+    <div class="cancel-info">${cancelMsg}</div>`;
+
+  const actions = $('modalActions');
+  actions.innerHTML = '';
+
+  if (afterSlot || isGrace) {
+    const btnRel = document.createElement('button');
+    btnRel.className = 'btn-modal btn-release';
+    btnRel.textContent = '🔓 Release Slot (No-show)';
+    btnRel.addEventListener('click', () => releaseSlot(booking));
+    actions.appendChild(btnRel);
+  }
+
+  // Extend button removed — slots end strictly at booked time (no extension allowed)
+
+  const btnCancel = document.createElement('button');
+  btnCancel.className = 'btn-modal btn-release';
+  btnCancel.textContent = '❌ Cancel Booking';
+  btnCancel.addEventListener('click', () => cancelBooking(booking, diffHrs));
+  actions.appendChild(btnCancel);
+
+  const btnClose = document.createElement('button');
+  btnClose.className = 'btn-modal btn-close';
+  btnClose.textContent = 'Close';
+  btnClose.addEventListener('click', closeModal);
+  actions.appendChild(btnClose);
+
+  $('modalOverlay').classList.remove('hidden');
+}
+
+function openAvailModal(court, sm) {
+  const hh = String(Math.floor(sm/60)).padStart(2,'0');
+  const mm  = String(sm%60).padStart(2,'0');
+  $('modalTitle').textContent = `${court.name} — ${hh}:${mm}`;
+  $('modalBody').innerHTML = `<div class="detail-row"><span class="dr-k">Status</span><span class="dr-v" style="color:var(--avail)">✅ Available</span></div><div style="padding:12px 0;font-size:13px;color:var(--muted)">This slot is open. Customers can book via the online booking page.</div>`;
+  $('modalActions').innerHTML = `<button class="btn-modal btn-close" onclick="closeModal()">Close</button>`;
+  $('modalOverlay').classList.remove('hidden');
+}
+
+function closeModal() { $('modalOverlay').classList.add('hidden'); }
+$('modalOverlay').addEventListener('click', e => { if (e.target===$('modalOverlay')) closeModal(); });
+window.closeModal = closeModal;
+
+/* ═══════════════ RELEASE SLOT ═══════════════ */
+async function releaseSlot(booking) {
+  if (!confirm(`Release slot for ${booking.name}? This cannot be undone.`)) return;
+  try {
+    const { db, doc, updateDoc } = window.__dashDb;
+    await updateDoc(doc(db,'court_bookings',booking.id), { status:'Released', releasedAt:Date.now() });
+    toast('Slot released ✅','ok');
+    closeModal();
+    await loadAndRender();
+  } catch(e) { toast('Failed: '+e.message,'err'); }
+}
+
+/* extendSlot removed — slots end strictly at booked time */
+
+/* ═══════════════ CANCEL BOOKING ═══════════════ */
+async function cancelBooking(booking, diffHrs) {
+  let msg = diffHrs >= 4
+    ? `Cancel booking for ${booking.name}?\n\nFull refund of ₹${booking.amount} will be issued via Razorpay.`
+    : `Cancel booking for ${booking.name}?\n\n⚠️ NO REFUND — less than 2 hours to slot.`;
+  if (!confirm(msg)) return;
+  try {
+    const { db, doc, updateDoc } = window.__dashDb;
+    await updateDoc(doc(db,'court_bookings',booking.id), {
+      status:'Cancelled', cancelledAt:Date.now(),
+      refundEligible: diffHrs >= 4,
+      refundAmount:   diffHrs >= 4 ? booking.amount : 0
+    });
+    toast(diffHrs >= 4 ? `Cancelled · Process refund of ₹${booking.amount} in Razorpay dashboard` : 'Cancelled · No refund applicable','ok');
+    closeModal();
+    await loadAndRender();
+  } catch(e) { toast('Failed: '+e.message,'err'); }
+}
+
+/* ═══════════════ TOAST ═══════════════ */
+function toast(msg, type='ok') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>

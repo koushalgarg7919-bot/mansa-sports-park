@@ -1,0 +1,2286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Mansa Sports Park — Manager booking panel.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manager Panel — Mansa Sports Park</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#0D4A26;--g2:#166534;--g3:#16a34a;--g4:#4ade80;--gbg:#f0fdf4;
+  --blue:#1d4ed8;--bluebg:#eff6ff;--bluebdr:#bfdbfe;
+  --gold:#92400e;--goldb:#d97706;--goldbg:#fffbeb;--goldbdr:#fde68a;
+  --red:#dc2626;--redbg:#fee2e2;--redbdr:#fca5a5;
+  --orange:#c2410c;--orangebg:#fff7ed;--orangebdr:#fed7aa;
+  --avail:#16a34a;--avail-bg:#dcfce7;
+  --booked:#dc2626;--booked-bg:#fee2e2;
+  --grace:#d97706;--grace-bg:#fef3c7;
+  --tent:#7c3aed;--tent-bg:#ede9fe;--tent-bdr:#c4b5fd;
+  --past:#94a3b8;--past-bg:#f1f5f9;
+  --bg:#f0f4f1;--surf:#fff;--text:#0a150d;--muted:#4b6358;--border:#d1e4d9;
+  --r:10px;--rlg:18px;--font:'Inter',system-ui,sans-serif;
+  --shadow:0 2px 14px rgba(13,74,38,.09);--shadow-lg:0 8px 36px rgba(0,0,0,.16);
+}
+html,body{min-height:100vh;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-size:14px}
+
+/* ── LOGIN ──────────────────────────────────────── */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(145deg,#050f08,var(--g1))}
+.lcard{background:var(--surf);border-radius:20px;padding:40px 32px;width:100%;max-width:380px;box-shadow:0 24px 64px rgba(0,0,0,.3);text-align:center}
+.lbadge{font-size:40px;margin-bottom:14px}
+.ltitle{font-size:20px;font-weight:900;color:var(--g1);margin-bottom:3px}
+.lsub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.linp{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:16px;font-weight:600;color:var(--text);background:var(--gbg);outline:none;margin-bottom:8px;-webkit-appearance:none}
+.linp:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+.linp.shake{animation:shk .4s ease;border-color:var(--red)}
+@keyframes shk{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-8px)}50%{transform:translateX(8px)}}
+.lerr{font-size:12px;color:var(--red);font-weight:600;min-height:16px;margin-bottom:10px;text-align:left}
+.btn-login{width:100%;padding:15px;background:linear-gradient(135deg,var(--g1),var(--g3));color:#fff;border:none;border-radius:var(--r);font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(22,163,74,.3)}
+
+/* ── TOP BAR ────────────────────────────────────── */
+.topbar{background:linear-gradient(135deg,var(--g1),#0a3520);padding:0 16px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-title{color:#fff;font-size:15px;font-weight:900;letter-spacing:-.2px}
+.tb-sub{color:rgba(255,255,255,.55);font-size:11px;font-weight:600}
+.tb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tb-stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:5px 12px;color:#fff;font-size:12px;font-weight:700;white-space:nowrap}
+.tb-stat span{color:var(--g4);font-size:14px;font-weight:900}
+.btn-tb{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:5px 10px;color:rgba(255,255,255,.75);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-tb:hover{background:rgba(255,255,255,.2)}
+
+/* ── TAB NAV ────────────────────────────────────── */
+.tabnav{display:flex;background:var(--surf);border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:54px;z-index:100}
+.tabnav::-webkit-scrollbar{display:none}
+.tab-btn{padding:14px 18px;border:none;background:none;font-family:var(--font);font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;-webkit-tap-highlight-color:transparent}
+.tab-btn.active{color:var(--g2);border-bottom-color:var(--g2)}
+.tab-btn .tb-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:var(--red);color:#fff;border-radius:50%;font-size:9px;font-weight:800;margin-left:5px;vertical-align:middle}
+
+/* ── PANELS ─────────────────────────────────────── */
+.panel{display:none;padding:14px;max-width:1100px;margin:0 auto}
+.panel.active{display:block}
+
+/* ── FORM CARD ──────────────────────────────────── */
+.fcard{background:var(--surf);border-radius:var(--rlg);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.fcard-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.fcard-head.blue{background:linear-gradient(135deg,#eff6ff,#dbeafe)}
+.fcard-head.green{background:linear-gradient(135deg,var(--gbg),#dcfce7)}
+.fcard-head.gold{background:linear-gradient(135deg,var(--goldbg),#fef3c7)}
+.fcard-head.dark{background:linear-gradient(135deg,#0a150d,var(--g1))}
+.fhi{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.fhi.blue{background:#dbeafe;border:1px solid #93c5fd}
+.fhi.green{background:#dcfce7;border:1px solid var(--g4)}
+.fhi.gold{background:var(--goldbg);border:1px solid var(--goldbdr)}
+.fcard-head.dark .fhi{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2)}
+.fht h3{font-size:14px;font-weight:800;color:var(--text)}
+.fcard-head.dark .fht h3{color:#fff}
+.fht p{font-size:11.5px;color:var(--muted);margin-top:1px}
+.fcard-head.dark .fht p{color:rgba(255,255,255,.55)}
+.fbody{padding:18px}
+
+/* FORM ELEMENTS */
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.frow.three{grid-template-columns:1fr 1fr 1fr}
+.frow.one{grid-template-columns:1fr}
+@media(max-width:600px){.frow,.frow.three{grid-template-columns:1fr}}
+.fg{display:flex;flex-direction:column;gap:5px}
+.flbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g2)}
+.finp,.fsel,.ftxt{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:500;color:var(--text);background:#fafdf9;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+.finp:focus,.fsel:focus,.ftxt:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(22,163,74,.10);background:#fff}
+.finp.err,.fsel.err{border-color:var(--red)}
+.ftxt{resize:vertical;min-height:72px;line-height:1.5}
+.fsel-wrap{position:relative}.fsel-wrap::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:13px}
+.fsel{padding-right:32px;cursor:pointer}
+
+/* SLOTS MINI GRID */
+.slots-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+@media(max-width:500px){.slots-mini{grid-template-columns:repeat(3,1fr)}}
+.sm-slot{padding:9px 4px;border:1.5px solid var(--border);border-radius:8px;text-align:center;cursor:pointer;transition:all .15s;background:var(--surf)}
+.sm-slot .smt{font-size:12px;font-weight:800;color:var(--text)}
+.sm-slot .sme{font-size:10px;color:var(--muted)}
+.sm-slot.booked{background:var(--redbg);border-color:var(--redbdr);cursor:not-allowed}
+.sm-slot.booked .smt{color:var(--red)}
+.sm-slot.tent{background:var(--tent-bg);border-color:var(--tent-bdr);cursor:not-allowed}
+.sm-slot.tent .smt{color:var(--tent)}
+.sm-slot.selected{border-color:var(--g2);background:var(--gbg)}
+.sm-slot.selected .smt{color:var(--g1)}
+.sm-slot:hover:not(.booked):not(.tent):not(.selected){border-color:var(--g3);background:var(--gbg)}
+
+/* PAYMENT MODE */
+.pay-mode{display:flex;gap:8px;margin-bottom:0}
+.pm-btn{flex:1;padding:10px 8px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:12.5px;font-weight:700;cursor:pointer;background:var(--surf);color:var(--muted);transition:all .15s;text-align:center;-webkit-tap-highlight-color:transparent}
+.pm-btn.sel{border-color:var(--g2);background:var(--gbg);color:var(--g1)}
+
+/* PRICE OVERRIDE */
+.price-row{display:flex;align-items:center;gap:8px}
+.price-base{font-size:13px;font-weight:700;color:var(--muted)}
+.discount-note{font-size:11px;color:var(--red);font-weight:600;margin-top:3px}
+
+/* BUTTONS */
+.btn{padding:13px 20px;border:none;border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:opacity .2s,transform .15s;-webkit-tap-highlight-color:transparent}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--g1),var(--g3));color:#fff;box-shadow:0 4px 14px rgba(22,163,74,.28);width:100%;padding:16px;font-size:15px}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-gold{background:var(--goldb);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--g2);color:var(--g2)}
+.btn-sm{padding:8px 14px;font-size:12.5px}
+.btn-ghost{background:var(--gbg);color:var(--g2);border:1.5px solid var(--border)}
+
+/* SPINNER */
+.spinner{display:inline-block;width:15px;height:15px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── COURT GRID (same as courts.html) ──────────── */
+.date-nav{display:flex;align-items:center;gap:8px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.date-nav::-webkit-scrollbar{display:none}
+.dnb{background:none;border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;font-family:var(--font);font-size:12.5px;font-weight:700;cursor:pointer;color:var(--muted);white-space:nowrap;transition:all .15s}
+.dnb.active{background:var(--g2);border-color:var(--g2);color:#fff}
+.grid-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.schedule{border-collapse:collapse;width:100%;min-width:720px}
+.schedule th{padding:8px 10px;background:var(--g1);color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:center;white-space:nowrap}
+.schedule th:first-child{width:56px;background:#050f08}
+.schedule td{padding:2px;border:1px solid var(--border);vertical-align:top}
+.schedule td:first-child{padding:5px 8px;background:var(--surf);font-size:11px;font-weight:700;color:var(--muted);text-align:right;white-space:nowrap;position:sticky;left:0;z-index:10;border-right:2px solid var(--border)}
+.slot-cell{border-radius:5px;padding:4px 6px;min-height:36px;cursor:pointer;transition:opacity .15s;display:flex;flex-direction:column;justify-content:center}
+.slot-cell:active{opacity:.7}
+.slot-cell.avail{background:var(--avail-bg);border:1px solid var(--g4)}
+.slot-cell.avail:hover{background:#bbf7d0}
+.slot-cell.booked{background:var(--booked-bg);border:1px solid var(--redbdr)}
+.slot-cell.grace{background:var(--grace-bg);border:1px solid var(--goldbdr)}
+.slot-cell.tent{background:var(--tent-bg);border:1px solid var(--tent-bdr)}
+.slot-cell.past{background:var(--past-bg);border:1px solid #e2e8f0;cursor:default;opacity:.55}
+.sc-name{font-size:10px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-time{font-size:9px;font-weight:500;opacity:.75;margin-top:1px}
+.sc-src{font-size:8.5px;font-weight:700;opacity:.65;margin-top:1px}
+.slot-cell.avail .sc-name{color:var(--avail)}
+.slot-cell.booked .sc-name{color:var(--booked)}
+.slot-cell.grace .sc-name{color:var(--grace)}
+.slot-cell.tent .sc-name{color:var(--tent)}
+.slot-cell.past .sc-name{color:var(--past)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--muted)}
+.leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+
+/* ── MODAL ──────────────────────────────────────── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:flex-end;justify-content:center}
+.overlay.hidden{display:none}
+.modal{background:var(--surf);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:14px auto 18px}
+.modal-inner{padding:0 18px 28px}
+.modal-title{font-size:16px;font-weight:900;color:var(--text);margin-bottom:16px}
+.dr{display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.dr:last-of-type{border-bottom:none}
+.dk{color:var(--muted);font-weight:500;flex-shrink:0;margin-right:12px}
+.dv{font-weight:700;color:var(--text);text-align:right;word-break:break-all}
+.modal-acts{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.modal-note-area{margin-top:10px}
+
+/* SOURCE TAGS */
+.src-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;font-size:10.5px;font-weight:700}
+.src-online{background:#dbeafe;color:#1d4ed8}
+.src-manager{background:var(--goldbg);color:var(--gold)}
+.src-call{background:var(--tent-bg);color:var(--tent)}
+
+/* ── CASH REGISTER ──────────────────────────────── */
+.cash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:480px){.cash-stats{grid-template-columns:1fr 1fr}}
+.cs-card{background:var(--surf);border-radius:var(--rlg);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px;text-align:center}
+.cs-val{font-size:28px;font-weight:900;color:var(--g1);letter-spacing:-1px;line-height:1}
+.cs-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.cash-list{background:var(--surf);border-radius:var(--rlg);border:1px solid var(--border);overflow:hidden;margin-bottom:14px}
+.cash-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px}
+.cash-row:last-child{border-bottom:none}
+.cash-row .cr-time{font-size:11px;color:var(--muted);font-weight:600;min-width:44px}
+.cash-row .cr-court{font-weight:700;color:var(--text);flex:1}
+.cash-row .cr-cust{color:var(--muted);font-size:12px;flex:1}
+.cash-row .cr-amt{font-weight:900;color:var(--g1);font-size:15px;white-space:nowrap}
+.submit-box{background:var(--goldbg);border:2px solid var(--goldbdr);border-radius:var(--rlg);padding:18px;text-align:center}
+.submit-box h3{font-size:15px;font-weight:800;color:var(--gold);margin-bottom:6px}
+.submit-box p{font-size:13px;color:var(--gold);opacity:.8;margin-bottom:16px}
+.diff-flag{background:var(--redbg);border:1px solid var(--redbdr);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--red);font-weight:700;margin-top:10px;display:none}
+.diff-flag.show{display:block}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 22px;border-radius:999px;font-size:13.5px;font-weight:700;z-index:9999;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s;opacity:0;pointer-events:none;max-width:90vw;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{background:var(--g2);color:#fff}
+.toast.err{background:var(--red);color:#fff}
+.toast.info{background:#1d4ed8;color:#fff}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:32px 20px;color:var(--muted)}
+.empty-state .ei{font-size:36px;margin-bottom:8px;opacity:.4}
+.empty-state p{font-size:13px}
+
+/* TENTATIVE TIMER */
+.tent-timer{background:var(--tent-bg);border:1px solid var(--tent-bdr);border-radius:var(--r);padding:8px 12px;font-size:12px;font-weight:700;color:var(--tent);margin-top:6px;display:none}
+.tent-timer.show{display:block}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="loginScreen">
+  <div class="lcard">
+    <div class="lbadge">🏟️</div>
+    <div class="ltitle">Manager Panel</div>
+    <div class="lsub">Mansa Sports Park — Authorised Staff Only</div>
+    <input type="password" class="linp" id="mgrPass" placeholder="Manager password" maxlength="30" autocomplete="current-password">
+    <div class="lerr" id="loginErr"></div>
+    <button class="btn-login" id="btnLogin">🔐 Login</button>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="appScreen" style="display:none">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="tb-left">
+      <div>
+        <div class="tb-title">🏟️ Manager Panel</div>
+        <div class="tb-sub" id="topDate"></div>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-stat">Cash <span id="tbCash">₹0</span></div>
+      <div class="tb-stat">Bookings <span id="tbBookings">0</span></div>
+      <div class="tb-stat" id="tbClock">—</div>
+      <button class="btn-tb" id="btnRefresh">↻ Refresh</button>
+      <button class="btn-tb" id="btnLogout">Exit</button>
+    </div>
+  </div>
+
+  <!-- TAB NAV -->
+  <div class="tabnav">
+    <button class="tab-btn active" data-tab="booking">📋 Quick Book</button>
+    <button class="tab-btn" data-tab="grid">📊 Court Grid</button>
+    <button class="tab-btn" data-tab="cash">💵 Cash Register</button>
+    <button class="tab-btn" data-tab="call">📞 Call Booking</button>
+    <button class="tab-btn" data-tab="passes">⭐ Issue Pass</button>
+  </div>
+
+  <!-- ══════════ TAB 1: QUICK BOOKING ══════════ -->
+  <div class="panel active" id="tab-booking">
+
+    <!-- ── TODAY'S PASS BATCH SETUP (Morning task) ──────────────────── -->
+    <div class="fcard" style="margin-top:14px" id="batchCard">
+      <div class="fcard-head gold">
+        <div class="fhi gold">🎫</div>
+        <div class="fht"><h3>Today's Pass Batch <span style="color:var(--red);font-weight:900">★ Set at shift start</span></h3><p>Activate wristband serial range before gate opens</p></div>
+      </div>
+      <div class="fbody" id="batchCardBody">
+
+        <!-- READ-ONLY view (shown after submission) -->
+        <div id="batchReadOnly" style="display:none">
+          <div style="background:var(--gbg);border:1.5px solid var(--g4);border-radius:var(--r);padding:14px;margin-bottom:10px">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g2);margin-bottom:10px">✅ Today's Batch Activated</div>
+            <div id="batchReadOnlyContent"></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);font-weight:500">Batch is locked. Contact owner to modify.</div>
+        </div>
+
+        <!-- FORM (shown if not yet submitted today) -->
+        <div id="batchForm">
+          <div class="frow">
+            <div class="fg">
+              <label class="flbl">Wristband Colour Today</label>
+              <div class="fsel-wrap">
+                <select class="fsel" id="batchColour">
+                  <option value="">— Select colour —</option>
+                  <option value="Red">🔴 Red</option>
+                  <option value="Blue">🔵 Blue</option>
+                  <option value="Green">🟢 Green</option>
+                  <option value="Yellow">🟡 Yellow</option>
+                  <option value="Orange">🟠 Orange</option>
+                  <option value="Purple">🟣 Purple</option>
+                  <option value="White">⚪ White</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="frow">
+            <div class="fg">
+              <label class="flbl">Serial From <span style="color:var(--red)">*</span></label>
+              <input type="number" class="finp" id="batchFrom" placeholder="e.g. 0001" min="1" max="9999" inputmode="numeric">
+            </div>
+            <div class="fg">
+              <label class="flbl">Serial To <span style="color:var(--red)">*</span></label>
+              <input type="number" class="finp" id="batchTo" placeholder="e.g. 0300" min="1" max="9999" inputmode="numeric">
+            </div>
+          </div>
+          <div style="background:var(--gbg);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--g2);font-weight:600;margin-bottom:14px" id="batchCalc">
+            Total passes: enter range above
+          </div>
+          <button class="btn btn-gold" style="width:100%;padding:14px;font-size:15px" id="btnActivateBatch">🎫 Activate Today's Batch</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── PASS ISSUANCE — cash walk-ins ────────────────────────────── -->
+    <div class="fcard" id="issueCard">
+      <div class="fcard-head green">
+        <div class="fhi green">🎟️</div>
+        <div class="fht">
+          <h3>Issue Pass to Walk-in Visitor</h3>
+          <p id="issueSubtitle">Loading today's batch…</p>
+        </div>
+      </div>
+      <div class="fbody">
+
+        <!-- Stats bar -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+          <div style="background:var(--gbg);border-radius:var(--r);padding:10px;text-align:center">
+            <div style="font-size:22px;font-weight:900;color:var(--g2)" id="issueCount">0</div>
+            <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase">Issued Today</div>
+          </div>
+          <div style="background:var(--gbg);border-radius:var(--r);padding:10px;text-align:center">
+            <div style="font-size:22px;font-weight:900;color:var(--goldb)" id="issueCash">₹0</div>
+            <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase">Expected Cash</div>
+          </div>
+          <div style="background:var(--gbg);border-radius:var(--r);padding:10px;text-align:center">
+            <div style="font-size:22px;font-weight:900;color:var(--blue)" id="issueRemaining">—</div>
+            <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase">Remaining</div>
+          </div>
+        </div>
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">Serial Number <span style="color:var(--red)">*</span></label>
+            <input type="number" class="finp" id="issueSerial" placeholder="e.g. 0042" min="1" max="9999" inputmode="numeric" style="font-size:20px;font-weight:900;letter-spacing:2px;font-family:monospace">
+            <div style="font-size:11.5px;color:var(--red);font-weight:600;margin-top:4px;display:none" id="issueSerialErr"></div>
+          </div>
+          <div class="fg">
+            <label class="flbl">Payment Mode</label>
+            <div class="pay-mode" id="issuePayMode">
+              <button class="pm-btn sel" data-pm="Cash">💵 Cash</button>
+              <button class="pm-btn" data-pm="UPI">📱 UPI</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="fg" id="issueUpiWrap" style="margin-bottom:14px;display:none">
+          <label class="flbl">UPI Reference No. <span style="color:var(--red)">*</span></label>
+          <input type="text" class="finp" id="issueUpiRef" placeholder="e.g. 4123456789" maxlength="30" autocomplete="off">
+        </div>
+
+        <button class="btn btn-primary" id="btnIssuePass" style="padding:16px;font-size:15px">🎫 Issue Pass</button>
+
+      </div>
+    </div>
+
+    <div class="fcard" style="margin-top:0">
+      <div class="fcard-head green">
+        <div class="fhi green">📋</div>
+        <div class="fht"><h3>Quick Walk-in Court Booking</h3><p>Book a slot immediately for today</p></div>
+      </div>
+      <div class="fbody">
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">Court</label>
+            <div class="fsel-wrap">
+              <select class="fsel" id="qCourt">
+                <option value="">— Select court —</option>
+              </select>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="flbl">Duration</label>
+            <div class="fsel-wrap">
+              <select class="fsel" id="qDur">
+                <option value="60">60 minutes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="fg" style="margin-bottom:12px">
+          <label class="flbl">Available Time Slots — Today</label>
+          <div class="slots-mini" id="qSlots">
+            <div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:12px">Select a court to see slots</div>
+          </div>
+          <div class="tent-timer" id="tentTimer"></div>
+        </div>
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">Customer Name</label>
+            <input type="text" class="finp" id="qName" placeholder="Full name" autocapitalize="words" maxlength="60">
+          </div>
+          <div class="fg">
+            <label class="flbl">Customer Phone</label>
+            <input type="tel" class="finp" id="qPhone" placeholder="10-digit number" inputmode="numeric" maxlength="10">
+          </div>
+        </div>
+
+        <div class="frow three">
+          <div class="fg">
+            <label class="flbl">No. of Players</label>
+            <input type="number" class="finp" id="qPlayers" placeholder="e.g. 4" min="1" max="22" value="2">
+          </div>
+          <div class="fg">
+            <label class="flbl">Payment Mode</label>
+            <div class="pay-mode" id="qPayMode">
+              <button class="pm-btn sel" data-pm="Cash">💵 Cash</button>
+              <button class="pm-btn" data-pm="UPI">📱 UPI</button>
+              <button class="pm-btn" data-pm="Online">🌐 Online</button>
+            </div>
+          </div>
+          <div class="fg" id="upiRefWrap" style="display:none">
+            <label class="flbl">UPI Reference No.</label>
+            <input type="text" class="finp" id="qUpiRef" placeholder="e.g. 123456789" maxlength="30">
+          </div>
+        </div>
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">Amount Received (₹)</label>
+            <input type="number" class="finp" id="qAmount" placeholder="0" min="0">
+            <div class="price-base" id="qBasePrice"></div>
+            <div class="discount-note" id="qDiscountNote" style="display:none"></div>
+          </div>
+          <div class="fg">
+            <label class="flbl">Discount Reason <span style="font-weight:500;text-transform:none;color:var(--muted)">(if any)</span></label>
+            <input type="text" class="finp" id="qDiscReason" placeholder="e.g. Regular customer" maxlength="100">
+          </div>
+        </div>
+
+        <div class="fg" style="margin-bottom:16px">
+          <label class="flbl">Notes <span style="font-weight:500;text-transform:none;color:var(--muted)">(optional)</span></label>
+          <textarea class="ftxt" id="qNotes" placeholder="e.g. Regular customer, VIP, group booking..." maxlength="300"></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="btnQuickBook">✅ Confirm Booking</button>
+
+      </div>
+    </div>
+
+    <!-- Recent Manager Bookings Today -->
+    <div class="fcard">
+      <div class="fcard-head green">
+        <div class="fhi green">📋</div>
+        <div class="fht"><h3>My Bookings Today</h3><p>Bookings made by you this session</p></div>
+      </div>
+      <div id="myBookingsList">
+        <div class="empty-state"><div class="ei">📋</div><p>No bookings made yet today</p></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════ TAB 2: COURT GRID ══════════ -->
+  <div class="panel" id="tab-grid">
+    <div style="padding:14px 0 10px">
+      <div class="date-nav" id="gridDateNav"></div>
+    </div>
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--avail-bg);border:1px solid var(--g4)"></div>Available</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--booked-bg);border:1px solid var(--redbdr)"></div>Confirmed</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--grace-bg);border:1px solid var(--goldbdr)"></div>Grace 15min</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--tent-bg);border:1px solid var(--tent-bdr)"></div>Tentative</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--past-bg);border:1px solid #e2e8f0"></div>Past</div>
+    </div>
+    <div class="grid-scroll">
+      <table class="schedule" id="mgGrid">
+        <thead id="mgGridHead"></thead>
+        <tbody id="mgGridBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 3: CASH REGISTER ══════════ -->
+  <div class="panel" id="tab-cash">
+    <div style="padding-top:14px">
+      <div class="cash-stats">
+        <div class="cs-card"><div class="cs-val" id="crCashTotal">₹0</div><div class="cs-lbl">Cash Collected</div></div>
+        <div class="cs-card"><div class="cs-val" id="crUpiTotal">₹0</div><div class="cs-lbl">UPI Collected</div></div>
+        <div class="cs-card"><div class="cs-val" id="crBookCount">0</div><div class="cs-lbl">Your Bookings</div></div>
+      </div>
+
+      <div class="cash-list" id="cashList">
+        <div class="empty-state"><div class="ei">💵</div><p>No cash entries yet today</p></div>
+      </div>
+
+      <div class="submit-box" id="dayEndBox">
+        <h3>📋 Day-End Submission</h3>
+        <p>Fill once at end of day. Cannot be modified after submission.</p>
+
+        <div id="dayEndFormWrap">
+          <div class="frow" style="margin-bottom:10px">
+            <div class="fg">
+              <label class="flbl">Wristbands Issued</label>
+              <input type="number" class="finp" id="deWristbands" placeholder="Count" min="0">
+            </div>
+            <div class="fg">
+              <label class="flbl">Cash at Gate (₹)</label>
+              <input type="number" class="finp" id="deCashGate" placeholder="₹0" min="0">
+            </div>
+          </div>
+          <div class="frow" style="margin-bottom:10px">
+            <div class="fg">
+              <label class="flbl">UPI at Gate (₹)</label>
+              <input type="number" class="finp" id="deUpiGate" placeholder="₹0" min="0">
+            </div>
+            <div class="fg">
+              <label class="flbl">Court Cash (₹)</label>
+              <input type="number" class="finp" id="deCourtCash" placeholder="₹0" min="0">
+            </div>
+          </div>
+          <div class="frow" style="margin-bottom:10px">
+            <div class="fg">
+              <label class="flbl">Court UPI (₹)</label>
+              <input type="number" class="finp" id="deCourtUpi" placeholder="₹0" min="0">
+            </div>
+            <div class="fg">
+              <label class="flbl">Kiosk Revenue (₹)</label>
+              <input type="number" class="finp" id="deKiosk" placeholder="₹0" min="0" value="0">
+            </div>
+          </div>
+          <div style="margin-bottom:14px">
+            <label class="flbl">Total Cash in Drawer (₹) <span style="color:var(--red)">*</span></label>
+            <input type="number" class="finp" id="deTotalCash" placeholder="Count all notes" min="0" style="font-size:20px;font-weight:900;letter-spacing:1px">
+          </div>
+          <div style="background:var(--gbg);border:1.5px solid var(--border);border-radius:var(--r);padding:12px 14px;font-size:13px;margin-bottom:14px" id="deSummary">Fill fields above to see expected total</div>
+          <button class="btn btn-gold" style="width:100%;padding:14px;font-size:15px" id="btnDayEnd">📋 Submit Day-End Report</button>
+          <div class="diff-flag" id="diffFlag" style="margin-top:10px"></div>
+        </div>
+
+        <div id="dayEndReadOnly" style="display:none">
+          <div style="background:#dcfce7;border:1px solid #86efac;border-radius:var(--r);padding:14px;font-size:13px;color:#166534;font-weight:700;text-align:center;margin-bottom:10px">✅ Day-end submitted. Read-only.</div>
+          <div id="dayEndROContent"></div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 4: CALL BOOKING (ADVANCE) ══════════ -->
+  <div class="panel" id="tab-call">
+    <div class="fcard" style="margin-top:14px">
+      <div class="fcard-head blue">
+        <div class="fhi blue">📞</div>
+        <div class="fht"><h3>Call / Advance Booking</h3><p>Book up to 7 days ahead · Slot held tentatively for 2 hours</p></div>
+      </div>
+      <div class="fbody">
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">Court</label>
+            <div class="fsel-wrap">
+              <select class="fsel" id="cCourt">
+                <option value="">— Select court —</option>
+              </select>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="flbl">Duration</label>
+            <div class="fsel-wrap">
+              <select class="fsel" id="cDur">
+                <option value="60">60 minutes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="fg" style="margin-bottom:12px">
+          <label class="flbl">Select Date (up to 7 days ahead)</label>
+          <div class="date-nav" id="callDateNav" style="margin-top:6px"></div>
+        </div>
+
+        <div class="fg" style="margin-bottom:12px">
+          <label class="flbl">Available Time Slots</label>
+          <div class="slots-mini" id="cSlots">
+            <div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:12px">Select a court and date to see slots</div>
+          </div>
+        </div>
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">Customer Name <span style="color:var(--red)">*</span></label>
+            <input type="text" class="finp" id="cName" placeholder="Full name — required" autocapitalize="words" maxlength="60">
+            <div style="font-size:11.5px;color:var(--red);font-weight:600;margin-top:4px;display:none" id="cNameErr">⚠️ Customer name is required</div>
+          </div>
+          <div class="fg">
+            <label class="flbl">Customer Phone <span style="color:var(--red)">*</span></label>
+            <input type="tel" class="finp" id="cPhone" placeholder="10-digit — required" inputmode="numeric" maxlength="10">
+            <div style="font-size:11.5px;color:var(--red);font-weight:600;margin-top:4px;display:none" id="cPhoneErr">⚠️ Valid phone required</div>
+          </div>
+        </div>
+
+        <div class="frow">
+          <div class="fg">
+            <label class="flbl">No. of Players</label>
+            <input type="number" class="finp" id="cPlayers" placeholder="e.g. 4" min="1" max="22" value="2">
+          </div>
+          <div class="fg">
+            <label class="flbl">Amount (₹) <span style="font-weight:500;text-transform:none;color:var(--muted)">— paid later</span></label>
+            <input type="number" class="finp" id="cAmount" placeholder="Auto-filled" min="0">
+          </div>
+        </div>
+
+        <div class="fg" style="margin-bottom:16px">
+          <label class="flbl">Notes</label>
+          <textarea class="ftxt" id="cNotes" placeholder="e.g. Called at 3PM, wants to pay on arrival..." maxlength="300"></textarea>
+        </div>
+
+        <div style="background:var(--tent-bg);border:1px solid var(--tent-bdr);border-radius:var(--r);padding:12px 14px;font-size:12.5px;color:var(--tent);margin-bottom:14px;line-height:1.5;font-weight:600">
+          ⏰ Slot will be marked <strong>Tentative</strong> (orange) for 2 hours.<br>
+          Customer will receive a WhatsApp payment link.<br>
+          If unpaid after 2 hours, slot auto-releases.<br>
+          🔔 You will get a browser notification 15 min before slot starts.
+        </div>
+
+        <button class="btn btn-blue" style="width:100%;padding:16px;font-size:15px" id="btnCallBook">📞 Hold Slot (VIP Hold)</button>
+
+      </div>
+    </div>
+
+    <!-- Tentative Bookings List -->
+    <div class="fcard">
+      <div class="fcard-head blue">
+        <div class="fhi blue">⏰</div>
+        <div class="fht"><h3>Pending Tentative Bookings</h3><p>Slots held awaiting payment</p></div>
+      </div>
+      <div id="tentativeList">
+        <div class="empty-state"><div class="ei">⏰</div><p>No pending tentative bookings</p></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════ TAB 5: ISSUE MONTHLY PASS ══════════ -->
+  <div class="panel" id="tab-passes">
+    <div style="padding-top:14px">
+
+      <!-- Renewal detection banner — shown when existing pass found -->
+      <div id="renewalBanner" style="display:none;background:#fef3c7;border:1.5px solid #fde68a;border-radius:var(--rlg);padding:14px 18px;margin-bottom:14px;display:none;align-items:center;gap:12px">
+        <span style="font-size:22px">🔄</span>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:#92400e" id="renewalTitle">Renewal Detected</div>
+          <div style="font-size:12.5px;color:#a16207;margin-top:2px" id="renewalSub">Previous pass found for this number</div>
+        </div>
+      </div>
+
+      <!-- Pass issue form -->
+      <div class="fcard">
+        <div class="fcard-head gold">
+          <div class="fhi gold">⭐</div>
+          <div class="fht">
+            <h3>Issue Monthly Pass</h3>
+            <p>For walk-in customers paying cash or UPI</p>
+          </div>
+        </div>
+        <div class="fbody">
+
+          <!-- Customer details -->
+          <div class="frow">
+            <div class="fg">
+              <label class="flbl">Customer Name <span style="color:var(--red)">*</span></label>
+              <input type="text" class="finp" id="mpName" placeholder="Full name" autocapitalize="words" maxlength="60">
+              <div style="font-size:11.5px;color:var(--red);font-weight:600;margin-top:4px;display:none" id="mpNameErr">⚠️ Name is required</div>
+            </div>
+            <div class="fg">
+              <label class="flbl">Mobile Number <span style="color:var(--red)">*</span></label>
+              <div style="display:flex">
+                <div style="padding:11px 12px;background:var(--gbg);border:1.5px solid var(--border);border-right:none;border-radius:var(--r) 0 0 var(--r);font-size:13px;font-weight:700;color:var(--g2);white-space:nowrap;display:flex;align-items:center">🇮🇳 +91</div>
+                <input type="tel" class="finp" id="mpPhone" placeholder="10-digit" inputmode="numeric" maxlength="10" style="border-radius:0 var(--r) var(--r) 0">
+              </div>
+              <div style="font-size:11.5px;color:var(--red);font-weight:600;margin-top:4px;display:none" id="mpPhoneErr">⚠️ Valid phone required</div>
+            </div>
+          </div>
+
+          <!-- Pass type selection -->
+          <div class="fg" style="margin-bottom:14px">
+            <label class="flbl">Pass Type <span style="color:var(--red)">*</span></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
+              <div class="pass-opt" id="mpOptMorning" data-type="Morning Pass" data-price="500"
+                style="border:2.5px solid var(--border);border-radius:var(--r);padding:14px 12px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;position:relative">
+                <div style="font-size:22px;margin-bottom:6px">🌅</div>
+                <div style="font-size:13px;font-weight:800;color:var(--text)">Morning Pass</div>
+                <div style="font-size:20px;font-weight:900;color:var(--goldb);letter-spacing:-.5px">₹500</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">6AM–9AM only</div>
+              </div>
+              <div class="pass-opt" id="mpOptFull" data-type="Full Day Pass" data-price="1500"
+                style="border:2.5px solid var(--border);border-radius:var(--r);padding:14px 12px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;position:relative">
+                <div style="position:absolute;top:8px;right:8px;background:var(--goldb);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:999px;text-transform:uppercase">Popular</div>
+                <div style="font-size:22px;margin-bottom:6px">☀️</div>
+                <div style="font-size:13px;font-weight:800;color:var(--text)">Full Day Pass</div>
+                <div style="font-size:20px;font-weight:900;color:var(--goldb);letter-spacing:-.5px">₹1,500</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">All day access</div>
+              </div>
+            </div>
+            <div style="font-size:11.5px;color:var(--red);font-weight:600;margin-top:6px;display:none" id="mpPassErr">⚠️ Select a pass type</div>
+          </div>
+
+          <!-- Payment mode -->
+          <div class="frow">
+            <div class="fg">
+              <label class="flbl">Payment Mode <span style="color:var(--red)">*</span></label>
+              <div class="pay-mode" id="mpPayMode">
+                <button class="pm-btn sel" data-pm="Cash">💵 Cash</button>
+                <button class="pm-btn" data-pm="UPI">📱 UPI</button>
+              </div>
+            </div>
+            <div class="fg" id="mpUpiWrap" style="display:none">
+              <label class="flbl">UPI Reference <span style="color:var(--red)">*</span></label>
+              <input type="text" class="finp" id="mpUpiRef" placeholder="e.g. 4123456789" maxlength="30">
+            </div>
+          </div>
+
+          <!-- Optional face photo -->
+          <div class="fg" style="margin-bottom:14px">
+            <label class="flbl">Face Photo <span style="font-weight:500;text-transform:none;color:var(--muted)">(optional — for gate recognition)</span></label>
+            <div style="border:2px dashed var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg)">
+              <div id="mpCamPlaceholder" style="padding:20px;text-align:center;color:var(--muted);font-size:13px">
+                <div style="font-size:28px;margin-bottom:6px">📸</div>
+                <div>Tap "Open Camera" to capture face</div>
+              </div>
+              <video id="mpVideo" autoplay playsinline muted style="width:100%;display:none;max-height:220px;object-fit:cover;background:#000"></video>
+              <canvas id="mpCanvas" style="display:none"></canvas>
+              <img id="mpPreview" alt="Face photo" style="width:100%;display:none;max-height:220px;object-fit:cover">
+              <div id="mpPhotoOk" style="display:none;align-items:center;gap:6px;padding:8px 12px;background:var(--gbg);font-size:12.5px;font-weight:700;color:var(--g2);border-top:1px solid var(--border)">✅ Photo captured</div>
+              <div style="display:flex;gap:8px;padding:10px;background:#f8fdf9;border-top:1px solid var(--border)">
+                <button class="btn-cam btn-cam-open" id="mpBtnCamOpen" type="button" style="flex:1;padding:10px;border:none;border-radius:8px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;background:var(--gbg);color:var(--g2);border:1.5px solid rgba(22,163,74,.25);display:flex;align-items:center;justify-content:center;gap:6px">📷 Open Camera</button>
+                <button id="mpBtnShoot" type="button" style="flex:1;padding:10px;border:none;border-radius:8px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;background:var(--g2);color:#fff;display:none;align-items:center;justify-content:center;gap:6px">🔴 Capture</button>
+                <button id="mpBtnRetake" type="button" style="flex:1;padding:10px;border:none;border-radius:8px;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;background:#fee2e2;color:var(--red);border:1.5px solid #fca5a5;display:none;align-items:center;justify-content:center;gap:6px">🔄 Retake</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Validity dates preview -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px" id="mpDatesWrap" style="display:none">
+            <div style="background:var(--goldbg);border:1px solid var(--goldbdr);border-radius:var(--r);padding:12px;text-align:center">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px">Starts</div>
+              <div style="font-size:14px;font-weight:800;color:var(--text)" id="mpStartDate">—</div>
+            </div>
+            <div style="background:var(--goldbg);border:1px solid var(--goldbdr);border-radius:var(--r);padding:12px;text-align:center">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px">Expires</div>
+              <div style="font-size:14px;font-weight:800;color:var(--text)" id="mpEndDate">—</div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="fg" style="margin-bottom:16px">
+            <label class="flbl">Notes <span style="font-weight:500;text-transform:none;color:var(--muted)">(optional)</span></label>
+            <textarea class="ftxt" id="mpNotes" placeholder="e.g. Regular customer, referred by member..." maxlength="200"></textarea>
+          </div>
+
+          <button class="btn btn-gold" id="btnIssueMonthlyPass" style="width:100%;padding:16px;font-size:15px;background:linear-gradient(135deg,#78350f,var(--goldb));color:#fff;border:none;border-radius:var(--r);font-family:var(--font);font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(217,119,6,.35)">⭐ Issue Monthly Pass</button>
+
+          <!-- Success flash -->
+          <div id="mpSuccess" style="display:none;background:linear-gradient(135deg,#dcfce7,#bbf7d0);border:2px solid #4ade80;border-radius:var(--r);padding:18px;margin-top:14px;text-align:center;animation:popIn .4s ease">
+            <div style="font-size:32px;margin-bottom:8px">🎉</div>
+            <div style="font-size:15px;font-weight:800;color:#166534" id="mpSuccessMsg">Pass issued successfully!</div>
+            <div style="font-size:12.5px;color:#4b7c5a;margin-top:4px" id="mpSuccessSub">WhatsApp confirmation sent</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Active passes list -->
+      <div class="fcard">
+        <div class="fcard-head gold">
+          <div class="fhi gold">📋</div>
+          <div class="fht">
+            <h3>Passes Issued Today</h3>
+            <p id="passesTodayCount">Loading…</p>
+          </div>
+        </div>
+        <div id="passesTodayList">
+          <div class="empty-state"><div class="ei">⭐</div><p>No passes issued today yet</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /appScreen -->
+
+<!-- BOOKING DETAIL MODAL -->
+<div class="overlay hidden" id="overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-inner">
+      <div class="modal-title" id="modalTitle">Booking Details</div>
+      <div id="modalBody"></div>
+      <div class="modal-acts" id="modalActs"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import {
+  getFirestore, collection, addDoc, getDocs, updateDoc, doc,
+  query, where, orderBy, getDoc, setDoc, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ══ CONFIG — same as all other modules ══ */
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCr0ITLauBZY1tEvXZcbMilWbCGuOYJLrM",
+  authDomain:        "mansasportspark-e0f3d.firebaseapp.com",
+  projectId:         "mansasportspark-e0f3d",
+  storageBucket:     "mansasportspark-e0f3d.firebasestorage.app",
+  messagingSenderId: "521169146944",
+  appId:             "1:521169146944:web:9877d8f7be192c60993ba5",
+  measurementId:     "G-9ZSKTGTJRC"
+};
+const TWILIO_FN_URL = "https://sendwhatsapp-a6itbc4lzq-uc.a.run.app";
+/* ════════════════════════════════════════ */
+
+const app     = initializeApp(FIREBASE_CONFIG);
+const db      = getFirestore(app);
+const storage = getStorage(app);
+window.__mgDb  = { db, storage, collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, getDoc, setDoc, ref, uploadString, getDownloadURL };
+window.__mgCfg = { TWILIO_FN_URL };
+window.dispatchEvent(new Event('mg-ready'));
+</script>
+
+<script>
+'use strict';
+/* ══ CONSTANTS ══════════════════════════════════ */
+const MGR_PASS = 'mansaManager2024'; // Change this
+
+const COURTS = [
+  {id:'tennis',    name:'Tennis',            icon:'🎾', price60:350, price30:null, durations:[60]},
+  {id:'badminton_in', name:'Badminton Indoor', icon:'🏸', price60:175, price30:null, durations:[60]},
+  {id:'badminton_out',name:'Badminton Outdoor',icon:'🏸', price60:90,  price30:null, durations:[60]},
+  {id:'pickleball',name:'Pickleball',        icon:'🏓', price60:175, price30:null, durations:[60]},
+  {id:'box_cricket',name:'Box Cricket Turf', icon:'🏏', price60:500, price30:null, durations:[60]},
+  {id:'cricket_net',name:'Cricket Net',      icon:'🏏', price60:250, price30:125,  durations:[30,60]},
+  {id:'table_tennis',name:'Table Tennis',    icon:'🏓', price60:140, price30:70,   durations:[30,60]},
+  {id:'basketball', name:'Basketball',        icon:'🏀', price60:180, price30:100,  durations:[30,60]},
+];
+
+const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const $      = id => document.getElementById(id);
+
+/* ══ STATE ══════════════════════════════════════ */
+let S = {
+  fbReady:false, mgrName:'Manager',
+  bookings:[], myBookings:[],
+  qCourt:null, qSlot:null, qPayMode:'Cash', qDate:null,
+  cCourt:null, cSlot:null, cDate:null, // [NOTE] cDate set by date nav clicks
+  gridDate: new Date(), gridDate2: new Date(),
+};
+S.gridDate.setHours(0,0,0,0);
+S.qDate = new Date(); S.qDate.setHours(0,0,0,0);
+
+window.addEventListener('mg-ready', () => { S.fbReady=true; loadData(); loadBatchData(); });
+
+/* ══ UTILITIES ══════════════════════════════════ */
+function toast(msg, type='ok') {
+  const t=$('toast'); t.textContent=msg; t.className=`toast show ${type}`;
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),4000);
+}
+function san(s){ return String(s||'').replace(/[<>"'`]/g,'').replace(/[\x00-\x1F]/g,'').trim().slice(0,300); }
+function fmtDate(d){ return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; }
+function fmtTime(d){ return d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+function slotKey(hm,dur){ return `${hm}_${dur}`; }
+function addMin(min){ const hh=String(Math.floor(min/60)).padStart(2,'0'); const mm=String(min%60).padStart(2,'0'); return `${hh}:${mm}`; }
+
+/* ══ LOGIN ══════════════════════════════════════ */
+function doLogin() {
+  const pass = $('mgrPass').value;
+  if (pass === MGR_PASS) {
+    $('loginScreen').style.display='none';
+    $('appScreen').style.display='block';
+    sessionStorage.setItem('msp_mgr','1');
+    init();
+  } else {
+    $('loginErr').textContent='Incorrect password.';
+    $('mgrPass').classList.add('shake');
+    $('mgrPass').value='';
+    setTimeout(()=>$('mgrPass').classList.remove('shake'),400);
+  }
+}
+if(sessionStorage.getItem('msp_mgr')==='1'){ $('loginScreen').style.display='none'; $('appScreen').style.display='block'; init(); }
+$('btnLogin').addEventListener('click', doLogin);
+$('mgrPass').addEventListener('keydown', e=>e.key==='Enter'&&doLogin());
+$('btnLogout').addEventListener('click', ()=>{ sessionStorage.removeItem('msp_mgr'); location.reload(); });
+
+/* ══ INIT ════════════════════════════════════════ */
+function init() {
+  buildCourtDropdowns();
+  buildGridDateNav();
+  buildCallDateNav();
+  buildTabNav();
+  startClock();
+  if(S.fbReady) loadData();
+}
+
+/* ══ CLOCK ══════════════════════════════════════ */
+function startClock() {
+  function tick() {
+    const now=new Date();
+    $('topDate').textContent = `${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]}`;
+    $('tbClock').textContent = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    checkTentativeExpiry();
+  }
+  tick(); setInterval(tick,30000);
+}
+
+/* ══ TABS ════════════════════════════════════════ */
+function buildTabNav() {
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      $('tab-'+btn.dataset.tab).classList.add('active');
+      if(btn.dataset.tab==='grid')   renderGrid();
+      if(btn.dataset.tab==='cash')   renderCashRegister();
+      if(btn.dataset.tab==='call')   renderTentativeList();
+      if(btn.dataset.tab==='passes') loadPassesToday();
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+}
+
+/* ══ COURT DROPDOWNS ════════════════════════════ */
+function buildCourtDropdowns() {
+  ['qCourt','cCourt'].forEach(id=>{
+    const sel=$( id );
+    sel.innerHTML='<option value="">— Select court —</option>';
+    COURTS.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c.id; o.textContent=`${c.icon} ${c.name} — ₹${c.price60}/hr`;
+      sel.appendChild(o);
+    });
+  });
+
+  // Quick booking court change
+  $('qCourt').addEventListener('change', ()=>{
+    const c = COURTS.find(x=>x.id===$('qCourt').value);
+    S.qCourt = c||null; S.qSlot=null;
+    buildDurSelect('qDur', c);
+    updateBasePrice('q');
+    if(c) loadQuickSlots();
+    else { $('qSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:12px">Select a court to see slots</div>'; }
+  });
+  $('qDur').addEventListener('change', ()=>{
+    S.qSlot=null; updateBasePrice('q');
+    if(S.qCourt) loadQuickSlots();
+  });
+
+  // Call booking court change
+  $('cCourt').addEventListener('change', ()=>{
+    const c = COURTS.find(x=>x.id===$('cCourt').value);
+    S.cCourt = c||null; S.cSlot=null;
+    buildDurSelect('cDur', c);
+    updateBasePrice('c');
+    if(c&&S.cDate) loadCallSlots();
+  });
+  $('cDur').addEventListener('change', ()=>{
+    S.cSlot=null; updateBasePrice('c');
+    if(S.cCourt&&S.cDate) loadCallSlots();
+  });
+}
+
+function buildDurSelect(selId, court) {
+  const sel=$(selId); sel.innerHTML='';
+  if(!court){ sel.innerHTML='<option value="60">60 minutes</option>'; return; }
+  court.durations.forEach(d=>{
+    const o=document.createElement('option');
+    o.value=d; o.textContent=`${d} minutes`;
+    sel.appendChild(o);
+  });
+}
+
+function getPrice(court, dur) {
+  if(!court) return 0;
+  return dur===30 ? (court.price30||court.price60) : court.price60;
+}
+
+function updateBasePrice(prefix) {
+  const court = prefix==='q' ? S.qCourt : S.cCourt;
+  const dur   = parseInt($(prefix+'Dur').value)||60;
+  const price = getPrice(court, dur);
+  const amtEl = $(prefix+'Amount');
+  if(price) {
+    amtEl.value = price;
+    if(prefix==='q') $('qBasePrice').textContent = `Standard rate: ₹${price}`;
+  }
+}
+
+/* ══ PAYMENT MODE ═══════════════════════════════ */
+document.querySelectorAll('#qPayMode .pm-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#qPayMode .pm-btn').forEach(b=>b.classList.remove('sel'));
+    btn.classList.add('sel');
+    S.qPayMode = btn.dataset.pm;
+    $('upiRefWrap').style.display = S.qPayMode==='UPI' ? 'flex' : 'none';
+  });
+});
+
+/* ══ PHONE GUARD ════════════════════════════════ */
+['qPhone','cPhone'].forEach(id=>{
+  const el=$(id);
+  el.addEventListener('input',()=>{ el.value=el.value.replace(/[^0-9]/g,'').slice(0,10); });
+  el.addEventListener('keydown',e=>{ if(!e.key||e.key==='Unidentified')return; const ok=['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Enter','Home','End']; if(!ok.includes(e.key)&&!/^[0-9]$/.test(e.key))e.preventDefault(); });
+  el.addEventListener('paste',e=>{ e.preventDefault(); el.value=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,10); });
+});
+['qName','cName'].forEach(id=>{ $(id).addEventListener('input',()=>{ $(id).value=$(id).value.replace(/[^a-zA-Z\u00C0-\u024F\s\-'.]/g,''); }); });
+
+/* ══ AMOUNT OVERRIDE (discount detection) ═══════ */
+$('qAmount').addEventListener('input',()=>{
+  const court=S.qCourt; const dur=parseInt($('qDur').value)||60;
+  const base=getPrice(court,dur); const entered=parseFloat($('qAmount').value)||0;
+  const note=$('qDiscountNote');
+  if(court&&entered>0&&entered<base){
+    const disc=base-entered; const pct=Math.round(disc/base*100);
+    note.textContent=`⚠️ Discount of ₹${disc} (${pct}%) — reason required`;
+    note.style.display='block';
+    $('qDiscReason').style.borderColor='var(--goldb)';
+  } else { note.style.display='none'; $('qDiscReason').style.borderColor=''; }
+});
+
+/* ══ LOAD DATA ══════════════════════════════════ */
+async function loadData() {
+  if(!window.__mgDb) return;
+  const { db, collection, getDocs } = window.__mgDb;
+  try {
+    const snap = await getDocs(collection(db,'court_bookings'));
+    S.bookings = [];
+    let cashToday=0, bookingsToday=0;
+    const todayStart=new Date(); todayStart.setHours(0,0,0,0);
+    snap.forEach(d=>{ const data={id:d.id,...d.data()}; S.bookings.push(data); });
+    S.bookings.forEach(b=>{
+      if((b.createdAt||0)>=todayStart.getTime()&&b.bookingSource==='Manager/Walk-in'&&b.status==='Confirmed'){
+        if(b.paymentMode==='Cash') cashToday+=b.amount||0;
+        bookingsToday++;
+      }
+    });
+    $('tbCash').textContent  = '₹'+cashToday.toLocaleString('en-IN');
+    $('tbBookings').textContent = bookingsToday;
+    S.myBookings = S.bookings.filter(b=>b.bookingSource==='Manager/Walk-in'&&(b.createdAt||0)>=todayStart.getTime());
+    renderMyBookings();
+    renderGrid();
+    renderCashRegister();
+    renderTentativeList();
+    // Re-schedule any existing tentative slot notifications
+    rescheduleExistingNotifications();
+  } catch(e){ toast('Load error: '+e.message,'err'); }
+}
+
+$('btnRefresh').addEventListener('click', ()=>{ loadData(); toast('Refreshed','info'); });
+
+/* ══ QUICK SLOTS ════════════════════════════════ */
+async function loadQuickSlots() {
+  const c=S.qCourt; if(!c) return;
+  const dur=parseInt($('qDur').value)||60;
+  $('qSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:10px">Loading…</div>';
+  S.qSlot=null;
+
+  const dateStr=S.qDate.toISOString().split('T')[0];
+  const booked=getBookedMinutes(c.id, dateStr);
+
+  const now=new Date(); const nowMin=now.getHours()*60+now.getMinutes();
+  const isToday=S.qDate.toDateString()===now.toDateString();
+  $('qSlots').innerHTML='';
+
+  let any=false;
+  for(let sm=6*60;sm+dur<=20*60+31;sm+=30){
+    if(sm>20*60+30) break;
+    const endMin=sm+dur;
+    const blocked=[...Array(dur).keys()].some(i=>booked.has(sm+i));
+    const past=isToday&&sm<nowMin+10;
+    if(blocked||past) continue;
+    any=true;
+    const btn=document.createElement('div');
+    btn.className='sm-slot'; btn.dataset.sm=sm;
+    btn.innerHTML=`<div class="smt">${addMin(sm)}</div><div class="sme">→${addMin(endMin)}</div>`;
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('#qSlots .sm-slot').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      S.qSlot={time:addMin(sm),end:addMin(endMin),startMin:sm};
+    });
+    $('qSlots').appendChild(btn);
+  }
+  if(!any) $('qSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:10px">No available slots for today</div>';
+}
+
+/* ══ CALL BOOKING SLOTS ════════════════════════ */
+async function loadCallSlots() {
+  const c=S.cCourt; if(!c||!S.cDate) return;
+  const dur=parseInt($('cDur').value)||60;
+  $('cSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:10px">Loading…</div>';
+  S.cSlot=null;
+
+  const dateStr=S.cDate.toISOString().split('T')[0];
+  const booked=getBookedMinutes(c.id, dateStr);
+  const now=new Date(); const nowMin=now.getHours()*60+now.getMinutes();
+  const isToday=S.cDate.toDateString()===now.toDateString();
+
+  $('cSlots').innerHTML='';
+  let any=false;
+  for(let sm=6*60;sm+dur<=20*60+31;sm+=30){
+    if(sm>20*60+30) break;
+    const blocked=[...Array(dur).keys()].some(i=>booked.has(sm+i));
+    const past=isToday&&sm<nowMin+10;
+    if(blocked||past) continue;
+    any=true;
+    const btn=document.createElement('div');
+    btn.className='sm-slot'; btn.dataset.sm=sm;
+    btn.innerHTML=`<div class="smt">${addMin(sm)}</div><div class="sme">→${addMin(sm+dur)}</div>`;
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('#cSlots .sm-slot').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      S.cSlot={time:addMin(sm),end:addMin(sm+dur),startMin:sm};
+      $('cAmount').value=getPrice(c,dur);
+    });
+    $('cSlots').appendChild(btn);
+  }
+  if(!any) $('cSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:12px;padding:10px">No available slots for this date</div>';
+}
+
+/* Helper: get booked minute-sets for a court on a date */
+function getBookedMinutes(courtId, dateStr) {
+  const s=new Set();
+  S.bookings.forEach(b=>{
+    if(b.courtId!==courtId||b.date!==dateStr) return;
+    if(['Released','Cancelled'].includes(b.status)) return;
+    const [h,m]=b.timeSlot.split(':').map(Number);
+    const start=h*60+m;
+    for(let i=0;i<b.duration;i++) s.add(start+i);
+  });
+  return s;
+}
+
+/* ══ CONFIRM QUICK BOOKING ═══════════════════════ */
+$('btnQuickBook').addEventListener('click', async ()=>{
+  if(!S.qCourt){ toast('Select a court first','err'); $('qCourt').focus(); return; }
+  if(!S.qSlot) { toast('Tap a time slot to select it','err'); $('qSlots').scrollIntoView({behavior:'smooth',block:'nearest'}); return; } // [FIXED] better feedback + scroll to slots
+  const name  = $('qName').value.trim();
+  const phone = $('qPhone').value.replace(/\D/g,'');
+  const amt   = parseFloat($('qAmount').value)||0;
+  if(!name||name.length<2){ toast('Enter customer name','err'); $('qName').classList.add('err'); return; }
+  if(!/^[6-9]\d{9}$/.test(phone)){ toast('Enter valid 10-digit phone','err'); $('qPhone').classList.add('err'); return; }
+  if(amt<=0){ toast('Enter amount received','err'); return; }
+
+  const dur      = parseInt($('qDur').value)||60;
+  const base     = getPrice(S.qCourt, dur);
+  const disc     = base - amt;
+  const discReas = $('qDiscReason').value.trim();
+  if(disc>0&&!discReas){ toast('Please enter a discount reason','err'); $('qDiscReason').style.borderColor='var(--red)'; return; }
+
+  const upiRef = S.qPayMode==='UPI' ? $('qUpiRef').value.trim() : '';
+  if(S.qPayMode==='UPI'&&!upiRef){ toast('Enter UPI reference number','err'); return; }
+
+  const btn=$('btnQuickBook'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Booking…';
+
+  const dateStr=S.qDate.toISOString().split('T')[0];
+  const d=new Date(S.qDate);
+  const dateStr2=`${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+
+  try {
+    const {db,collection,addDoc}=window.__mgDb;
+    const booking = {
+      name:san(name), phone, court:S.qCourt.name, courtId:S.qCourt.id,
+      date:dateStr, dateStr:dateStr2,
+      timeSlot:S.qSlot.time, slotEnd:S.qSlot.end, duration:dur,
+      amount:amt, baseAmount:base,
+      discount:disc>0?disc:0, discountReason:san(discReas),
+      paymentMode:S.qPayMode, upiRef:san(upiRef),
+      players:parseInt($('qPlayers').value)||2,
+      notes:san($('qNotes').value),
+      bookingSource:'Manager/Walk-in',
+      status:'Confirmed', managerName:'Manager',
+      createdAt:Date.now(),
+    };
+    await addDoc(collection(db,'court_bookings'), booking);
+
+    // WhatsApp
+    await sendWhatsApp('+91'+phone,
+      `✅ Court Booked - Mansa Sports Park\nName: ${name}\nCourt: ${S.qCourt.name}\nDate: ${dateStr2}\nTime: ${S.qSlot.time} – ${S.qSlot.end}\nAmount: ₹${amt}\nPayment: ${S.qPayMode}\nBooked by: Manager\nSee you at the park!`
+    );
+
+    toast(`✅ ${name} booked for ${S.qSlot.time}!`,'ok');
+    await loadData();
+    resetQuickForm();
+  } catch(e){ toast('Failed: '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.innerHTML='✅ Confirm Booking'; }
+});
+
+function resetQuickForm() {
+  $('qCourt').value=''; $('qName').value=''; $('qPhone').value='';
+  $('qPlayers').value='2'; $('qAmount').value=''; $('qDiscReason').value='';
+  $('qNotes').value=''; $('qUpiRef').value=''; $('qBasePrice').textContent='';
+  $('qDiscountNote').style.display='none';
+  S.qCourt=null; S.qSlot=null; S.qPayMode='Cash';
+  document.querySelectorAll('#qPayMode .pm-btn').forEach((b,i)=>b.classList.toggle('sel',i===0));
+  $('upiRefWrap').style.display='none';
+  $('qSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:12px">Select a court to see slots</div>';
+}
+
+/* ══ CALL BOOKING ════════════════════════════════ */
+$('btnCallBook').addEventListener('click', async ()=>{
+  // ── Mandatory field validation with visual error feedback ──
+  const name  = $('cName').value.trim();
+  const phone = $('cPhone').value.replace(/\D/g,'');
+  let ok = true;
+
+  if(!name||name.length<2){
+    $('cNameErr').style.display='block';
+    $('cName').style.borderColor='var(--red)';
+    ok=false;
+  } else {
+    $('cNameErr').style.display='none';
+    $('cName').style.borderColor='';
+  }
+
+  if(!/^[6-9]\d{9}$/.test(phone)){
+    $('cPhoneErr').style.display='block';
+    $('cPhone').style.borderColor='var(--red)';
+    ok=false;
+  } else {
+    $('cPhoneErr').style.display='none';
+    $('cPhone').style.borderColor='';
+  }
+
+  if(!S.cCourt){ toast('Select a court','err'); return; }
+  if(!S.cSlot) { toast('Select a time slot','err'); return; }
+  if(!S.cDate) { toast('Select a date','err'); return; }
+  if(!ok){ toast('Name and phone are required','err'); return; }
+
+  const dur   = parseInt($('cDur').value)||60;
+  const amt   = parseFloat($('cAmount').value)||getPrice(S.cCourt,dur);
+  const dateStr=S.cDate.toISOString().split('T')[0];
+  const dateStr2=`${DAYS[S.cDate.getDay()]}, ${fmtDate(S.cDate)}`;
+
+  const btn=$('btnCallBook'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Holding…';
+
+  try {
+    const {db,collection,addDoc}=window.__mgDb;
+    const expiry=new Date(Date.now()+2*60*60*1000);
+    const payLink=`${location.origin.replace(/\/$/,'')}/mansa-sports-park/book.html`;
+
+    await addDoc(collection(db,'court_bookings'),{
+      name:san(name), phone, court:S.cCourt.name, courtId:S.cCourt.id,
+      date:dateStr, dateStr:dateStr2,
+      timeSlot:S.cSlot.time, slotEnd:S.cSlot.end, duration:dur,
+      amount:amt, paymentMode:'Pending',
+      players:parseInt($('cPlayers').value)||2,
+      notes:san($('cNotes').value),
+      bookingSource:'Manager/Call',
+      status:'Tentative',
+      tentativeExpiry:expiry.toISOString(),
+      tentativeExpiryTs:expiry.getTime(),
+      managerName:S.mgrName||'Manager',
+      createdAt:Date.now(),
+    });
+
+    await sendWhatsApp('+91'+phone,
+      `⏰ Court Slot Reserved - Mansa Sports Park\nName: ${name}\nCourt: ${S.cCourt.name}\nDate: ${dateStr2}\nTime: ${S.cSlot.time} – ${S.cSlot.end}\nAmount: ₹${amt}\n\n⚠️ This slot is held for 2 hours. Complete payment here:\n${payLink}\n\nSlot auto-releases if unpaid by ${fmtTime(expiry)}.`
+    );
+
+    // ── Schedule 15-min browser notification before slot starts ──
+    scheduleSlotNotification(name, phone, S.cDate, S.cSlot.time, S.cCourt.name);
+
+    toast(`📞 VIP Hold confirmed for ${name} — notification set 15 min before slot`,'ok');
+    await loadData();
+    resetCallForm();
+  } catch(e){ toast('Failed: '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.innerHTML='📞 Hold Slot (VIP Hold)'; }
+});
+
+function resetCallForm() {
+  $('cCourt').value=''; $('cName').value=''; $('cPhone').value='';
+  $('cPlayers').value='2'; $('cAmount').value=''; $('cNotes').value='';
+  S.cCourt=null; S.cSlot=null;
+  $('cSlots').innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:12px">Select a court and date to see slots</div>';
+  document.querySelectorAll('#callDateNav .dnb').forEach(b=>b.classList.remove('active'));
+}
+
+/* ══ CHECK TENTATIVE EXPIRY ═════════════════════ */
+async function checkTentativeExpiry() {
+  if(!window.__mgDb) return;
+  const {db,doc,updateDoc}=window.__mgDb;
+  const now=Date.now();
+  const expired=S.bookings.filter(b=>b.status==='Tentative'&&b.tentativeExpiryTs&&b.tentativeExpiryTs<now);
+  for(const b of expired){
+    try{ await updateDoc(doc(db,'court_bookings',b.id),{status:'Released',autoReleasedAt:now}); }
+    catch(e){ console.warn('Auto-release failed',e); }
+  }
+  if(expired.length){ await loadData(); toast(`${expired.length} tentative slot(s) auto-released`,'info'); }
+}
+
+/* ══ DATE NAVS ══════════════════════════════════ */
+function buildGridDateNav() {
+  const nav=$('gridDateNav'); nav.innerHTML='';
+  const today=new Date(); today.setHours(0,0,0,0);
+  for(let i=-1;i<=3;i++){
+    const d=new Date(today); d.setDate(today.getDate()+i);
+    const btn=document.createElement('button'); btn.className='dnb'+(i===0?' active':'');
+    btn.textContent=i===0?'Today':i===-1?'Yesterday':`${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+    btn.addEventListener('click',()=>{
+      nav.querySelectorAll('.dnb').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); S.gridDate=d; renderGrid();
+    });
+    nav.appendChild(btn);
+  }
+}
+
+function buildCallDateNav() {
+  const nav=$('callDateNav'); nav.innerHTML='';
+  const today=new Date(); today.setHours(0,0,0,0);
+  for(let i=0;i<=6;i++){
+    const d=new Date(today); d.setDate(today.getDate()+i);
+    const btn=document.createElement('button'); btn.className='dnb';
+    btn.textContent=i===0?'Today':`${DAYS[d.getDay()]} ${d.getDate()}`;
+    btn.addEventListener('click',()=>{
+      nav.querySelectorAll('.dnb').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); S.cDate=d;
+      if(S.cCourt) loadCallSlots();
+    });
+    nav.appendChild(btn);
+  }
+}
+
+/* ══ COURT GRID ══════════════════════════════════ */
+function renderGrid() {
+  const head=$('mgGridHead'); const body=$('mgGridBody');
+  head.innerHTML=''; body.innerHTML='';
+  const hr=document.createElement('tr');
+  const th0=document.createElement('th'); th0.textContent='Time'; hr.appendChild(th0);
+  COURTS.forEach(c=>{ const th=document.createElement('th'); th.textContent=c.name; hr.appendChild(th); });
+  head.appendChild(hr);
+  const now=new Date(); const isToday=S.gridDate.toDateString()===now.toDateString();
+  const nowMin=now.getHours()*60+now.getMinutes();
+  const dateStr=S.gridDate.toISOString().split('T')[0];
+  for(let sm=6*60;sm<21*60;sm+=30){
+    const row=document.createElement('tr');
+    const td0=document.createElement('td'); td0.textContent=addMin(sm); row.appendChild(td0);
+    COURTS.forEach(c=>{
+      const td=document.createElement('td');
+      td.appendChild(buildGridCell(c,sm,dateStr,nowMin,isToday));
+      row.appendChild(td);
+    });
+    body.appendChild(row);
+  }
+}
+
+function buildGridCell(court, sm, dateStr, nowMin, isToday) {
+  const div=document.createElement('div');
+  const b=S.bookings.find(bk=>{
+    if(bk.courtId!==court.id||bk.date!==dateStr) return false;
+    if(['Released'].includes(bk.status)) return false;
+    const [h,m]=bk.timeSlot.split(':').map(Number);
+    const bs=h*60+m; const be=bs+(bk.duration||60);
+    return sm>=bs&&sm<be;
+  });
+  const isPast=isToday&&sm<nowMin;
+  if(b){
+    const [bh,bm]=b.timeSlot.split(':').map(Number);
+    const bs=bh*60+bm; const be=bs+(b.duration||60); const ge=be+15;
+    const isGrace=isToday&&nowMin>=be&&nowMin<ge;
+    const isTent=b.status==='Tentative';
+    div.className=`slot-cell ${isTent?'tent':isGrace?'grace':'booked'}`;
+    if(sm===bs){
+      const src=b.bookingSource==='Manager/Walk-in'?'MGR':b.bookingSource==='Manager/Call'?'CALL':'WEB';
+      const scName=(b.name||'').replace(/[<>&"]/g,''); // [FIXED] XSS: sanitize name in grid cell
+      div.innerHTML=`<div class="sc-name">${scName}</div><div class="sc-time">${b.timeSlot}–${b.slotEnd}</div><div class="sc-src">${src}${b.paymentMode==='Cash'?' 💵':b.paymentMode==='UPI'?' 📱':' 🌐'}</div>`;
+    } else {
+      div.innerHTML='<div class="sc-time" style="text-align:center;font-size:9px">▓</div>';
+    }
+    div.addEventListener('click',()=>openBookingModal(b,isGrace,isTent));
+  } else if(isPast){
+    div.className='slot-cell past';
+    div.innerHTML='<div class="sc-time" style="text-align:center;font-size:10px">—</div>';
+  } else {
+    div.className='slot-cell avail';
+    div.innerHTML='<div class="sc-name" style="font-size:10px">Free</div>';
+  }
+  return div;
+}
+
+/* ══ GRID MODAL ══════════════════════════════════ */
+function openBookingModal(b, isGrace, isTent) {
+  const now=new Date(); const nowMin=now.getHours()*60+now.getMinutes();
+  const [sh,sm_]=b.timeSlot.split(':').map(Number);
+  const slotEndMin=sh*60+sm_+(b.duration||60);
+  const isAfter=nowMin>slotEndMin;
+  const slotDate=new Date(b.date);
+  const slotStart=new Date(slotDate); slotStart.setHours(sh,sm_,0,0);
+  const diffHrs=(slotStart-now)/3600000;
+  const srcTag=b.bookingSource==='Manager/Walk-in'?`<span class="src-tag src-manager">Manager</span>`:
+    b.bookingSource==='Manager/Call'?`<span class="src-tag src-call">Call Booking</span>`:
+    `<span class="src-tag src-online">Online</span>`;
+
+  $('modalTitle').textContent=`${b.court} — ${b.timeSlot}`;
+  $('modalBody').innerHTML=`
+    <div class="dr"><span class="dk">Customer</span><span class="dv">${b.name}</span></div>
+    <div class="dr"><span class="dk">Phone</span><span class="dv">+91 ${b.phone||'—'}</span></div>
+    <div class="dr"><span class="dk">Date</span><span class="dv">${b.dateStr||b.date}</span></div>
+    <div class="dr"><span class="dk">Time</span><span class="dv">${b.timeSlot} – ${b.slotEnd}</span></div>
+    <div class="dr"><span class="dk">Duration</span><span class="dv">${b.duration} min</span></div>
+    <div class="dr"><span class="dk">Amount</span><span class="dv">₹${b.amount}${b.discount>0?` <span style="color:var(--red);font-size:11px">(₹${b.discount} disc.)</span>`:''}</span></div>
+    <div class="dr"><span class="dk">Payment</span><span class="dv">${b.paymentMode||'Online'}${b.upiRef?` · ${b.upiRef}`:''}</span></div>
+    <div class="dr"><span class="dk">Players</span><span class="dv">${b.players||'—'}</span></div>
+    <div class="dr"><span class="dk">Source</span><span class="dv">${srcTag}</span></div>
+    <div class="dr"><span class="dk">Status</span><span class="dv">${isTent?'⏰ Tentative':isGrace?'⚠️ Grace Period':'✅ Confirmed'}</span></div>
+    ${b.discount>0?`<div class="dr"><span class="dk">Disc. Reason</span><span class="dv">${b.discountReason||'—'}</span></div>`:''}
+    ${b.notes?`<div class="dr"><span class="dk">Notes</span><span class="dv">${b.notes}</span></div>`:''}
+    ${isTent&&b.tentativeExpiry?`<div class="dr"><span class="dk">Expires</span><span class="dv" style="color:var(--tent)">${new Date(b.tentativeExpiry).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span></div>`:''}
+    <div class="modal-note-area">
+      <label class="flbl" style="margin-bottom:5px;display:block">Add / Update Note</label>
+      <textarea class="ftxt" id="modalNoteInput" rows="2" placeholder="Add a note…" maxlength="300">${b.notes||''}</textarea>
+    </div>`;
+
+  const acts=$('modalActs'); acts.innerHTML='';
+  const mkBtn=(label,cls,fn)=>{ const b=document.createElement('button'); b.className=`btn ${cls} btn-sm`; b.textContent=label; b.style.padding='11px 16px'; b.addEventListener('click',fn); acts.appendChild(b); };
+
+  mkBtn('💾 Save Note','btn-outline btn-sm',()=>saveNote(b));
+  if((isGrace||isAfter)&&!isTent) mkBtn('❌ Mark No-show','btn-red btn-sm',()=>markNoshow(b));
+  if(isTent) mkBtn('✅ Confirm (Cash received)','btn-primary btn-sm',()=>confirmTentative(b));
+  // Release slot — checks if it's a late release (>15 min past slot start)
+  if(isTent||isGrace||isAfter) mkBtn('🔓 Release Slot','btn-red btn-sm',()=>releaseSlot(b,now,slotEndMin));
+  mkBtn('🚫 Cancel Booking','btn-ghost btn-sm',()=>cancelBooking(b,diffHrs));
+  mkBtn('Close','btn-ghost btn-sm',closeModal);
+
+  $('overlay').classList.remove('hidden');
+}
+
+function closeModal(){ $('overlay').classList.add('hidden'); }
+$('overlay').addEventListener('click', e=>{ if(e.target===$('overlay'))closeModal(); });
+window.closeModal=closeModal;
+
+async function saveNote(b) {
+  const note=san($('modalNoteInput').value);
+  try{
+    const {db,doc,updateDoc}=window.__mgDb;
+    await updateDoc(doc(db,'court_bookings',b.id),{notes:note,noteUpdatedAt:Date.now()});
+    toast('Note saved','ok'); closeModal(); await loadData();
+  }catch(e){toast('Failed: '+e.message,'err');}
+}
+
+async function releaseSlot(b, now, slotEndMin) {
+  const nowMin  = now.getHours()*60+now.getMinutes();
+  const [sh,sm_] = b.timeSlot.split(':').map(Number);
+  const slotStartMin = sh*60+sm_;
+  const isToday = new Date(b.date).toDateString() === now.toDateString();
+
+  // Check if release is more than 15 min PAST slot start time
+  const isLateRelease = isToday && nowMin > (slotStartMin + 15);
+
+  if (isLateRelease) {
+    const confirmed = confirm(
+      `⚠️ This release is past the 15-min mark.\n\n` +
+      `A warning strike will be logged against your record.\n\n` +
+      `Court: ${b.court}\n` +
+      `Slot: ${b.timeSlot} – ${b.slotEnd}\n` +
+      `Customer: ${b.name}\n` +
+      `Charge: ₹${b.amount}\n\n` +
+      `Do you still want to release this slot?`
+    );
+    if (!confirmed) return;
+
+    // Log strike to Firebase
+    await logManagerStrike(b, Date.now());
+    toast('⚠️ Slot released — strike logged against your record', 'err');
+  } else {
+    if (!confirm(`Release slot for ${b.name}? This cannot be undone.`)) return;
+    toast('Slot released', 'ok');
+  }
+
+  try {
+    const {db,doc,updateDoc}=window.__mgDb;
+    await updateDoc(doc(db,'court_bookings',b.id),{
+      status:'Released',
+      releasedAt:Date.now(),
+      releasedBy:S.mgrName||'Manager',
+      lateRelease:isLateRelease
+    });
+    closeModal(); await loadData();
+  } catch(e){ toast('Failed: '+e.message,'err'); }
+}
+
+async function markNoshow(b) {
+  if(!confirm(`Mark ${b.name} as no-show? Amount ₹${b.amount} is forfeited.`)) return;
+  try{
+    const {db,doc,updateDoc}=window.__mgDb;
+    await updateDoc(doc(db,'court_bookings',b.id),{status:'No-show',noshowAt:Date.now(),noshowBy:'Manager'});
+    toast('Marked as no-show','ok'); closeModal(); await loadData();
+  }catch(e){toast('Failed: '+e.message,'err');}
+}
+
+async function confirmTentative(b) {
+  try{
+    const {db,doc,updateDoc}=window.__mgDb;
+    await updateDoc(doc(db,'court_bookings',b.id),{status:'Confirmed',paymentMode:'Cash',confirmedAt:Date.now()});
+    toast('Booking confirmed ✅','ok'); closeModal(); await loadData();
+  }catch(e){toast('Failed: '+e.message,'err');}
+}
+
+async function cancelBooking(b, diffHrs) {
+  const reason=prompt(`Cancel booking for ${b.name}?\nEnter reason for cancellation:`);
+  if(reason===null) return;
+  if(!reason.trim()){ toast('Reason required to cancel','err'); return; }
+  const refund=diffHrs>=4;
+  try{
+    const {db,doc,updateDoc}=window.__mgDb;
+    await updateDoc(doc(db,'court_bookings',b.id),{
+      status:'Cancelled',cancelledAt:Date.now(),cancelReason:san(reason),
+      refundEligible:refund,refundAmount:refund?b.amount:0,cancelledBy:'Manager'
+    });
+    toast(refund?`Cancelled · Process refund of ₹${b.amount}`:'Cancelled · No refund applicable','ok');
+    closeModal(); await loadData();
+  }catch(e){toast('Failed: '+e.message,'err');}
+}
+
+/* ══ CASH REGISTER ═══════════════════════════════ */
+function renderCashRegister() {
+  const todayStart=new Date(); todayStart.setHours(0,0,0,0);
+  const mgrBookings=S.bookings.filter(b=>b.bookingSource==='Manager/Walk-in'&&(b.createdAt||0)>=todayStart.getTime()&&b.status==='Confirmed');
+  const cashEntries=mgrBookings.filter(b=>b.paymentMode==='Cash');
+  const upiEntries =mgrBookings.filter(b=>b.paymentMode==='UPI');
+  const cashTotal  =cashEntries.reduce((s,b)=>s+(b.amount||0),0);
+  const upiTotal   =upiEntries.reduce((s,b)=>s+(b.amount||0),0);
+
+  $('crCashTotal').textContent = '₹'+cashTotal.toLocaleString('en-IN');
+  $('crUpiTotal').textContent  = '₹'+upiTotal.toLocaleString('en-IN');
+  $('crBookCount').textContent = mgrBookings.length;
+  $('tbCash').textContent      = '₹'+cashTotal.toLocaleString('en-IN');
+
+  const list=$('cashList');
+  if(!cashEntries.length){ list.innerHTML='<div class="empty-state"><div class="ei">💵</div><p>No cash bookings today</p></div>'; }
+  else {
+    list.innerHTML=cashEntries.map(b=>{
+      const t=new Date(b.createdAt); const tStr=t.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      const crCourt=(b.court||'').replace(/[<>&"]/g,''); const crName=(b.name||'').replace(/[<>&"]/g,'');
+      return `<div class="cash-row"><span class="cr-time">${tStr}</span><span class="cr-court">${crCourt}<br><span style="font-size:10px;font-weight:500;color:var(--muted)">${b.timeSlot}–${b.slotEnd}</span></span><span class="cr-cust">${crName}<br><span style="font-size:10px">+91 ${b.phone}</span></span><span class="cr-amt">₹${b.amount}</span></div>`;
+    }).join('');
+  }
+
+  // ── Day-end form logic ──────────────────────────────────────────
+  const today=new Date().toISOString().split('T')[0];
+
+  // Check if already submitted today
+  // (We'll check in Firebase when cash tab loads)
+  checkDayEndSubmitted(today);
+
+  // Live summary calculation
+  ['deWristbands','deCashGate','deUpiGate','deCourtCash','deCourtUpi','deKiosk','deTotalCash'].forEach(id=>{
+    $(id)?.addEventListener('input', updateDayEndSummary);
+  });
+
+  // Submit handler
+  $('btnDayEnd')?.addEventListener('click', async()=>{
+    const bands   = parseInt($('deWristbands').value)||0;
+    const cashG   = parseFloat($('deCashGate').value)||0;
+    const upiG    = parseFloat($('deUpiGate').value)||0;
+    const courtC  = parseFloat($('deCourtCash').value)||0;
+    const courtU  = parseFloat($('deCourtUpi').value)||0;
+    const kiosk   = parseFloat($('deKiosk').value)||0;
+    const drawer  = parseFloat($('deTotalCash').value);
+
+    if(isNaN(drawer)||drawer<0){ toast('Enter total cash in drawer','err'); return; }
+
+    const expectedEntry  = bands * 50;
+    const totalExpected  = expectedEntry + cashG + upiG + courtC + courtU + kiosk;
+    const totalCash      = cashG + courtC;
+    const totalUPI       = upiG + courtU;
+    const variance       = totalCash - drawer;
+
+    const btn=$('btnDayEnd'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Submitting…';
+    try{
+      const {db,collection,addDoc}=window.__mgDb;
+      await addDoc(collection(db,'cash_submissions'),{
+        date:today,
+        wristbandsIssued:bands,
+        expectedEntryRevenue:expectedEntry,
+        cashAtGate:cashG,
+        upiAtGate:upiG,
+        courtCash:courtC,
+        courtUpi:courtU,
+        kioskRevenue:kiosk,
+        totalExpected,
+        totalCashCollected:totalCash,
+        totalUPICollected:totalUPI,
+        drawerCash:drawer,
+        variance,
+        submittedBy:S.mgrName||'Manager',
+        submittedAt:Date.now()
+      });
+      toast('✅ Day-end report submitted','ok');
+      checkDayEndSubmitted(today);
+    }catch(e){ toast('Failed: '+e.message,'err'); }
+    finally{ btn.disabled=false; btn.innerHTML='📋 Submit Day-End Report'; }
+  });
+}
+
+async function checkDayEndSubmitted(today) {
+  if(!window.__mgDb) return;
+  const {db,collection,getDocs}=window.__mgDb;
+  try{
+    const snap=await getDocs(collection(db,'cash_submissions'));
+    let submitted=null;
+    snap.forEach(d=>{ if(d.data().date===today) submitted=d.data(); });
+    const form=$('dayEndFormWrap'), ro=$('dayEndReadOnly');
+    if(!form||!ro) return;
+    if(submitted){
+      form.style.display='none'; ro.style.display='block';
+      const roContent=$('dayEndROContent');
+      if(roContent) roContent.innerHTML=`
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Wristbands Issued</span><span style="font-weight:700">${submitted.wristbandsIssued||0}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Cash at Gate</span><span style="font-weight:700">₹${(submitted.cashAtGate||0).toLocaleString('en-IN')}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">UPI at Gate</span><span style="font-weight:700">₹${(submitted.upiAtGate||0).toLocaleString('en-IN')}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Court Cash</span><span style="font-weight:700">₹${(submitted.courtCash||0).toLocaleString('en-IN')}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Court UPI</span><span style="font-weight:700">₹${(submitted.courtUpi||0).toLocaleString('en-IN')}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Kiosk</span><span style="font-weight:700">₹${(submitted.kioskRevenue||0).toLocaleString('en-IN')}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Total Expected</span><span style="font-weight:700">₹${(submitted.totalExpected||0).toLocaleString('en-IN')}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Drawer Cash</span><span style="font-weight:700">₹${(submitted.drawerCash||0).toLocaleString('en-IN')}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0"><span style="color:var(--muted)">Variance</span><span style="font-weight:900;color:${Math.abs(submitted.variance||0)>500?'var(--red)':Math.abs(submitted.variance||0)>100?'var(--goldb)':'var(--g2)'}">₹${Math.abs(submitted.variance||0)} ${(submitted.variance||0)>0?'SHORT':(submitted.variance||0)<0?'OVER':'✅ OK'}</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Submitted by ${submitted.submittedBy||'—'} at ${submitted.submittedAt?new Date(submitted.submittedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'—'}</div>
+        </div>`;
+    } else {
+      form.style.display='block'; ro.style.display='none';
+    }
+  }catch(e){ console.warn('Day-end check error:',e); }
+}
+
+function updateDayEndSummary() {
+  const bands  = parseInt($('deWristbands')?.value)||0;
+  const cashG  = parseFloat($('deCashGate')?.value)||0;
+  const upiG   = parseFloat($('deUpiGate')?.value)||0;
+  const courtC = parseFloat($('deCourtCash')?.value)||0;
+  const courtU = parseFloat($('deCourtUpi')?.value)||0;
+  const kiosk  = parseFloat($('deKiosk')?.value)||0;
+  const drawer = parseFloat($('deTotalCash')?.value)||0;
+  const expected = bands*50 + cashG + upiG + courtC + courtU + kiosk;
+  const variance = (cashG+courtC) - drawer;
+  const el=$('deSummary');
+  if(el) el.innerHTML=`Expected total: <strong>₹${expected.toLocaleString('en-IN')}</strong> &nbsp;|&nbsp; Cash variance: <strong style="color:${Math.abs(variance)>500?'var(--red)':Math.abs(variance)>100?'var(--goldb)':'var(--g2)'}">${variance>=0?'+':'-'}₹${Math.abs(variance)}</strong>`;
+}
+
+/* ══ MY BOOKINGS LIST ════════════════════════════ */
+function renderMyBookings() {
+  const list=$('myBookingsList');
+  if(!S.myBookings.length){ list.innerHTML='<div class="empty-state"><div class="ei">📋</div><p>No bookings made yet today</p></div>'; return; }
+  list.innerHTML=S.myBookings.slice().reverse().map(b=>{
+    const src=b.bookingSource==='Manager/Call'?'📞 Call':'🚶 Walk-in';
+    const pm=b.paymentMode==='Cash'?'💵':b.paymentMode==='UPI'?'📱':'🌐';
+    return `<div class="cash-row">
+      <span class="cr-time">${new Date(b.createdAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span>
+      <span class="cr-court">${b.court}<br><span style="font-size:10px;color:var(--muted)">${b.timeSlot}–${b.slotEnd} · ${b.date}</span></span>
+      <span class="cr-cust">${b.name}<br><span style="font-size:10px">${src} · ${pm} ₹${b.amount}</span></span>
+      <span class="cr-amt" style="font-size:12px;color:${b.status==='Tentative'?'var(--tent)':b.status==='Cancelled'?'var(--red)':'var(--g2)'}">${b.status}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ══ TENTATIVE LIST ══════════════════════════════ */
+function renderTentativeList() {
+  const list=$('tentativeList');
+  const tents=S.bookings.filter(b=>b.status==='Tentative');
+  if(!tents.length){ list.innerHTML='<div class="empty-state"><div class="ei">⏰</div><p>No pending tentative bookings</p></div>'; return; }
+  list.innerHTML=tents.map(b=>{
+    const exp=b.tentativeExpiry?new Date(b.tentativeExpiry):null;
+    const rem=exp?Math.max(0,Math.round((exp-Date.now())/60000)):0;
+    const remStr=rem>0?`${Math.floor(rem/60)}h ${rem%60}m remaining`:'EXPIRED';
+    return `<div class="cash-row">
+      <span class="cr-time" style="color:var(--tent);min-width:56px">${b.timeSlot}</span>
+      <span class="cr-court">${(b.court||'').replace(/[<>&"]/g,'')} · ${(b.dateStr||b.date||'').replace(/[<>&"]/g,'')}<br> <!-- [FIXED] XSS --><span style="font-size:10px;color:var(--muted)">${b.timeSlot}–${b.slotEnd}</span></span>
+      <span class="cr-cust">${b.name}<br><span style="font-size:10px">+91 ${b.phone}</span></span>
+      <span class="cr-amt" style="font-size:11px;color:var(--tent);text-align:right">⏰ ${remStr}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ══ DAILY PASS BATCH ══════════════════════════════════════════════════
+   Manages wristband serial ranges and walk-in pass issuance
+════════════════════════════════════════════════════════════════════════ */
+let todayBatch    = null;   // { date, colour, serialFrom, serialTo, totalLoaded, activatedBy }
+let issuedToday   = [];     // array of logged issuances
+let issuePayMode_ = 'Cash'; // current selected payment mode
+
+const COLOUR_HEX = {
+  Red:'#ef4444', Blue:'#3b82f6', Green:'#22c55e', Yellow:'#eab308',
+  Orange:'#f97316', Purple:'#7c3aed', White:'#e5e7eb'
+};
+
+async function loadBatchData() {
+  if(!window.__mgDb) return;
+  const {db,collection,getDocs} = window.__mgDb;
+  const today = new Date().toISOString().split('T')[0];
+  try{
+    // Load today's batch
+    const bSnap = await getDocs(collection(db,'daily_pass_batch'));
+    todayBatch = null;
+    bSnap.forEach(d=>{ if(d.data().date===today) todayBatch={id:d.id,...d.data()}; });
+
+    // Load today's issuances
+    const iSnap = await getDocs(collection(db,'pass_issuances'));
+    issuedToday = [];
+    iSnap.forEach(d=>{ if(d.data().date===today) issuedToday.push({id:d.id,...d.data()}); });
+
+    renderBatchSection();
+    renderIssueStats();
+  }catch(e){ console.error('Batch load error:',e); }
+}
+
+function renderBatchSection() {
+  const today = new Date().toISOString().split('T')[0];
+  if(todayBatch && todayBatch.date===today) {
+    // Already set — show read-only
+    $('batchForm').style.display      = 'none';
+    $('batchReadOnly').style.display  = 'block';
+    const hex = COLOUR_HEX[todayBatch.colour]||'#94a3b8';
+    $('batchReadOnlyContent').innerHTML=`
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Colour</span><span style="font-weight:800;display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;border-radius:50%;background:${hex};display:inline-block;border:1px solid rgba(0,0,0,.1)"></span>${todayBatch.colour}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Serial Range</span><span style="font-weight:900;font-family:monospace;font-size:15px;color:var(--g1)">${String(todayBatch.serialFrom).padStart(4,'0')} – ${String(todayBatch.serialTo).padStart(4,'0')}</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Total Loaded</span><span style="font-weight:800">${todayBatch.totalLoaded} passes</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">By</span><span style="font-weight:600">${todayBatch.activatedBy||'Manager'}</span></div>
+      </div>`;
+    $('issueSubtitle').textContent = `Valid range: ${String(todayBatch.serialFrom).padStart(4,'0')} – ${String(todayBatch.serialTo).padStart(4,'0')} · ${todayBatch.colour} wristband`;
+  } else {
+    $('batchForm').style.display     = 'block';
+    $('batchReadOnly').style.display = 'none';
+    $('issueSubtitle').textContent   = '⚠️ Set today's batch first before issuing passes';
+  }
+}
+
+function renderIssueStats() {
+  const total    = issuedToday.length;
+  const expected = total * 50;
+  const remaining= todayBatch ? Math.max(0, todayBatch.totalLoaded - total) : '—';
+  $('issueCount').textContent     = total;
+  $('issueCash').textContent      = '₹' + expected.toLocaleString('en-IN');
+  $('issueRemaining').textContent = remaining;
+}
+
+// Serial range auto-calc
+['batchFrom','batchTo'].forEach(id=>{
+  $(id)?.addEventListener('input',()=>{
+    const f=parseInt($('batchFrom').value)||0;
+    const t=parseInt($('batchTo').value)||0;
+    const calc=$('batchCalc');
+    if(f>0&&t>f) calc.textContent=`Total passes: ${t-f+1}`;
+    else calc.textContent='Total passes: enter range above';
+  });
+});
+
+// Activate batch
+$('btnActivateBatch')?.addEventListener('click', async()=>{
+  const colour = $('batchColour').value;
+  const from   = parseInt($('batchFrom').value);
+  const to     = parseInt($('batchTo').value);
+  if(!colour){ toast('Select wristband colour','err'); return; }
+  if(!from||!to||from>=to){ toast('Enter valid serial range (From must be less than To)','err'); return; }
+  if(to-from>500){ toast('Maximum 500 passes per batch allowed','err'); return; }
+
+  const btn=$('btnActivateBatch'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Activating…';
+  const today=new Date().toISOString().split('T')[0];
+  try{
+    const {db,collection,addDoc}=window.__mgDb;
+    await addDoc(collection(db,'daily_pass_batch'),{
+      date:today, colour, serialFrom:from, serialTo:to,
+      totalLoaded:to-from+1, activatedBy:S.mgrName||'Manager',
+      activatedAt:Date.now()
+    });
+    toast(`✅ Batch activated: ${to-from+1} passes (${String(from).padStart(4,'0')}–${String(to).padStart(4,'0')}) · ${colour} wristband`,'ok');
+    await loadBatchData();
+    // Send alert to owner about batch activation
+    await sendWhatsApp(window.__mgCfg?.OWNER_PHONE||'',
+      `✅ Pass batch activated - Mansa Sports Park\nDate: ${today}\nColour: ${colour}\nRange: ${String(from).padStart(4,'0')} – ${String(to).padStart(4,'0')}\nTotal: ${to-from+1} passes\nBy: ${S.mgrName||'Manager'}`
+    );
+  }catch(e){ toast('Failed: '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.innerHTML='🎫 Activate Today\'s Batch'; }
+});
+
+// Payment mode toggle for issuance
+document.querySelectorAll('#issuePayMode .pm-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#issuePayMode .pm-btn').forEach(b=>b.classList.remove('sel'));
+    btn.classList.add('sel');
+    issuePayMode_=btn.dataset.pm;
+    $('issueUpiWrap').style.display=issuePayMode_==='UPI'?'block':'none';
+  });
+});
+
+// Issue pass
+$('btnIssuePass')?.addEventListener('click', async()=>{
+  const serial=parseInt($('issueSerial').value);
+  const upiRef=$('issueUpiRef')?.value.trim()||'';
+  const errEl=$('issueSerialErr');
+
+  errEl.style.display='none';
+  $('issueSerial').style.borderColor='';
+
+  if(!serial||isNaN(serial)){
+    errEl.textContent='⚠️ Enter a serial number'; errEl.style.display='block';
+    $('issueSerial').style.borderColor='var(--red)'; return;
+  }
+  if(!todayBatch){
+    errEl.textContent='⚠️ No batch set today. Activate batch first.'; errEl.style.display='block'; return;
+  }
+
+  // Validate range
+  if(serial<todayBatch.serialFrom||serial>todayBatch.serialTo){
+    errEl.textContent=`🚫 INVALID: Serial ${String(serial).padStart(4,'0')} is NOT in today's batch (${String(todayBatch.serialFrom).padStart(4,'0')} – ${String(todayBatch.serialTo).padStart(4,'0')}). Do NOT accept this pass.`;
+    errEl.style.display='block'; $('issueSerial').style.borderColor='var(--red)'; return;
+  }
+
+  // Check duplicate
+  const dup=issuedToday.find(p=>Number(p.serialNumber)===serial);
+  if(dup){
+    const t=dup.time?new Date(dup.time).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'earlier';
+    errEl.textContent=`⚠️ DUPLICATE: Serial ${String(serial).padStart(4,'0')} was already issued today at ${t}. Possible fraud.`;
+    errEl.style.display='block'; $('issueSerial').style.borderColor='var(--red)'; return;
+  }
+
+  if(issuePayMode_==='UPI'&&!upiRef){
+    toast('Enter UPI reference number','err'); return;
+  }
+
+  const btn=$('btnIssuePass'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Logging…';
+  const today=new Date().toISOString().split('T')[0];
+  try{
+    const {db,collection,addDoc}=window.__mgDb;
+    await addDoc(collection(db,'pass_issuances'),{
+      serialNumber: serial,
+      date:         today,
+      time:         Date.now(),
+      paymentMode:  issuePayMode_,
+      upiRef:       issuePayMode_==='UPI'?upiRef:'',
+      amount:       50,
+      issuedBy:     S.mgrName||'Staff',
+      wristbandColour: todayBatch.colour
+    });
+    issuedToday.push({serialNumber:serial,paymentMode:issuePayMode_,date:today,time:Date.now()});
+    renderIssueStats();
+    $('issueSerial').value='';
+    $('issueUpiRef').value='';
+    $('issueSerial').style.borderColor='var(--g3)';
+    setTimeout(()=>$('issueSerial').style.borderColor='',1500);
+    toast(`✅ Pass ${String(serial).padStart(4,'0')} issued — ${issuePayMode_}`,'ok');
+  }catch(e){ toast('Failed: '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.innerHTML='🎫 Issue Pass'; }
+});
+
+/* ══ MONTHLY PASS ISSUANCE ══════════════════════════════════════════════
+   Manager issues passes at the counter for cash/UPI customers.
+   Also handles renewals — detects existing pass by phone number.
+════════════════════════════════════════════════════════════════════════ */
+let mpPassType    = '';
+let mpPassPrice   = 0;
+let mpPayMode_    = 'Cash';
+let mpPhotoData   = '';
+let mpCamStream   = null;
+let mpCamOpen     = false;
+let mpPhotoTaken  = false;
+const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function fmtDateShort(d) {
+  return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/* ── Pass type selection ─────────────────────────────────────────── */
+document.querySelectorAll('.pass-opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.pass-opt').forEach(o => {
+      o.style.borderColor = 'var(--border)';
+      o.style.background  = '';
+    });
+    opt.style.borderColor = 'var(--goldb)';
+    opt.style.background  = 'var(--goldbg)';
+    mpPassType  = opt.dataset.type;
+    mpPassPrice = parseInt(opt.dataset.price);
+    $('mpPassErr').style.display = 'none';
+    // Show validity dates
+    const now = new Date();
+    const end = new Date(now); end.setDate(end.getDate() + 30);
+    $('mpStartDate').textContent = fmtDateShort(now);
+    $('mpEndDate').textContent   = fmtDateShort(end);
+    $('mpDatesWrap').style.display = 'grid';
+  });
+});
+
+/* ── Payment mode ────────────────────────────────────────────────── */
+document.querySelectorAll('#mpPayMode .pm-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#mpPayMode .pm-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    mpPayMode_ = btn.dataset.pm;
+    $('mpUpiWrap').style.display = mpPayMode_ === 'UPI' ? 'flex' : 'none';
+  });
+});
+
+/* ── Phone number input guard + renewal detection ────────────────── */
+const mpPhoneInp = $('mpPhone');
+if (mpPhoneInp) {
+  mpPhoneInp.addEventListener('input', () => {
+    mpPhoneInp.value = mpPhoneInp.value.replace(/[^0-9]/g,'').slice(0,10);
+  });
+  mpPhoneInp.addEventListener('keydown', e => {
+    if(!e.key||e.key==='Unidentified') return;
+    const ok=['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Enter','Home','End'];
+    if(!ok.includes(e.key)&&!/^[0-9]$/.test(e.key)) e.preventDefault();
+  });
+  mpPhoneInp.addEventListener('paste', e => {
+    e.preventDefault();
+    mpPhoneInp.value=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,10);
+  });
+  // Renewal detection — fires when phone is 10 digits
+  mpPhoneInp.addEventListener('input', async () => {
+    const phone = mpPhoneInp.value.replace(/\D/g,'');
+    if (phone.length !== 10 || !window.__mgDb) return;
+    const { db, collection, getDocs } = window.__mgDb;
+    try {
+      const snap = await getDocs(collection(db,'monthly_passes'));
+      let existing = null;
+      snap.forEach(d => {
+        const data = d.data();
+        if (data.phone === phone) {
+          // Take the most recent pass for this phone
+          if (!existing || (data.createdAt||0) > (existing.createdAt||0)) existing = data;
+        }
+      });
+      const banner = $('renewalBanner');
+      if (existing) {
+        const expDate = existing.endDate ? new Date(existing.endDate) : null;
+        const isExpired = expDate && expDate < new Date();
+        banner.style.display = 'flex';
+        $('renewalTitle').textContent = isExpired ? '🔄 Renewal — Previous Pass Expired' : '⚠️ Active Pass Exists';
+        $('renewalSub').textContent = isExpired
+          ? `${existing.passType} expired on ${fmtDateShort(expDate)}. Issuing a new pass.`
+          : `${existing.passType} active until ${fmtDateShort(expDate)}. Are you sure you want to issue another?`;
+        // Auto-fill name if empty
+        if (!$('mpName').value.trim() && existing.name) {
+          $('mpName').value = existing.name;
+        }
+      } else {
+        banner.style.display = 'none';
+      }
+    } catch(e) { console.warn('Renewal check failed:', e); }
+  });
+}
+
+/* ── Name input guard ────────────────────────────────────────────── */
+$('mpName')?.addEventListener('input', () => {
+  $('mpName').value = $('mpName').value.replace(/[^a-zA-Z\u00C0-\u024F\s\-'.]/g,'');
+});
+
+/* ── Camera for optional photo ───────────────────────────────────── */
+function mpStopCam() {
+  if (mpCamStream) { mpCamStream.getTracks().forEach(t => t.stop()); mpCamStream = null; }
+  mpCamOpen = false;
+  $('mpVideo').style.display = 'none';
+}
+
+function mpResetCam() {
+  mpStopCam();
+  mpPhotoTaken = false; mpPhotoData = '';
+  $('mpPreview').style.display = 'none'; $('mpPreview').src = '';
+  $('mpCamPlaceholder').style.display = 'block';
+  $('mpPhotoOk').style.display = 'none';
+  $('mpBtnCamOpen').style.display = '';
+  $('mpBtnShoot').style.display   = 'none';
+  $('mpBtnRetake').style.display  = 'none';
+}
+
+$('mpBtnCamOpen')?.addEventListener('click', async () => {
+  if (mpCamOpen) return;
+  $('mpBtnCamOpen').textContent = 'Starting…';
+  $('mpBtnCamOpen').disabled    = true;
+  if (!navigator.mediaDevices?.getUserMedia) {
+    toast('Camera not supported on this device','err');
+    $('mpBtnCamOpen').textContent = '📷 Open Camera'; $('mpBtnCamOpen').disabled = false; return;
+  }
+  try {
+    let stream;
+    try { stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'user'},width:{ideal:640}},audio:false}); }
+    catch(_) { stream = await navigator.mediaDevices.getUserMedia({video:true,audio:false}); }
+    mpCamStream = stream;
+    const vid = $('mpVideo');
+    vid.srcObject = stream; vid.setAttribute('playsinline',''); vid.muted=true;
+    try { await vid.play(); } catch(_){}
+    vid.style.display = 'block';
+    $('mpCamPlaceholder').style.display = 'none';
+    mpCamOpen = true;
+    $('mpBtnCamOpen').style.display = 'none';
+    $('mpBtnShoot').style.display = 'flex';
+    $('mpBtnCamOpen').disabled = false;
+  } catch(err) {
+    $('mpBtnCamOpen').textContent = '📷 Open Camera'; $('mpBtnCamOpen').disabled = false;
+    const msgs={NotAllowedError:'Camera permission denied.',NotFoundError:'No camera found.',NotReadableError:'Camera in use by another app.'};
+    toast(msgs[err.name]||'Camera error: '+err.message,'err');
+  }
+});
+
+$('mpBtnShoot')?.addEventListener('click', () => {
+  const vid=document.getElementById('mpVideo'), canvas=document.getElementById('mpCanvas');
+  canvas.width=480; canvas.height=360;
+  canvas.getContext('2d').drawImage(vid,0,0,480,360);
+  mpPhotoData = canvas.toDataURL('image/jpeg',0.82);
+  $('mpPreview').src = mpPhotoData; $('mpPreview').style.display='block';
+  $('mpPhotoOk').style.display='flex';
+  mpStopCam(); mpPhotoTaken=true;
+  $('mpBtnShoot').style.display='none';
+  $('mpBtnRetake').style.display='flex';
+  $('mpBtnCamOpen').style.display='none';
+  $('mpCamPlaceholder').style.display='none';
+});
+
+$('mpBtnRetake')?.addEventListener('click', mpResetCam);
+
+/* ── Issue Pass button ───────────────────────────────────────────── */
+$('btnIssueMonthlyPass')?.addEventListener('click', async () => {
+  const name  = $('mpName').value.trim();
+  const phone = $('mpPhone').value.replace(/\D/g,'');
+  const upiRef= $('mpUpiRef')?.value.trim()||'';
+  let ok = true;
+
+  // Validation
+  if(!name||name.length<2){ $('mpNameErr').style.display='block'; $('mpName').style.borderColor='var(--red)'; ok=false; }
+  else { $('mpNameErr').style.display='none'; $('mpName').style.borderColor=''; }
+
+  if(!/^[6-9]\d{9}$/.test(phone)){ $('mpPhoneErr').style.display='block'; $('mpPhone').style.borderColor='var(--red)'; ok=false; }
+  else { $('mpPhoneErr').style.display='none'; $('mpPhone').style.borderColor=''; }
+
+  if(!mpPassType){ $('mpPassErr').style.display='block'; ok=false; }
+  else { $('mpPassErr').style.display='none'; }
+
+  if(mpPayMode_==='UPI'&&!upiRef){ toast('Enter UPI reference number','err'); ok=false; }
+
+  if(!ok) return;
+
+  const btn=$('btnIssueMonthlyPass'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Issuing pass…';
+
+  const now      = new Date();
+  const endDate  = new Date(now); endDate.setDate(endDate.getDate()+30);
+  const startStr = fmtDateShort(now);
+  const endStr   = fmtDateShort(endDate);
+
+  try {
+    const { db, storage, collection, addDoc, ref, uploadString, getDownloadURL } = window.__mgDb;
+
+    // 1. Upload photo if captured
+    let facePhotoURL = '';
+    if (mpPhotoTaken && mpPhotoData && window.__mgDb.ref) {
+      try {
+        const storageRef = ref(storage, `pass_faces/${phone}_mgr_${Date.now()}.jpg`);
+        await uploadString(storageRef, mpPhotoData, 'data_url');
+        facePhotoURL = await getDownloadURL(storageRef);
+      } catch(e) { console.warn('Photo upload failed (non-critical):', e); }
+    }
+
+    // 2. Save to monthly_passes
+    await addDoc(collection(db,'monthly_passes'), {
+      name:          san(name),
+      phone,
+      facePhotoURL,
+      passType:      mpPassType,
+      passPrice:     mpPassPrice,
+      startDate:     now.toISOString(),
+      endDate:       endDate.toISOString(),
+      startDateStr:  startStr,
+      endDateStr:    endStr,
+      status:        'Active',
+      wristbandColor:'Daily',
+      paymentMode:   mpPayMode_,
+      upiRef:        san(upiRef),
+      issuedBy:      S.mgrName||'Manager',
+      issuedAt:      Date.now(),
+      source:        'Manager Counter',
+      notes:         san($('mpNotes').value||''),
+      reminderSent:  false,
+      createdAt:     Date.now()
+    });
+
+    // 3. WhatsApp confirmation
+    const accessNote = mpPassType==='Morning Pass'?'⏰ Access hours: 6AM–9AM daily':'✅ All-day access';
+    await sendWhatsApp('+91'+phone,
+      `⭐ Monthly Pass Issued - Mansa Sports Park\nName: ${name}\nPass Type: ${mpPassType}\nValid: ${startStr} to ${endStr}\n${accessNote}\nYour face is your pass. Just show up!\n\nIssued at park counter.`
+    );
+
+    // 4. Success UI
+    $('mpSuccess').style.display = 'block';
+    $('mpSuccessMsg').textContent = `${name}'s ${mpPassType} issued successfully!`;
+    $('mpSuccessSub').textContent = `Valid ${startStr} → ${endStr} · ${mpPayMode_} ₹${mpPassPrice.toLocaleString('en-IN')}`;
+    toast(`⭐ ${mpPassType} issued for ${name}`,'ok');
+
+    // 5. Refresh passes today list
+    await loadPassesToday();
+
+    // 6. Reset form after 3s
+    setTimeout(() => {
+      mpResetForm();
+      btn.disabled = false;
+      btn.innerHTML = '⭐ Issue Monthly Pass';
+    }, 3000);
+
+  } catch(err) {
+    console.error(err);
+    toast('Failed: '+err.message,'err');
+    btn.disabled=false; btn.innerHTML='⭐ Issue Monthly Pass';
+  }
+});
+
+function mpResetForm() {
+  $('mpName').value=''; $('mpPhone').value='';
+  $('mpUpiRef').value=''; $('mpNotes').value='';
+  mpPassType=''; mpPassPrice=0; mpPayMode_='Cash'; mpPhotoData='';
+  document.querySelectorAll('.pass-opt').forEach(o=>{ o.style.borderColor='var(--border)'; o.style.background=''; });
+  document.querySelectorAll('#mpPayMode .pm-btn').forEach((b,i)=>b.classList.toggle('sel',i===0));
+  $('mpUpiWrap').style.display='none';
+  $('mpDatesWrap').style.display='none';
+  $('mpSuccess').style.display='none';
+  $('renewalBanner').style.display='none';
+  $('mpNameErr').style.display='none'; $('mpPhoneErr').style.display='none'; $('mpPassErr').style.display='none';
+  mpResetCam();
+}
+
+/* ── Passes issued today list ────────────────────────────────────── */
+async function loadPassesToday() {
+  if(!window.__mgDb) return;
+  const { db, collection, getDocs } = window.__mgDb;
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const snap = await getDocs(collection(db,'monthly_passes'));
+    const todayPasses = [];
+    snap.forEach(d => {
+      const data = d.data();
+      if (data.source==='Manager Counter' && (data.issuedAt||0) >= new Date(today).setHours(0,0,0,0)) {
+        todayPasses.push(data);
+      }
+    });
+    todayPasses.sort((a,b)=>(b.issuedAt||0)-(a.issuedAt||0));
+    const list=$('passesTodayList');
+    const count=$('passesTodayCount');
+    const totalRev = todayPasses.reduce((s,p)=>s+(p.passPrice||0),0);
+    count.textContent = `${todayPasses.length} issued · ₹${totalRev.toLocaleString('en-IN')} collected`;
+    if(!todayPasses.length){ list.innerHTML='<div class="empty-state"><div class="ei">⭐</div><p>No passes issued today yet</p></div>'; return; }
+    list.innerHTML = todayPasses.map(p=>{
+      const t=p.issuedAt?new Date(p.issuedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'—';
+      const pm=p.paymentMode==='Cash'?'💵':'📱';
+      return `<div class="cash-row">
+        <span class="cr-time">${t}</span>
+        <span class="cr-court">${(p.name||'').replace(/[<>&"]/g,'')}<br><span style="font-size:10px;color:var(--muted)">${p.passType}</span></span>
+        <span class="cr-cust">+91 ${p.phone||'—'}<br><span style="font-size:10px">${p.endDateStr||'—'}</span></span>
+        <span class="cr-amt">${pm} ₹${(p.passPrice||0).toLocaleString('en-IN')}</span>
+      </div>`;
+    }).join('');
+  } catch(e) { console.warn('Passes today error:',e); }
+}
+
+/* ══ WHATSAPP ════════════════════════════════ */
+async function sendWhatsApp(to, body) {
+  const url=window.__mgCfg?.TWILIO_FN_URL;
+  if(!url||url==='https://sendwhatsapp-a6itbc4lzq-uc.a.run.app') return;
+  try{ await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,body})}); }
+  catch(e){ console.warn('WhatsApp failed',e); }
+}
+
+/* ══ BROWSER NOTIFICATION — 15 min before slot start ════════════════════
+   Requests notification permission once, then schedules a setTimeout.
+   Works while this browser tab is open.
+══════════════════════════════════════════════════════════════════════════ */
+const scheduledNotifications = []; // track timeouts so we can clear if needed
+
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) return false;
+  if (Notification.permission === 'granted') return true;
+  if (Notification.permission === 'denied') return false;
+  const result = await Notification.requestPermission();
+  return result === 'granted';
+}
+
+function scheduleSlotNotification(customerName, customerPhone, slotDate, slotTime, courtName) {
+  // Build the slot start Date object
+  const [h, m] = slotTime.split(':').map(Number);
+  const slotStart = new Date(slotDate);
+  slotStart.setHours(h, m, 0, 0);
+
+  // Fire 15 minutes before
+  const notifyAt = slotStart.getTime() - 15 * 60 * 1000;
+  const delay    = notifyAt - Date.now();
+
+  if (delay < 0) {
+    // Slot is in the past or within 15 min — no notification needed
+    return;
+  }
+
+  requestNotificationPermission().then(granted => {
+    if (!granted) {
+      toast('Enable browser notifications to get slot reminders', 'info');
+      return;
+    }
+
+    const tid = setTimeout(() => {
+      const msg = `⚠️ Call ${customerName} — ${customerPhone} — ${courtName} slot starts in 15 min`;
+      try {
+        new Notification('🏟️ Mansa Sports Park — VIP Hold Reminder', {
+          body:    msg,
+          icon:    '/mansa-sports-park/favicon.ico',
+          badge:   '/mansa-sports-park/favicon.ico',
+          tag:     `vip-${customerPhone}-${slotTime}`,
+          requireInteraction: true  // stays on screen until dismissed
+        });
+      } catch(e) {
+        // Fallback: toast in tab
+        toast(msg, 'info');
+      }
+    }, delay);
+
+    scheduledNotifications.push({ tid, customerName, courtName, slotTime });
+    console.log(`Notification scheduled for ${customerName} at ${new Date(notifyAt).toLocaleTimeString('en-IN')}`);
+  });
+}
+
+/* Re-schedule notifications on page load for existing tentative bookings */
+async function rescheduleExistingNotifications() {
+  const granted = await requestNotificationPermission();
+  if (!granted) return;
+
+  const today = new Date().toISOString().split('T')[0];
+  S.bookings
+    .filter(b => b.status === 'Tentative' && b.date >= today && b.bookingSource === 'Manager/Call')
+    .forEach(b => {
+      const d = new Date(b.date);
+      scheduleSlotNotification(b.name, b.phone, d, b.timeSlot, b.court);
+    });
+}
+
+/* ══ LATE RELEASE STRIKE LOGGING ════════════════════════════════════════
+   If manager releases a slot more than 15 min after slot start time,
+   a strike is logged to Firebase manager_strikes collection.
+══════════════════════════════════════════════════════════════════════════ */
+async function logManagerStrike(booking, releaseTime) {
+  if (!window.__mgDb) return;
+  const { db, collection, addDoc } = window.__mgDb;
+  try {
+    await addDoc(collection(db, 'manager_strikes'), {
+      ManagerName:   S.mgrName || 'Manager',
+      Date:          new Date().toISOString().split('T')[0],
+      Court:         booking.court || '',
+      SlotTime:      booking.timeSlot || '',
+      SlotEnd:       booking.slotEnd || '',
+      CustomerName:  booking.name || '',
+      CustomerPhone: booking.phone || '',
+      CourtCharge:   booking.amount || 0,
+      ReleaseTime:   new Date(releaseTime).toISOString(),
+      Reason:        'Late VIP release',
+      BookingId:     booking.id || '',
+      loggedAt:      Date.now()
+    });
+    console.log('Strike logged for late release');
+  } catch(e) {
+    console.error('Strike log failed:', e);
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Book courts at Mansa Sports Park — instant confirmation online.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Book a Court — Mansa Sports Park</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#0D4A26;--g2:#166534;--g3:#16a34a;--g4:#4ade80;--gbg:#f0fdf4;
+  --gold:#d97706;--goldbg:#fffbeb;
+  --red:#dc2626;--redbg:#fef2f2;
+  --bg:#f7f9f7;--surf:#fff;--text:#0a150d;--muted:#4b6358;--border:#d1e4d9;
+  --r:12px;--rlg:20px;--font:'Inter',system-ui,sans-serif;--display:'DM Serif Display',serif;
+  --shadow:0 2px 16px rgba(13,74,38,.10);--shadow-lg:0 8px 40px rgba(13,74,38,.14);
+}
+html,body{min-height:100vh;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* HERO */
+.hero{background:linear-gradient(150deg,var(--g1) 0%,var(--g2) 55%,var(--g3) 100%);padding:32px 24px 48px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:32px;background:var(--bg);border-radius:32px 32px 0 0}
+.hero-logo{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.hero-logo .badge{width:42px;height:42px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.hero-logo span{color:#fff;font-size:15px;font-weight:700;opacity:.85}
+.hero h1{font-family:var(--display);font-size:32px;color:#fff;line-height:1.15;letter-spacing:-.3px;margin-bottom:6px}
+.hero p{color:rgba(255,255,255,.70);font-size:14px;font-weight:500}
+
+/* STEPPER */
+.stepper{display:flex;align-items:center;justify-content:center;gap:0;padding:20px 24px 0;max-width:560px;margin:0 auto}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:2px solid var(--border);background:var(--surf);color:var(--muted);flex-shrink:0;transition:all .3s}
+.step-dot.active{background:var(--g2);border-color:var(--g2);color:#fff}
+.step-dot.done{background:var(--g4);border-color:var(--g3);color:var(--g1)}
+.step-line{flex:1;height:2px;background:var(--border);margin:0 4px;transition:background .3s}
+.step-line.done{background:var(--g3)}
+
+/* CARD */
+.card{background:var(--surf);border-radius:var(--rlg);box-shadow:var(--shadow);border:1px solid var(--border);padding:24px 20px;width:calc(100% - 32px);max-width:560px;margin:16px auto}
+
+/* STEP */
+.step-pane{display:none}.step-pane.active{display:block}
+.step-title{font-size:19px;font-weight:800;color:var(--g1);margin-bottom:4px;letter-spacing:-.3px}
+.step-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+
+/* COURT GRID */
+.court-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.court-opt{border:2px solid var(--border);border-radius:var(--r);padding:14px 12px;cursor:pointer;transition:border-color .2s,background .2s;-webkit-tap-highlight-color:transparent}
+.court-opt:hover{border-color:var(--g3);background:var(--gbg)}
+.court-opt.selected{border-color:var(--g2);background:var(--gbg)}
+.court-opt .co-icon{font-size:24px;margin-bottom:6px}
+.court-opt .co-name{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
+.court-opt .co-price{font-size:12px;color:var(--g2);font-weight:700;margin-top:3px}
+.court-opt .co-note{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.3}
+
+/* DURATION TOGGLE */
+.dur-toggle{display:flex;gap:8px;margin-bottom:20px}
+.dur-btn{flex:1;padding:11px;border:2px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13.5px;font-weight:700;cursor:pointer;background:var(--surf);color:var(--muted);transition:all .2s;-webkit-tap-highlight-color:transparent}
+.dur-btn.selected{border-color:var(--g2);background:var(--gbg);color:var(--g1)}
+
+/* DATE PICKER */
+.date-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.date-scroll::-webkit-scrollbar{display:none}
+.date-chip{min-width:56px;padding:10px 8px;border:2px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;flex-shrink:0;transition:all .2s;background:var(--surf);-webkit-tap-highlight-color:transparent}
+.date-chip .dc-day{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.date-chip .dc-num{font-size:20px;font-weight:900;color:var(--text);line-height:1}
+.date-chip .dc-mon{font-size:10px;font-weight:600;color:var(--muted)}
+.date-chip.selected{border-color:var(--g2);background:var(--gbg)}
+.date-chip.today .dc-num{color:var(--g2)}
+
+/* TIME SLOTS */
+.slots-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.slot-btn{padding:12px 6px;border:2px solid var(--border);border-radius:var(--r);text-align:center;cursor:pointer;transition:all .2s;background:var(--surf);-webkit-tap-highlight-color:transparent}
+.slot-btn .sb-time{font-size:13px;font-weight:800;color:var(--text)}
+.slot-btn .sb-end{font-size:11px;color:var(--muted);margin-top:1px}
+.slot-btn.booked{background:#fee2e2;border-color:#fca5a5;cursor:not-allowed}
+.slot-btn.booked .sb-time{color:var(--red)}
+.slot-btn.booked .sb-end{color:#f87171}
+.slot-btn.selected{border-color:var(--g2);background:var(--gbg)}
+.slot-btn.selected .sb-time{color:var(--g1)}
+.slot-btn:hover:not(.booked):not(.selected){border-color:var(--g3);background:var(--gbg)}
+
+/* FORM FIELDS */
+.field{margin-bottom:16px}
+.flabel{display:block;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--g2);margin-bottom:6px}
+.finput{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:16px;font-weight:500;color:var(--text);background:var(--bg);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+.finput:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(22,163,74,.12);background:#fff}
+.finput.err{border-color:var(--red)}
+.ferr{font-size:12px;color:var(--red);font-weight:600;margin-top:4px;display:none}
+.ferr.show{display:block}
+.phone-row{display:flex;gap:0}
+.phone-pfx{padding:13px 14px;background:var(--gbg);border:1.5px solid var(--border);border-right:none;border-radius:var(--r) 0 0 var(--r);font-size:15px;font-weight:700;color:var(--g2);white-space:nowrap;display:flex;align-items:center}
+.phone-row .finput{border-radius:0 var(--r) var(--r) 0}
+
+/* SUMMARY BOX */
+.summary-box{background:var(--gbg);border:1.5px solid var(--g4);border-radius:var(--r);padding:16px;margin-bottom:20px}
+.sb-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13.5px}
+.sb-row:last-child{border-bottom:none;padding-top:10px;margin-top:4px}
+.sb-key{color:var(--muted);font-weight:500}
+.sb-val{font-weight:700;color:var(--text)}
+.sb-total .sb-key{font-size:15px;font-weight:700;color:var(--g1)}
+.sb-total .sb-val{font-size:22px;font-weight:900;color:var(--g1)}
+
+/* CANCEL POLICY */
+.policy-box{background:var(--goldbg);border:1px solid #fde68a;border-radius:var(--r);padding:12px 14px;font-size:12.5px;color:#92400e;margin-bottom:20px;line-height:1.5}
+.policy-box strong{font-weight:700}
+
+/* BUTTONS */
+.btn{width:100%;padding:16px;border:none;border-radius:var(--r);font-family:var(--font);font-size:16px;font-weight:800;cursor:pointer;transition:opacity .2s,transform .15s;-webkit-tap-highlight-color:transparent;letter-spacing:-.2px}
+.btn:active:not(:disabled){transform:scale(.98)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--g1),var(--g3));color:#fff;box-shadow:0 4px 16px rgba(22,163,74,.30)}
+.btn-pay{background:linear-gradient(135deg,var(--g1) 0%,var(--g4) 100%);color:#fff;font-size:18px;padding:18px;box-shadow:0 6px 24px rgba(74,222,128,.35)}
+.btn-outline{background:transparent;border:2px solid var(--g2);color:var(--g2);margin-top:10px}
+.btn-sm{width:auto;padding:8px 16px;font-size:13px}
+
+/* SUCCESS */
+.success-screen{text-align:center;padding:8px 0 12px}
+.success-icon{width:80px;height:80px;background:var(--gbg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:40px;border:3px solid var(--g4)}
+.success-name{font-family:var(--display);font-size:26px;color:var(--g1);margin-bottom:6px}
+.success-msg{font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.ticket{background:var(--bg);border:1.5px dashed var(--g3);border-radius:var(--r);padding:18px;text-align:left;position:relative;overflow:hidden}
+.ticket::before,.ticket::after{content:'';position:absolute;top:50%;width:22px;height:22px;background:var(--surf);border-radius:50%;transform:translateY(-50%);border:1.5px dashed var(--g3)}
+.ticket::before{left:-12px}.ticket::after{right:-12px}
+.tk-header{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--g3);margin-bottom:12px}
+.tk-row{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px dashed var(--border)}
+.tk-row:last-child{border-bottom:none;padding-bottom:0}
+.tk-k{color:var(--muted);font-weight:500}.tk-v{font-weight:700;color:var(--text);text-align:right;max-width:60%;word-break:break-all}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 22px;border-radius:999px;font-size:13.5px;font-weight:700;z-index:9999;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s;opacity:0;pointer-events:none;max-width:90vw;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{background:var(--g2);color:#fff}.toast.err{background:var(--red);color:#fff}
+
+/* SPINNER */
+.spinner{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* NO SLOTS */
+.no-slots{text-align:center;padding:28px;color:var(--muted);font-size:13px;border:2px dashed var(--border);border-radius:var(--r)}
+
+@media(max-width:380px){.court-grid{grid-template-columns:1fr}.slots-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* QR */
+.qr-wrap{display:flex;flex-direction:column;align-items:center;margin:20px 0 12px}
+.qr-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px}
+.qr-frame{background:#fff;border:3px solid var(--g1);border-radius:14px;padding:12px;box-shadow:0 4px 16px rgba(13,74,38,.12)}
+.qr-frame canvas,.qr-frame img{display:block;border-radius:4px}
+.qr-sub{font-size:12px;color:var(--muted);margin-top:8px;text-align:center;font-weight:500}
+.qr-id{font-size:11px;color:var(--g2);font-weight:700;margin-top:3px;text-align:center;font-family:monospace}
+.btn-dlqr{margin-top:10px;padding:9px 18px;background:var(--gbg);border:1.5px solid var(--g3);border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;color:var(--g1);cursor:pointer;display:flex;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-logo"><div class="badge">🏟️</div><span>Mansa Sports Park</span></div>
+  <h1>Book Your Court</h1>
+  <p>Instant confirmation · 100% online · No queues</p>
+</div>
+
+<div class="stepper" id="stepper">
+  <div class="step-dot active" id="sd1">1</div>
+  <div class="step-line" id="sl1"></div>
+  <div class="step-dot" id="sd2">2</div>
+  <div class="step-line" id="sl2"></div>
+  <div class="step-dot" id="sd3">3</div>
+  <div class="step-line" id="sl3"></div>
+  <div class="step-dot" id="sd4">4</div>
+</div>
+
+<div class="card">
+
+  <!-- STEP 1: Court + Duration + Date -->
+  <div class="step-pane active" id="pane1">
+    <div class="step-title">Choose a Court</div>
+    <div class="step-sub">Select court type, duration and date</div>
+    <div class="court-grid" id="courtGrid"></div>
+    <div id="durWrap" style="display:none;margin-top:12px;margin-bottom:4px">
+      <div class="flabel">Duration</div>
+      <div class="dur-toggle" id="durToggle"></div>
+    </div>
+    <div style="margin-top:16px;margin-bottom:8px"><div class="flabel">Select Date</div></div>
+    <div class="date-scroll" id="dateScroll"></div>
+    <div style="margin-top:16px"><button class="btn btn-primary" id="btnStep1" disabled>Select a Time Slot →</button></div>
+  </div>
+
+  <!-- STEP 2: Time Slot -->
+  <div class="step-pane" id="pane2">
+    <div class="step-title">Pick a Time Slot</div>
+    <div class="step-sub" id="slotSub">Available slots for your selection</div>
+    <div id="slotsContainer"></div>
+    <button class="btn btn-primary" id="btnStep2" disabled style="margin-top:12px">Enter Your Details →</button>
+    <button class="btn btn-outline" id="btnBack1">← Change Court</button>
+  </div>
+
+  <!-- STEP 3: Name + Phone -->
+  <div class="step-pane" id="pane3">
+    <div class="step-title">Your Details</div>
+    <div class="step-sub">We'll send your confirmation to WhatsApp</div>
+    <div class="field">
+      <label class="flabel" for="custName">Full Name</label>
+      <input type="text" class="finput" id="custName" placeholder="e.g. Arjun Sharma" autocapitalize="words" autocorrect="off" maxlength="60">
+      <div class="ferr" id="nameErr">Please enter your full name</div>
+    </div>
+    <div class="field">
+      <label class="flabel">Mobile Number</label>
+      <div class="phone-row">
+        <div class="phone-pfx">🇮🇳 +91</div>
+        <input type="tel" class="finput" id="custPhone" placeholder="10-digit number" inputmode="numeric" maxlength="10">
+      </div>
+      <div class="ferr" id="phoneErr">Enter a valid 10-digit mobile number</div>
+    </div>
+    <button class="btn btn-primary" id="btnStep3">Review & Pay →</button>
+    <button class="btn btn-outline" id="btnBack2">← Change Slot</button>
+  </div>
+
+  <!-- STEP 4: Summary + Pay -->
+  <div class="step-pane" id="pane4">
+    <div class="step-title">Review Booking</div>
+    <div class="step-sub">Confirm details before payment</div>
+    <div class="summary-box" id="summaryBox"></div>
+    <div class="policy-box">
+      <strong>Cancellation Policy:</strong><br>
+      ✅ Cancel 4+ hours before slot → <strong>Full refund</strong><br>
+      ❌ Cancel within 2 hours → <strong>No refund</strong><br>
+      To cancel, WhatsApp us at <strong>+91 98765 43210</strong>
+    </div>
+    <button class="btn btn-pay" id="btnPay">🔒 Pay & Confirm Booking</button>
+    <button class="btn btn-outline" id="btnBack3">← Edit Details</button>
+  </div>
+
+  <!-- STEP 5: Success -->
+  <div class="step-pane" id="pane5">
+    <div class="success-screen">
+      <div class="success-icon">🏆</div>
+      <div class="success-name">Court Booked!</div>
+      <div class="success-msg">Booking confirmed.<br>Show QR code at the court entrance.</div>
+
+      <!-- QR CODE -->
+      <div class="qr-wrap">
+        <div class="qr-lbl">📲 Show at court entrance</div>
+        <div class="qr-frame"><div id="bookQrCode"></div></div>
+        <div class="qr-sub">Staff will scan to verify your booking</div>
+        <div class="qr-id" id="bookQrRef"></div>
+        <button class="btn-dlqr" id="btnSaveBookQR">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Save QR
+        </button>
+      </div>
+
+      <div class="ticket">
+        <div class="tk-header">🏟️ Mansa Sports Park — Court Booking</div>
+        <div class="tk-row"><span class="tk-k">Name</span>      <span class="tk-v" id="tkName">—</span></div>
+        <div class="tk-row"><span class="tk-k">Court</span>     <span class="tk-v" id="tkCourt">—</span></div>
+        <div class="tk-row"><span class="tk-k">Date</span>      <span class="tk-v" id="tkDate">—</span></div>
+        <div class="tk-row"><span class="tk-k">Time</span>      <span class="tk-v" id="tkTime">—</span></div>
+        <div class="tk-row"><span class="tk-k">Duration</span>  <span class="tk-v" id="tkDur">—</span></div>
+        <div class="tk-row"><span class="tk-k">Amount</span>    <span class="tk-v" id="tkAmt">—</span></div>
+        <div class="tk-row"><span class="tk-k">Ref ID</span>    <span class="tk-v" id="tkRef">—</span></div>
+        <div class="tk-row"><span class="tk-k">Status</span>    <span class="tk-v" style="color:var(--g2)">✅ CONFIRMED</span></div>
+      </div>
+      <div style="margin-top:16px;padding:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:var(--r);font-size:13px;color:#92400e;font-weight:500">
+        💬 QR code &amp; confirmation sent to WhatsApp
+      </div>
+      <button class="btn btn-primary" style="margin-top:16px" onclick="location.reload()">Book Another Court</button>
+    </div>
+  </div>
+
+</div><!-- /card -->
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ══════════════════════ CONFIG ══════════════════════ */
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCr0ITLauBZY1tEvXZcbMilWbCGuOYJLrM",
+  authDomain:        "mansasportspark-e0f3d.firebaseapp.com",
+  projectId:         "mansasportspark-e0f3d",
+  storageBucket:     "mansasportspark-e0f3d.firebasestorage.app",
+  messagingSenderId: "521169146944",
+  appId:             "1:521169146944:web:9877d8f7be192c60993ba5",
+  measurementId:     "G-9ZSKTGTJRC"
+};
+const RAZORPAY_KEY  = "YOUR_RAZORPAY_KEY_ID";
+const TWILIO_FN_URL = "https://sendwhatsapp-a6itbc4lzq-uc.a.run.app";
+/* ═══════════════════════════════════════════════════ */
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+window.__bookDb = { db, collection, addDoc, getDocs, query, where };
+window.__bookCfg = { RAZORPAY_KEY, TWILIO_FN_URL };
+window.dispatchEvent(new Event('book-ready'));
+</script>
+
+<script>
+'use strict';
+/* ══════════════════════ COURTS ══════════════════════ */
+const COURTS = [
+  { id:'tennis',    name:'Tennis',            icon:'🎾', unit:'hr',   price:350,  durations:[60],           note:'Full hour only' },
+  { id:'badminton_in', name:'Badminton Indoor', icon:'🏸', unit:'hr',   price:175,  durations:[60],           note:'Indoor court' },
+  { id:'badminton_out',name:'Badminton Outdoor',icon:'🏸', unit:'hr',   price:90,   durations:[60],           note:'Outdoor court' },
+  { id:'pickleball',name:'Pickleball',         icon:'🏓', unit:'hr',   price:175,  durations:[60],           note:'Full hour only' },
+  { id:'box_cricket',name:'Box Cricket Turf',  icon:'🏏', unit:'hr',   price:500,  durations:[60],           note:'Full hour only' },
+  { id:'cricket_net',name:'Cricket Net',       icon:'🏏', unit:'30min',price:125,  durations:[30,60],        note:'₹125/30min · ₹250/hr' },
+  { id:'table_tennis',name:'Table Tennis',     icon:'🏓', unit:'30min',price:70,   durations:[30,60],        note:'₹70/30min · ₹140/hr' },
+  { id:'basketball', name:'Basketball',        icon:'🏀', unit:'30min',price:100,  durations:[30,60],        priceHr:180, note:'₹100/30min · ₹180/hr\nWknd 5PM–9PM: 60min only' },
+];
+
+/* ══════════════════════ STATE ══════════════════════ */
+const S = { court:null, dur:60, date:null, slot:null, name:'', phone:'', paymentId:'', fbReady:false };
+const $ = id => document.getElementById(id);
+
+window.addEventListener('book-ready', () => { S.fbReady = true; });
+
+/* ══════════════════════ TOAST ══════════════════════ */
+function toast(msg, type='ok') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+/* ══════════════════════ STEPPER ══════════════════════ */
+function goStep(n) {
+  document.querySelectorAll('.step-pane').forEach((p,i) => p.classList.toggle('active', i===n-1));
+  [1,2,3,4].forEach(i => {
+    $(`sd${i}`).classList.toggle('active', i===n);
+    $(`sd${i}`).classList.toggle('done',   i<n);
+    if(i<4) { $(`sl${i}`).classList.toggle('done', i<n); }
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ══════════════════════ BUILD COURT GRID ══════════════════════ */
+const grid = $('courtGrid');
+COURTS.forEach(c => {
+  const d = document.createElement('div');
+  d.className = 'court-opt';
+  d.innerHTML = `<div class="co-icon">${c.icon}</div><div class="co-name">${c.name}</div><div class="co-price">₹${c.price}/${c.unit}</div><div class="co-note">${c.note.replace(/\n/g,'<br>')}</div>`;
+  d.addEventListener('click', () => {
+    document.querySelectorAll('.court-opt').forEach(el => el.classList.remove('selected'));
+    d.classList.add('selected');
+    S.court = c;
+    buildDurationToggle(c);
+    checkStep1();
+  });
+  grid.appendChild(d);
+});
+
+function buildDurationToggle(c) {
+  const wrap   = $('durWrap');
+  const toggle = $('durToggle');
+  toggle.innerHTML = '';
+  S.slot = null; // [FIXED] reset slot when court/duration changes
+  $('btnStep1').disabled = !(S.court && S.date); // re-check
+  if (c.durations.length === 1) {
+    S.dur = c.durations[0];
+    wrap.style.display = 'none';
+  } else {
+    wrap.style.display = 'block';
+    c.durations.forEach(d => {
+      const btn = document.createElement('button');
+      btn.className = 'dur-btn' + (d === S.dur ? ' selected' : '');
+      const price = d === 30 ? c.price : (c.priceHr || c.price * 2);
+      btn.textContent = `${d} min — ₹${price}`;
+      btn.addEventListener('click', () => {
+        toggle.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        S.dur = d;
+        checkStep1();
+      });
+      toggle.appendChild(btn);
+    });
+    S.dur = c.durations[0];
+    toggle.querySelector('.dur-btn')?.classList.add('selected');
+  }
+}
+
+/* ══════════════════════ BUILD DATE SCROLL ══════════════════════ */
+const dateScroll = $('dateScroll');
+const today = new Date(); today.setHours(0,0,0,0);
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+for (let i = 0; i < 7; i++) {
+  const d   = new Date(today); d.setDate(today.getDate() + i);
+  const chip = document.createElement('div');
+  chip.className = 'date-chip' + (i === 0 ? ' today' : '');
+  chip.dataset.date = d.toISOString().split('T')[0];
+  chip.innerHTML = `<div class="dc-day">${DAYS[d.getDay()]}</div><div class="dc-num">${d.getDate()}</div><div class="dc-mon">${MONTHS[d.getMonth()]}</div>`;
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    S.date = chip.dataset.date;
+    checkStep1();
+  });
+  dateScroll.appendChild(chip);
+}
+
+function checkStep1() {
+  $('btnStep1').disabled = !(S.court && S.date);
+}
+
+$('btnStep1').addEventListener('click', async () => {
+  if (!S.court || !S.date) return;
+  // Enforce basketball weekend evening rule
+  enforceBasketballRule();
+  await buildSlots();
+  goStep(2);
+});
+
+/* ══════════════════════ BASKETBALL WEEKEND RULE ══════════════════════ */
+function enforceBasketballRule() {
+  if (S.court?.id !== 'basketball') return;
+  const d    = new Date(S.date);
+  const dow  = d.getDay(); // 0=Sun, 6=Sat
+  if (dow === 0 || dow === 6) {
+    // Will enforce per-slot later — mark flag
+    S.bbWeekendEvening = true;
+  } else {
+    S.bbWeekendEvening = false;
+  }
+}
+
+function calcSlotPrice(startHour) {
+  const c = S.court;
+  if (c.id === 'basketball') {
+    if (S.dur === 60) return c.priceHr || 180;
+    // Weekend 17:00–21:00 check
+    if (S.bbWeekendEvening && startHour >= 17) return c.priceHr || 180; // forced to 60min
+    return c.price; // 100
+  }
+  if (S.dur === 30) return c.price;
+  return c.priceHr || c.price * 2;
+}
+
+/* ══════════════════════ BUILD SLOTS ══════════════════════ */
+async function buildSlots() {
+  const container = $('slotsContainer');
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading slots…</div>';
+  $('btnStep2').disabled = true;
+  S.slot = null;
+
+  // Fetch booked slots from Firebase
+  let bookedSlots = new Set();
+  if (S.fbReady && window.__bookDb) {
+    try {
+      const { db, collection, getDocs, query, where } = window.__bookDb;
+      const q = query(collection(db,'court_bookings'), where('date','==',S.date), where('courtId','==',S.court.id), where('status','==','Confirmed'));
+      const snap = await getDocs(q);
+      snap.forEach(d => {
+        const data = d.data();
+        // Mark all minutes covered by this booking
+        const [h,m] = data.timeSlot.split(':').map(Number);
+        const startMin = h*60+m;
+        for (let i=0;i<data.duration;i++) bookedSlots.add(startMin+i);
+      });
+    } catch(e) { console.warn('Slot fetch error:', e); }
+  }
+
+  // Generate time slots 06:00 – 20:30 (last start) in increments of duration
+  const START_MIN = 6*60, END_MIN = 20*60+30;
+  const INC = S.dur;
+  container.innerHTML = '';
+
+  const now = new Date();
+  const selectedDate = new Date(S.date);
+  const isToday = selectedDate.toDateString() === now.toDateString();
+  const nowMin = isToday ? now.getHours()*60+now.getMinutes() : 0;
+
+  const slotsGrid = document.createElement('div');
+  slotsGrid.className = 'slots-grid';
+
+  let hasAvailable = false;
+
+  for (let sm = START_MIN; sm + INC <= END_MIN + 1; sm += INC) {
+    // Basketball weekend evening: 17:00–21:00 only 60min
+    // [FIXED] Basketball weekend evening: actually skip 30-min slots (was missing 'continue')
+    if (S.court.id === 'basketball' && S.bbWeekendEvening && sm >= 17*60 && INC === 30) {
+      continue; // enforce 60-min minimum on Sat/Sun 5PM-9PM
+    }
+    const endMin = sm + INC;
+    if (endMin > 21*60) break; // no booking past 9PM end
+    if (sm > 20*60+30) break;  // no start past 8:30PM
+
+    const booked  = [...Array(INC).keys()].some(i => bookedSlots.has(sm+i));
+    const past    = isToday && sm < nowMin + 15; // 15min buffer for today
+
+    const hh = String(Math.floor(sm/60)).padStart(2,'0');
+    const mm = String(sm%60).padStart(2,'0');
+    const eh = String(Math.floor(endMin/60)).padStart(2,'0');
+    const em = String(endMin%60).padStart(2,'0');
+
+    const btn = document.createElement('div');
+    btn.className = 'slot-btn' + ((booked||past) ? ' booked' : '');
+    btn.innerHTML = `<div class="sb-time">${hh}:${mm}</div><div class="sb-end">→ ${eh}:${em}</div>`;
+
+    if (!booked && !past) {
+      hasAvailable = true;
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        S.slot = { time:`${hh}:${mm}`, end:`${eh}:${em}`, startMin:sm };
+        $('btnStep2').disabled = false;
+      });
+    }
+    slotsGrid.appendChild(btn);
+  }
+
+  if (!hasAvailable) {
+    container.innerHTML = '<div class="no-slots">😔 No available slots for this court on this date.<br>Please try another date.</div>';
+  } else {
+    container.appendChild(slotsGrid);
+  }
+
+  const d = new Date(S.date);
+  $('slotSub').textContent = `${S.court.name} · ${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} · ${S.dur} min slots`;
+}
+
+$('btnStep2').addEventListener('click', () => { if (S.slot) goStep(3); });
+$('btnBack1').addEventListener('click', () => goStep(1));
+$('btnBack2').addEventListener('click', () => goStep(2));
+$('btnBack3').addEventListener('click', () => goStep(3));
+
+/* ══════════════════════ PHONE INPUT GUARD ══════════════════════ */
+const ph = $('custPhone');
+ph.addEventListener('input',    () => { ph.value = ph.value.replace(/[^0-9]/g,'').slice(0,10); });
+ph.addEventListener('keydown',  e  => { if(!e.key||e.key==='Unidentified')return; const ok=['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Enter','Home','End']; if(!ok.includes(e.key)&&!/^[0-9]$/.test(e.key))e.preventDefault(); });
+ph.addEventListener('paste',    e  => { e.preventDefault(); ph.value=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,10); });
+
+const nm = $('custName');
+nm.addEventListener('input', () => { nm.value = nm.value.replace(/[^a-zA-Z\u00C0-\u024F\s\-'.]/g,''); });
+
+/* ══════════════════════ STEP 3 → 4 ══════════════════════ */
+$('btnStep3').addEventListener('click', () => {
+  const name  = nm.value.trim();
+  const phone = ph.value.replace(/\D/g,'');
+  let ok = true;
+  if (!name || name.length < 2) { $('nameErr').classList.add('show'); nm.classList.add('err'); ok=false; } else { $('nameErr').classList.remove('show'); nm.classList.remove('err'); }
+  if (!/^[6-9]\d{9}$/.test(phone)) { $('phoneErr').classList.add('show'); ph.classList.add('err'); ok=false; } else { $('phoneErr').classList.remove('show'); ph.classList.remove('err'); }
+  if (!ok) return;
+  S.name = name; S.phone = phone;
+  buildSummary();
+  goStep(4);
+});
+
+function getPrice() {
+  const c = S.court;
+  if (!c) return 0;
+  if (c.id === 'basketball') return S.dur === 60 ? (c.priceHr||180) : c.price;
+  if (S.dur === 30) return c.price;
+  return c.priceHr || c.price * 2;
+}
+
+function buildSummary() {
+  const price = getPrice();
+  const d = new Date(S.date);
+  $('summaryBox').innerHTML = `
+    <div class="sb-row"><span class="sb-key">Court</span><span class="sb-val">${S.court.name}</span></div>
+    <div class="sb-row"><span class="sb-key">Date</span><span class="sb-val">${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}</span></div>
+    <div class="sb-row"><span class="sb-key">Time</span><span class="sb-val">${S.slot.time} – ${S.slot.end}</span></div>
+    <div class="sb-row"><span class="sb-key">Duration</span><span class="sb-val">${S.dur} minutes</span></div>
+    <div class="sb-row"><span class="sb-key">Name</span><span class="sb-val">${S.name}</span></div>
+    <div class="sb-row"><span class="sb-key">Mobile</span><span class="sb-val">+91 ${S.phone}</span></div>
+    <div class="sb-row sb-total"><span class="sb-key">Total</span><span class="sb-val">₹${price}</span></div>`;
+}
+
+/* ══════════════════════ RAZORPAY ══════════════════════ */
+let paying = false;
+$('btnPay').addEventListener('click', () => {
+  if (paying) return;
+  const key = window.__bookCfg?.RAZORPAY_KEY;
+  if (!key || key==='YOUR_RAZORPAY_KEY_ID') { toast('Razorpay not configured yet','err'); return; }
+  if (!S.fbReady) { toast('Firebase not ready','err'); return; }
+  paying = true;
+  $('btnPay').disabled = true;
+  const price = getPrice();
+  const rzp = new Razorpay({
+    key, amount:price*100, currency:'INR',
+    name:'Mansa Sports Park', description:`${S.court.name} · ${S.slot.time}`,
+    prefill:{ name:S.name, contact:'+91'+S.phone },
+    theme:{ color:'#166534' },
+    handler: async r => { await onPaymentSuccess(r.razorpay_payment_id); },
+    modal:{ ondismiss:()=>{ paying=false; $('btnPay').disabled=false; toast('Payment cancelled','err'); } }
+  });
+  rzp.on('payment.failed', r => { paying=false; $('btnPay').disabled=false; toast('Payment failed: '+(r.error?.description||'try again'),'err'); });
+  rzp.open();
+});
+
+async function onPaymentSuccess(paymentId) {
+  $('btnPay').innerHTML = '<span class="spinner"></span>Saving…';
+  const price = getPrice();
+  const d = new Date(S.date);
+  const dateStr = `${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+  try {
+    const { db, collection, addDoc } = window.__bookDb;
+    await addDoc(collection(db,'court_bookings'), {
+      name:S.name, phone:S.phone,
+      courtId:S.court.id, court:S.court.name,
+      date:S.date, dateStr,
+      timeSlot:S.slot.time, slotEnd:S.slot.end,
+      duration:S.dur,
+      amount:price, paymentId,
+      status:'Confirmed',
+      createdAt:Date.now(),
+    });
+    // WhatsApp
+    const cfg = window.__bookCfg;
+    if (cfg.TWILIO_FN_URL && cfg.TWILIO_FN_URL!=='https://sendwhatsapp-a6itbc4lzq-uc.a.run.app') {
+      try {
+        await fetch(cfg.TWILIO_FN_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+          to:'+91'+S.phone,
+          body:`✅ Court Booked - Mansa Sports Park\nName: ${S.name}\nCourt: ${S.court.name}\nDate: ${dateStr}\nTime: ${S.slot.time} – ${S.slot.end}\nAmount: ₹${price}\nRef: ${paymentId}\nShow this at the gate.`
+        })});
+      } catch(e){ console.warn('WA failed',e); }
+    }
+    S.paymentId = paymentId;
+    // Fill ticket
+    $('tkName').textContent  = S.name;
+    $('tkCourt').textContent = S.court.name;
+    $('tkDate').textContent  = dateStr;
+    $('tkTime').textContent  = `${S.slot.time} – ${S.slot.end}`;
+    $('tkDur').textContent   = `${S.dur} minutes`;
+    $('tkAmt').textContent   = `₹${price}`;
+    $('tkRef').textContent   = paymentId;
+    goStep(5);
+  } catch(e) {
+    toast('Payment done but save failed. Ref: '+paymentId,'err');
+    $('btnPay').disabled=false;
+    $('btnPay').innerHTML='🔒 Pay & Confirm Booking';
+    paying=false;
+  }
+}
+
+/* QR Generation for court booking */
+function generateBookingQR(paymentId) {
+  const container = $('bookQrCode');
+  container.innerHTML = '';
+  if (typeof QRCode === 'undefined') {
+    container.style.cssText='padding:16px;font-family:monospace;font-size:12px;color:#166534;word-break:break-all;';
+    container.textContent = paymentId; return;
+  }
+  try {
+    new QRCode(container, {
+      text: paymentId, width:180, height:180,
+      colorDark:'#0D4A26', colorLight:'#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  } catch(e) {
+    container.style.cssText='padding:16px;font-family:monospace;font-size:12px;color:#166534;word-break:break-all;max-width:180px;';
+    container.textContent = paymentId;
+  }
+  $('bookQrRef').textContent = paymentId.slice(0,22)+(paymentId.length>22?'…':'');
+}
+
+$('btnSaveBookQR').addEventListener('click', () => {
+  try {
+    const canvas = $('bookQrCode').querySelector('canvas');
+    const img    = $('bookQrCode').querySelector('img');
+    let dataUrl;
+    if (canvas) { dataUrl = canvas.toDataURL('image/png'); }
+    else if (img) {
+      const tmp=document.createElement('canvas'); tmp.width=180; tmp.height=180;
+      tmp.getContext('2d').drawImage(img,0,0,180,180); dataUrl=tmp.toDataURL('image/png');
+    } else { alert('Screenshot this screen to save the QR.'); return; }
+    const a=document.createElement('a'); a.href=dataUrl; a.download=`court-booking-${S.phone||'mansa'}.png`; a.click();
+  } catch(e) { alert('Screenshot this screen to save the QR code.'); }
+});
+</script>
+</body>
+</html>

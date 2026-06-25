@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="Mansa Sports Park — Owner analytics dashboard.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner Dashboard — Mansa Sports Park</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#052e16;--g2:#166534;--g3:#16a34a;--g4:#4ade80;--gbg:#f0fdf4;
+  --blue:#1d4ed8;--bluebg:#eff6ff;
+  --gold:#92400e;--goldb:#d97706;--goldbg:#fffbeb;
+  --red:#dc2626;--redbg:#fef2f2;
+  --orange:#c2410c;--orangebg:#fff7ed;
+  --purple:#7c3aed;--purplebg:#f5f3ff;
+  --bg:#f1f5f2;--surf:#fff;--text:#0a150d;--muted:#4b6358;--border:#d1e4d9;
+  --r:10px;--rlg:18px;--font:'Inter',system-ui,sans-serif;
+  --shadow:0 2px 14px rgba(13,74,38,.09);--shadow-lg:0 8px 32px rgba(0,0,0,.14);
+}
+html,body{min-height:100vh;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-size:14px}
+
+/* LOGIN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(145deg,#020d05,var(--g1))}
+.lcard{background:var(--surf);border-radius:22px;padding:44px 36px;width:100%;max-width:400px;box-shadow:0 28px 72px rgba(0,0,0,.35);text-align:center}
+.lbadge{font-size:44px;margin-bottom:16px}
+.ltitle{font-size:22px;font-weight:900;color:var(--g1);margin-bottom:4px}
+.lrole{display:inline-block;background:var(--goldbg);color:var(--gold);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-bottom:16px;border:1px solid var(--goldb)}
+.lsub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.linp{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:16px;font-weight:600;color:var(--text);background:var(--gbg);outline:none;margin-bottom:8px;-webkit-appearance:none;letter-spacing:1px}
+.linp:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+.linp.shake{animation:shk .4s ease;border-color:var(--red)}
+@keyframes shk{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-8px)}50%{transform:translateX(8px)}}
+.lerr{font-size:12px;color:var(--red);font-weight:600;min-height:16px;margin-bottom:12px;text-align:left}
+.btn-login{width:100%;padding:16px;background:linear-gradient(135deg,var(--g1),var(--g3));color:#fff;border:none;border-radius:var(--r);font-family:var(--font);font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(22,163,74,.3)}
+
+/* TOPBAR */
+.topbar{background:linear-gradient(135deg,var(--g1),#0a3a1c);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:300;box-shadow:0 2px 14px rgba(0,0,0,.3)}
+.tb-brand{display:flex;align-items:center;gap:10px;color:#fff;font-size:15px;font-weight:900}
+.tb-brand span{color:rgba(255,255,255,.55);font-size:11px;font-weight:600;display:block;margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tb-live{display:flex;align-items:center;gap:5px;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:700;color:var(--g4)}
+.tb-live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--g4);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.btn-tb{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:5px 12px;color:rgba(255,255,255,.8);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer}
+.btn-tb:hover{background:rgba(255,255,255,.2)}
+.tb-clock{color:rgba(255,255,255,.65);font-size:12.5px;font-weight:700}
+
+/* TAB NAV */
+.tabnav{background:var(--surf);border-bottom:2px solid var(--border);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:56px;z-index:200}
+.tabnav::-webkit-scrollbar{display:none}
+.tab{padding:14px 16px;border:none;background:none;font-family:var(--font);font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;-webkit-tap-highlight-color:transparent}
+.tab.active{color:var(--g2);border-bottom-color:var(--g2)}
+
+/* PANELS */
+.panel{display:none;padding:16px;max-width:1200px;margin:0 auto}
+.panel.active{display:block}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:900px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.stat-grid{grid-template-columns:1fr 1fr}}
+.scard{background:var(--surf);border-radius:var(--rlg);border:1px solid var(--border);box-shadow:var(--shadow);padding:18px 16px;position:relative;overflow:hidden}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.scard.green::before{background:linear-gradient(90deg,var(--g2),var(--g4))}
+.scard.blue::before{background:linear-gradient(90deg,var(--blue),#60a5fa)}
+.scard.gold::before{background:linear-gradient(90deg,var(--gold),var(--goldb))}
+.scard.red::before{background:linear-gradient(90deg,var(--red),#f87171)}
+.scard.purple::before{background:linear-gradient(90deg,var(--purple),#a78bfa)}
+.sc-icon{font-size:24px;margin-bottom:8px}
+.sc-val{font-size:30px;font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1}
+.sc-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.sc-sub{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+.sc-trend{font-size:11px;font-weight:700;margin-top:4px}
+.sc-trend.up{color:var(--g3)}.sc-trend.dn{color:var(--red)}
+
+/* REVENUE BREAKDOWN */
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+@media(max-width:600px){.rev-grid{grid-template-columns:1fr}}
+.rcard{background:var(--surf);border-radius:var(--rlg);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px}
+.rc-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:12px}
+.rc-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
+.rc-row:last-child{border-bottom:none;padding-top:8px;margin-top:4px;font-weight:800}
+.rc-k{color:var(--muted);font-weight:500}.rc-v{font-weight:700;color:var(--text)}
+.rc-total .rc-k{color:var(--g2)}.rc-total .rc-v{font-size:18px;color:var(--g1)}
+
+/* CARD WRAPPER */
+.card{background:var(--surf);border-radius:var(--rlg);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,var(--gbg),#dcfce7)}
+.card-head.blue{background:linear-gradient(135deg,var(--bluebg),#dbeafe)}
+.card-head.gold{background:linear-gradient(135deg,var(--goldbg),#fef3c7)}
+.card-head.dark{background:linear-gradient(135deg,var(--g1),#0a3a1c)}
+.ch-left{display:flex;align-items:center;gap:10px}
+.ch-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;background:rgba(255,255,255,.7);border:1px solid var(--border)}
+.card-head.dark .ch-icon{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2)}
+.ch-title{font-size:14px;font-weight:800;color:var(--text)}
+.card-head.dark .ch-title{color:#fff}
+.ch-sub{font-size:11.5px;color:var(--muted)}
+.card-head.dark .ch-sub{color:rgba(255,255,255,.55)}
+.card-body{padding:16px 18px}
+
+/* LIVE COURTS */
+.courts-live{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:700px){.courts-live{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:380px){.courts-live{grid-template-columns:1fr 1fr}}
+.cl-item{border-radius:var(--r);padding:12px 10px;border:1.5px solid var(--border);text-align:center}
+.cl-item.occupied{background:var(--redbg);border-color:#fca5a5}
+.cl-item.free{background:var(--gbg);border-color:var(--g4)}
+.cl-icon{font-size:22px;margin-bottom:4px}
+.cl-name{font-size:11px;font-weight:700;color:var(--text)}
+.cl-status{font-size:10.5px;font-weight:600;margin-top:3px}
+.cl-item.occupied .cl-status{color:var(--red)}
+.cl-item.free .cl-status{color:var(--g3)}
+
+/* CHART CONTAINERS */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:700px){.chart-grid{grid-template-columns:1fr}}
+.chart-box{background:var(--surf);border-radius:var(--rlg);border:1px solid var(--border);box-shadow:var(--shadow);padding:16px}
+.chart-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:14px}
+.chart-wrap{position:relative;height:220px}
+
+/* HEATMAP */
+.heatmap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.hm-table{border-collapse:collapse;width:100%;min-width:500px}
+.hm-table th{font-size:10px;font-weight:700;color:var(--muted);padding:4px 6px;text-align:center;text-transform:uppercase}
+.hm-table td{width:32px;height:28px;border-radius:4px;text-align:center;font-size:10px;font-weight:700;margin:2px;border:1px solid transparent}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{padding:10px 12px;background:var(--g1);color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;text-align:left;white-space:nowrap}
+.data-table th:first-child{border-radius:8px 0 0 0}.data-table th:last-child{border-radius:0 8px 0 0}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--gbg)}
+.data-table .photo{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--g4)}
+.data-table .avatar{width:36px;height:36px;border-radius:50%;background:var(--gbg);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:700;white-space:nowrap}
+.badge-green{background:var(--gbg);color:var(--g2);border:1px solid var(--g4)}
+.badge-red{background:var(--redbg);color:var(--red);border:1px solid #fca5a5}
+.badge-gold{background:var(--goldbg);color:var(--gold);border:1px solid var(--goldb)}
+.badge-purple{background:var(--purplebg);color:var(--purple);border:1px solid #c4b5fd}
+.badge-blue{background:var(--bluebg);color:var(--blue);border:1px solid #93c5fd}
+.badge-gray{background:#f3f4f6;color:#374151;border:1px solid #d1d5db}
+
+/* SEARCH BAR */
+.search-bar{display:flex;gap:8px;margin-bottom:14px}
+.search-inp{flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:500;color:var(--text);background:var(--surf);outline:none;transition:border-color .2s}
+.search-inp:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(22,163,74,.10)}
+.btn-search{padding:11px 18px;background:var(--g2);color:#fff;border:none;border-radius:var(--r);font-family:var(--font);font-size:13.5px;font-weight:700;cursor:pointer}
+
+/* RECONCILIATION */
+.recon-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px}
+.recon-row:last-child{border-bottom:none}
+.recon-ok{color:var(--g3);font-weight:700}
+.recon-flag{color:var(--red);font-weight:700;background:var(--redbg);padding:3px 8px;border-radius:6px;border:1px solid #fca5a5}
+
+/* EXPORT BUTTON */
+.btn-export{padding:8px 14px;background:var(--gbg);color:var(--g2);border:1.5px solid var(--g4);border-radius:var(--r);font-family:var(--font);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px}
+.btn-export:hover{background:#dcfce7}
+
+/* BUTTONS */
+.btn{padding:9px 16px;border:none;border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s,transform .15s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--g2);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-gold{background:var(--goldb);color:#fff}
+.btn-ghost{background:var(--gbg);color:var(--g2);border:1px solid var(--border)}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+/* PASS EXPIRY */
+.expiry-soon{background:#fff7ed;border-left:4px solid var(--goldb)}
+.expiry-urgent{background:var(--redbg);border-left:4px solid var(--red)}
+
+/* VARIANCE FLAG */
+.var-flag{display:flex;align-items:center;gap:8px;padding:12px 14px;background:var(--redbg);border:1px solid #fca5a5;border-radius:var(--r);margin-bottom:12px;font-size:13px;font-weight:700;color:var(--red)}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:32px 20px;color:var(--muted)}
+.empty .ei{font-size:36px;margin-bottom:8px;opacity:.4}
+.empty p{font-size:13px}
+
+/* SPINNER */
+.spinner{display:inline-block;width:14px;height:14px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 22px;border-radius:999px;font-size:13px;font-weight:700;z-index:9999;transition:transform .3s,opacity .3s;opacity:0;pointer-events:none;max-width:88vw;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{background:var(--g2);color:#fff}
+.toast.err{background:var(--red);color:#fff}
+.toast.info{background:#1d4ed8;color:#fff}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:flex;align-items:flex-end;justify-content:center}
+.overlay.hidden{display:none}
+.modal{background:var(--surf);border-radius:20px 20px 0 0;width:100%;max-width:540px;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:14px auto 16px}
+.modal-inner{padding:0 18px 28px}
+.modal-title{font-size:16px;font-weight:900;margin-bottom:16px}
+.dr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.dr:last-of-type{border-bottom:none}
+.dk{color:var(--muted);font-weight:500}.dv{font-weight:700;text-align:right;max-width:60%;word-break:break-all}
+.modal-acts{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+
+/* LIVE DOT */
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--g4);display:inline-block;margin-right:4px;animation:pulse 2s infinite}
+
+/* RESPONSIVE TABLE */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.two-col{grid-template-columns:1fr}}
+
+/* FILTER ROW */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.fchip{padding:6px 12px;border:1.5px solid var(--border);border-radius:999px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;background:var(--surf);transition:all .15s}
+.fchip.active{border-color:var(--g2);background:var(--gbg);color:var(--g2)}
+
+/* NUMBER HIGHLIGHT */
+.num-green{color:var(--g2);font-weight:900}
+.num-red{color:var(--red);font-weight:900}
+.num-gold{color:var(--goldb);font-weight:900}
+
+@media(max-width:480px){
+  .topbar{padding:0 12px}
+  .panel{padding:10px}
+  .card-body{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="lcard">
+    <div class="lbadge">🏟️</div>
+    <div class="ltitle">Owner Dashboard</div>
+    <div class="lrole">⭐ Owner Access Only</div>
+    <div class="lsub">Mansa Sports Park — Complete Business Overview</div>
+    <input type="password" class="linp" id="ownerPass" placeholder="Owner password" maxlength="40" autocomplete="current-password">
+    <div class="lerr" id="loginErr"></div>
+    <button class="btn-login" id="btnLogin">🔐 Access Dashboard</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="appScreen" style="display:none">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-brand">
+      🏟️
+      <div><div>Mansa Sports Park</div><span>Owner Dashboard</span></div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-live">LIVE</div>
+      <div class="tb-clock" id="tbClock">—</div>
+      <button class="btn-tb" id="btnRefresh">↻ Refresh</button>
+      <button class="btn-tb" id="btnLogout">Exit</button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabnav">
+    <button class="tab active" data-tab="live">🔴 Live</button>
+    <button class="tab" data-tab="daily">📊 Daily</button>
+    <button class="tab" data-tab="weekly">📈 Weekly</button>
+    <button class="tab" data-tab="visitors">👥 Visitors</button>
+    <button class="tab" data-tab="society">🏘️ Society</button>
+    <button class="tab" data-tab="passes">🎫 Passes</button>
+    <button class="tab" data-tab="recon">💰 Day-End</button>
+    <button class="tab" data-tab="strikes">⚠️ Strikes</button>
+  </div>
+
+  <!-- ══ TAB: LIVE OVERVIEW ══ -->
+  <div class="panel active" id="tab-live">
+
+    <div class="stat-grid" style="margin-top:14px">
+      <div class="scard green">
+        <div class="sc-icon">👥</div>
+        <div class="sc-val" id="lv-total">—</div>
+        <div class="sc-lbl">Today's Visitors</div>
+        <div class="sc-sub" id="lv-breakdown">Loading…</div>
+      </div>
+      <div class="scard blue">
+        <div class="sc-icon">💰</div>
+        <div class="sc-val" id="lv-revenue">—</div>
+        <div class="sc-lbl">Today's Revenue</div>
+        <div class="sc-sub" id="lv-rev-break">Entry + Courts + Passes</div>
+      </div>
+      <div class="scard gold">
+        <div class="sc-icon">🎾</div>
+        <div class="sc-val" id="lv-courts">—</div>
+        <div class="sc-lbl">Courts Booked Today</div>
+        <div class="sc-sub" id="lv-court-rev">Court revenue today</div>
+      </div>
+      <div class="scard purple">
+        <div class="sc-icon">🎫</div>
+        <div class="sc-val" id="lv-passes">—</div>
+        <div class="sc-lbl">Active Monthly Passes</div>
+        <div class="sc-sub" id="lv-pass-exp">Expiring this week</div>
+      </div>
+    </div>
+
+    <!-- LIVE COURTS -->
+    <div class="card">
+      <div class="card-head dark">
+        <div class="ch-left">
+          <div class="ch-icon">🎾</div>
+          <div><div class="ch-title">Courts — Right Now</div><div class="ch-sub">Current occupancy status</div></div>
+        </div>
+        <div class="live-dot"></div>
+      </div>
+      <div class="card-body">
+        <div class="courts-live" id="courtsLive"></div>
+      </div>
+    </div>
+
+    <!-- RECENT ENTRIES -->
+    <div class="card">
+      <div class="card-head">
+        <div class="ch-left">
+          <div class="ch-icon">🚪</div>
+          <div><div class="ch-title">Recent Gate Entries</div><div class="ch-sub">Last 10 entries today</div></div>
+        </div>
+        <button class="btn-export" onclick="exportCSV('entries')">⬇ CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="recentEntriesTable">
+          <thead><tr><th>Time</th><th>Name</th><th>Type</th><th>Wristband</th><th>Phone</th></tr></thead>
+          <tbody id="recentEntriesBody"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MANAGER ACTIVITY -->
+    <div class="card">
+      <div class="card-head gold">
+        <div class="ch-left">
+          <div class="ch-icon">👔</div>
+          <div><div class="ch-title">Manager Activity Today</div><div class="ch-sub">Bookings, discounts, no-shows</div></div>
+        </div>
+      </div>
+      <div class="card-body" id="mgrActivity">Loading…</div>
+    </div>
+
+  </div>
+
+  <!-- ══ TAB: DAILY REPORT ══ -->
+  <div class="panel" id="tab-daily">
+
+    <!-- Date selector -->
+    <div style="display:flex;align-items:center;gap:10px;margin:14px 0 16px;flex-wrap:wrap">
+      <input type="date" id="dailyDatePicker" style="padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:600;color:var(--text);background:var(--surf);outline:none;cursor:pointer">
+      <button class="btn btn-primary btn-sm" id="btnLoadDaily">Load Report</button>
+      <button class="btn-export" onclick="exportCSV('daily')">⬇ Export CSV</button>
+    </div>
+
+    <!-- VARIANCE FLAG (shown if cash mismatch) -->
+    <div class="var-flag" id="dailyVarFlag" style="display:none">
+      ⚠️ <span id="dailyVarMsg"></span>
+    </div>
+
+    <div class="rev-grid">
+      <div class="rcard">
+        <div class="rc-title">Entry Revenue</div>
+        <div class="rc-row"><span class="rc-k">Cash walk-ins</span><span class="rc-v" id="dr-cash">₹0</span></div>
+        <div class="rc-row"><span class="rc-k">Online (Razorpay)</span><span class="rc-v" id="dr-online">₹0</span></div>
+        <div class="rc-row"><span class="rc-k">Society (Free)</span><span class="rc-v" id="dr-society">—</span></div>
+        <div class="rc-row rc-total"><span class="rc-k">Entry Total</span><span class="rc-v" id="dr-entry-total">₹0</span></div>
+      </div>
+      <div class="rcard">
+        <div class="rc-title">Court Revenue</div>
+        <div id="dr-courts-breakdown"><div style="color:var(--muted);font-size:13px">Loading…</div></div>
+        <div class="rc-row rc-total"><span class="rc-k">Court Total</span><span class="rc-v" id="dr-court-total">₹0</span></div>
+      </div>
+      <div class="rcard">
+        <div class="rc-title">Day-End Reconciliation</div>
+        <div id="dr-recon-body"><div style="color:var(--muted);font-size:13px">Loading…</div></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head">
+          <div class="ch-left"><div class="ch-icon">👥</div><div><div class="ch-title">Visitors by Category</div></div></div>
+        </div>
+        <div class="card-body" id="dr-visitor-cats">Loading…</div>
+      </div>
+      <div class="card">
+        <div class="card-head gold">
+          <div class="ch-left"><div class="ch-icon">👔</div><div><div class="ch-title">Manager Discounts</div></div></div>
+        </div>
+        <div class="card-body" id="dr-discounts">Loading…</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="ch-left"><div class="ch-icon">❌</div><div><div class="ch-title">No-shows & Cancellations</div></div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="dr-noshows-table">
+          <thead><tr><th>Time</th><th>Court</th><th>Customer</th><th>Amount</th><th>Reason</th><th>Status</th></tr></thead>
+          <tbody id="dr-noshows-body"><tr><td colspan="6" style="text-align:center;padding:16px;color:var(--muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ TAB: WEEKLY CHARTS ══ -->
+  <div class="panel" id="tab-weekly">
+    <div style="margin-top:14px">
+      <div class="chart-grid">
+        <div class="chart-box">
+          <div class="chart-title">📊 Visitors Per Day (Last 7 Days)</div>
+          <div class="chart-wrap"><canvas id="chartVisitors"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-title">💰 Revenue Per Day (Last 7 Days)</div>
+          <div class="chart-wrap"><canvas id="chartRevenue"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-box">
+          <div class="chart-title">🎾 Most Popular Courts</div>
+          <div class="chart-wrap"><canvas id="chartCourts"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-title">⏰ Busiest Entry Hours</div>
+          <div class="chart-wrap"><canvas id="chartHours"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: VISITOR DATABASE ══ -->
+  <div class="panel" id="tab-visitors">
+    <div style="margin-top:14px">
+      <div class="search-bar">
+        <input type="text" class="search-inp" id="visitorSearch" placeholder="Search by name or phone number…" maxlength="60">
+        <button class="btn-search" id="btnVisitorSearch">Search</button>
+      </div>
+      <div style="margin-bottom:10px;display:flex;justify-content:flex-end">
+        <button class="btn-export" onclick="exportCSV('visitors')">⬇ Export All Visitors CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="visitorsTable">
+          <thead><tr><th>Photo</th><th>Name</th><th>Phone</th><th>Type</th><th>Visits</th><th>Last Visit</th><th>Actions</th></tr></thead>
+          <tbody id="visitorsBody"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading visitors…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: SOCIETY MEMBERS ══ -->
+  <div class="panel" id="tab-society">
+    <div style="margin-top:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div>
+          <span class="badge badge-green" style="font-size:13px;padding:5px 12px" id="soc-count">0 Active Members</span>
+        </div>
+        <button class="btn-export" onclick="exportCSV('society')">⬇ Export CSV</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" class="search-inp" id="socSearch" placeholder="Search by name, phone or house number…">
+        <button class="btn-search" id="btnSocSearch">Search</button>
+      </div>
+      <div class="filter-row" id="socFilters"></div>
+      <div class="table-wrap">
+        <table class="data-table" id="societyTable">
+          <thead><tr><th>Photo</th><th>Name</th><th>House</th><th>Society</th><th>Relation</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="societyBody"><tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: MONTHLY PASSES ══ -->
+  <div class="panel" id="tab-passes">
+    <div style="margin-top:14px">
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px">
+        <div class="scard green"><div class="sc-icon">✅</div><div class="sc-val" id="pass-active">—</div><div class="sc-lbl">Active Passes</div></div>
+        <div class="scard gold"><div class="sc-icon">⚠️</div><div class="sc-val" id="pass-expiring">—</div><div class="sc-lbl">Expiring in 7 Days</div></div>
+        <div class="scard blue"><div class="sc-icon">💰</div><div class="sc-val" id="pass-revenue">—</div><div class="sc-lbl">Revenue This Month</div></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button class="btn-export" onclick="exportCSV('passes')">⬇ Export CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="passesTable">
+          <thead><tr><th>Photo</th><th>Name</th><th>Phone</th><th>Pass Type</th><th>Start</th><th>Expires</th><th>Paid</th><th>Status</th></tr></thead>
+          <tbody id="passesBody"><tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ TAB: DAY-END RECONCILIATION ══ -->
+  <div class="panel" id="tab-recon">
+    <div style="margin-top:14px">
+
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button class="btn-export" onclick="exportCSV('recon')">⬇ Export CSV</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" id="reconTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Bands</th>
+              <th>Expected Entry</th>
+              <th>Cash Gate</th>
+              <th>UPI Gate</th>
+              <th>Court Cash</th>
+              <th>Court UPI</th>
+              <th>Kiosk</th>
+              <th>Total Expected</th>
+              <th>Drawer Cash</th>
+              <th>Variance</th>
+              <th>Submitted By</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="reconBody">
+            <tr><td colspan="13" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: MANAGER STRIKES ══ -->
+  <div class="panel" id="tab-strikes">
+    <div style="margin-top:14px">
+
+      <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:var(--rlg);padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:24px">⚠️</span>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:#dc2626">Manager Strike Log</div>
+          <div style="font-size:12.5px;color:#9b1c1c;margin-top:2px">Slots released more than 15 minutes after start time. Manager cannot see or edit this section.</div>
+        </div>
+      </div>
+
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px">
+        <div class="scard red"><div class="sc-icon">⚠️</div><div class="sc-val" id="strike-month">—</div><div class="sc-lbl">Strikes This Month</div></div>
+        <div class="scard red"><div class="sc-icon">💰</div><div class="sc-val" id="strike-loss">—</div><div class="sc-lbl">Revenue Lost</div></div>
+        <div class="scard red"><div class="sc-icon">📅</div><div class="sc-val" id="strike-total">—</div><div class="sc-lbl">Total All Time</div></div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button class="btn-export" onclick="exportCSV('strikes')">⬇ Export CSV</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" id="strikesTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Manager</th>
+              <th>Court</th>
+              <th>Slot</th>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Charge</th>
+              <th>Released At</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody id="strikesBody">
+            <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /appScreen -->
+
+<!-- VISITOR DETAIL MODAL -->
+<div class="overlay hidden" id="overlay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-inner">
+      <div class="modal-title" id="modalTitle">Details</div>
+      <div id="modalBody"></div>
+      <div class="modal-acts" id="modalActs"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, getDocs, updateDoc, doc, addDoc, query, where
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ══════ CONFIG — same as all modules ══════ */
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCr0ITLauBZY1tEvXZcbMilWbCGuOYJLrM",
+  authDomain:        "mansasportspark-e0f3d.firebaseapp.com",
+  projectId:         "mansasportspark-e0f3d",
+  storageBucket:     "mansasportspark-e0f3d.firebasestorage.app",
+  messagingSenderId: "521169146944",
+  appId:             "1:521169146944:web:9877d8f7be192c60993ba5",
+  measurementId:     "G-9ZSKTGTJRC"
+};
+const OWNER_FB_EMAIL    = "owner@mansasportspark.com";
+const OWNER_FB_PASSWORD = "OwnerMansa@2024!";
+/* ══════════════════════════════════════════ */
+
+const app  = initializeApp(FIREBASE_CONFIG);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+try {
+  await signInWithEmailAndPassword(auth, OWNER_FB_EMAIL, OWNER_FB_PASSWORD);
+} catch (e) {
+  console.warn('Owner Firebase Auth failed:', e.message);
+}
+
+window.__ownerDb = { db, collection, getDocs, updateDoc, doc, addDoc, query, where };
+window.dispatchEvent(new Event('owner-ready'));
+</script>
+
+<script>
+'use strict';
+/* ══ PASSWORD — CHANGE THIS ══════════════════════ */
+const OWNER_PASS = 'MansaOwner@2024!';
+/* ═══════════════════════════════════════════════ */
+
+const COURTS_DEF = [
+  {id:'tennis',    name:'Tennis',      icon:'🎾'},
+  {id:'badminton_in', name:'Badmin.In',icon:'🏸'},
+  {id:'badminton_out',name:'Badmin.Out',icon:'🏸'},
+  {id:'pickleball',name:'Pickleball',  icon:'🏓'},
+  {id:'box_cricket',name:'Box Cricket',icon:'🏏'},
+  {id:'cricket_net',name:'Cricket Net',icon:'🏏'},
+  {id:'table_tennis',name:'Table TT',  icon:'🏓'},
+  {id:'basketball', name:'Basketball', icon:'🏀'},
+];
+
+const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const $      = id => document.getElementById(id);
+
+/* DATA STORE */
+let D = {
+  visitors:[],gateEntries:[],courtBookings:[],
+  society:[],passes:[],cashSubmissions:[],strikes:[],
+  passBatches:[],passIssuances:[],
+  loaded:false
+};
+
+let charts = {};
+
+/* ══ LOGIN ════════════════════════════════════ */
+function doLogin() {
+  if($('ownerPass').value === OWNER_PASS) {
+    $('loginScreen').style.display='none';
+    $('appScreen').style.display='block';
+    sessionStorage.setItem('msp_owner','1');
+    initApp();
+  } else {
+    $('loginErr').textContent='Incorrect password.';
+    $('ownerPass').classList.add('shake');
+    $('ownerPass').value='';
+    setTimeout(()=>$('ownerPass').classList.remove('shake'),400);
+  }
+}
+if(sessionStorage.getItem('msp_owner')==='1'){ $('loginScreen').style.display='none'; $('appScreen').style.display='block'; initApp(); }
+$('btnLogin').addEventListener('click', doLogin);
+$('ownerPass').addEventListener('keydown', e=>e.key==='Enter'&&doLogin());
+$('btnLogout').addEventListener('click', ()=>{ sessionStorage.removeItem('msp_owner'); location.reload(); });
+
+/* ══ INIT ═════════════════════════════════════ */
+function initApp() {
+  startClock();
+  buildTabs();
+  setDefaultDate();
+  window.addEventListener('owner-ready', ()=>{ loadAll(); });
+  if(window.__ownerDb) loadAll();
+  setInterval(loadAll, 60000); // auto-refresh every 60s
+}
+
+function setDefaultDate() {
+  $('dailyDatePicker').value = new Date().toISOString().split('T')[0];
+}
+
+/* ══ CLOCK ════════════════════════════════════ */
+function startClock() {
+  function tick(){
+    const now=new Date();
+    $('tbClock').textContent=now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }
+  tick(); setInterval(tick,1000);
+}
+
+/* ══ TABS ═════════════════════════════════════ */
+function buildTabs() {
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      $('tab-'+tab.dataset.tab).classList.add('active');
+      if(tab.dataset.tab==='weekly' && D.loaded) buildCharts();
+      if(tab.dataset.tab==='society') renderSociety(D.society);
+      if(tab.dataset.tab==='passes') renderPasses(D.passes);
+      if(tab.dataset.tab==='visitors') renderVisitors(D.visitors);
+      if(tab.dataset.tab==='recon') renderRecon();
+      if(tab.dataset.tab==='strikes') renderStrikes(D.strikes);
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+  $('btnRefresh').addEventListener('click',()=>{ loadAll(); toast('Refreshed','info'); });
+  $('btnLoadDaily').addEventListener('click',()=>renderDailyReport());
+  $('btnVisitorSearch').addEventListener('click',()=>{
+    const q=$('visitorSearch').value.trim().toLowerCase();
+    renderVisitors(q?D.visitors.filter(v=>(v.name||'').toLowerCase().includes(q)||(v.phone||'').includes(q)):D.visitors);
+  });
+  $('btnSocSearch').addEventListener('click',()=>{
+    const q=$('socSearch').value.trim().toLowerCase();
+    renderSociety(q?D.society.filter(m=>(m.Name||m.name||'').toLowerCase().includes(q)||(m.Phone||m.phone||'').includes(q)||(m.HouseNumber||'').toLowerCase().includes(q)):D.society);
+  });
+  $('visitorSearch').addEventListener('keydown',e=>e.key==='Enter'&&$('btnVisitorSearch').click());
+  $('socSearch').addEventListener('keydown',e=>e.key==='Enter'&&$('btnSocSearch').click());
+}
+
+/* ══ LOAD ALL DATA ════════════════════════════ */
+async function loadAll() {
+  if(!window.__ownerDb) return;
+  const {db,collection,getDocs}=window.__ownerDb;
+  try {
+    const [vs,ge,cb,sm,mp,cs,st,pb,pi] = await Promise.all([
+      getDocs(collection(db,'visitors')),
+      getDocs(collection(db,'gate_entries')),
+      getDocs(collection(db,'court_bookings')),
+      getDocs(collection(db,'society_members')),
+      getDocs(collection(db,'monthly_passes')),
+      getDocs(collection(db,'cash_submissions')),
+      getDocs(collection(db,'manager_strikes')),
+      getDocs(collection(db,'daily_pass_batch')),
+      getDocs(collection(db,'pass_issuances')),
+    ]);
+    D.visitors=[]; vs.forEach(d=>D.visitors.push({id:d.id,...d.data()}));
+    D.gateEntries=[]; ge.forEach(d=>D.gateEntries.push({id:d.id,...d.data()}));
+    D.courtBookings=[]; cb.forEach(d=>D.courtBookings.push({id:d.id,...d.data()}));
+    D.society=[]; sm.forEach(d=>D.society.push({id:d.id,...d.data()}));
+    D.passes=[]; mp.forEach(d=>D.passes.push({id:d.id,...d.data()}));
+    D.cashSubmissions=[]; cs.forEach(d=>D.cashSubmissions.push({id:d.id,...d.data()}));
+    D.strikes=[]; st.forEach(d=>D.strikes.push({id:d.id,...d.data()}));
+    D.passBatches=[]; pb.forEach(d=>D.passBatches.push({id:d.id,...d.data()}));
+    D.passIssuances=[]; pi.forEach(d=>D.passIssuances.push({id:d.id,...d.data()}));
+    D.loaded=true;
+    renderLive();
+    renderDailyReport();
+    // Refresh whichever tab is active
+    const activeTab=document.querySelector('.tab.active')?.dataset.tab;
+    if(activeTab==='weekly') buildCharts();
+    if(activeTab==='society') renderSociety(D.society);
+    if(activeTab==='passes') renderPasses(D.passes);
+    if(activeTab==='visitors') renderVisitors(D.visitors);
+    if(activeTab==='recon') renderRecon();
+    if(activeTab==='strikes') renderStrikes(D.strikes);
+  } catch(e){ toast('Load error: '+e.message,'err'); console.error(e); }
+}
+
+/* ══ UTILITIES ════════════════════════════════ */
+function todayStart(){ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); }
+function fmtDate(d){ if(!d) return '—'; const dt=new Date(d); return `${dt.getDate()} ${MONTHS[dt.getMonth()]} ${dt.getFullYear()}`; }
+function fmtTime(ts){ if(!ts) return '—'; return new Date(ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+function rupee(n){ return '₹'+(n||0).toLocaleString('en-IN'); }
+function san(s){ return String(s||'').replace(/[<>&"']/g,'').trim(); }
+function addMin(min){ return `${String(Math.floor(min/60)).padStart(2,'0')}:${String(min%60).padStart(2,'0')}`; }
+
+/* ══ LIVE TAB ═════════════════════════════════ */
+function renderLive() {
+  const ts=todayStart();
+  const todayEntries=D.gateEntries.filter(e=>(e.entryTime||0)>=ts);
+  const regular=todayEntries.filter(e=>e.visitorType==='Regular'||!e.visitorType);
+  const society=todayEntries.filter(e=>e.visitorType==='Society Member');
+  const passH  =todayEntries.filter(e=>e.visitorType==='Monthly Pass');
+
+  $('lv-total').textContent=todayEntries.length;
+  $('lv-breakdown').innerHTML=`<span class="num-green">${regular.length}</span> paying · <span style="color:var(--purple);font-weight:700">${society.length}</span> society · <span class="num-gold">${passH.length}</span> pass`;
+
+  // Revenue today
+  // [FIXED] only count visitors with paymentId (confirmed online payment), use actual amount not default
+  const entryRev=D.visitors.filter(v=>(v.createdAt||0)>=ts&&v.paymentId).reduce((s,v)=>s+(v.amount||50),0);
+  const courtRev=D.courtBookings.filter(b=>(b.createdAt||0)>=ts&&b.status==='Confirmed').reduce((s,b)=>s+(b.amount||0),0);
+  const passRev =D.passes.filter(p=>(p.createdAt||0)>=ts).reduce((s,p)=>s+(p.passPrice||0),0);
+  const totalRev=entryRev+courtRev+passRev;
+  $('lv-revenue').textContent=rupee(totalRev);
+  $('lv-rev-break').innerHTML=`Entry ${rupee(entryRev)} · Courts ${rupee(courtRev)} · Passes ${rupee(passRev)}`;
+
+  // Courts
+  const todayCourts=D.courtBookings.filter(b=>{
+    const d=new Date(); const ds=d.toISOString().split('T')[0];
+    return b.date===ds&&b.status==='Confirmed';
+  });
+  $('lv-courts').textContent=todayCourts.length;
+  $('lv-court-rev').textContent='Court revenue: '+rupee(courtRev);
+
+  // Passes
+  const activePasses=D.passes.filter(p=>p.status==='Active'&&new Date(p.endDate)>new Date());
+  const expiringPasses=D.passes.filter(p=>{
+    if(p.status!=='Active') return false;
+    const exp=new Date(p.endDate); const now=new Date();
+    const diff=(exp-now)/86400000;
+    return diff>=0&&diff<=7;
+  });
+  $('lv-passes').textContent=activePasses.length;
+  $('lv-pass-exp').textContent=`${expiringPasses.length} expiring this week`;
+
+  // Courts live grid
+  renderCourtsLive(todayCourts);
+
+  // Recent entries
+  const recent=[...todayEntries].sort((a,b)=>(b.entryTime||0)-(a.entryTime||0)).slice(0,10);
+  const tbody=$('recentEntriesBody');
+  tbody.innerHTML=recent.length?recent.map(e=>{
+    const typeColor=e.visitorType==='Society Member'?'badge-purple':e.visitorType==='Monthly Pass'?'badge-gold':'badge-green';
+    return `<tr>
+      <td>${fmtTime(e.entryTime)}</td>
+      <td><strong>${san(e.name||'Walk-in')}</strong></td>
+      <td><span class="badge ${typeColor}">${san(e.visitorType||'Regular')}</span></td>
+      <td><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${e.wristbandColor||'#94a3b8'};border:1px solid rgba(0,0,0,.1);vertical-align:middle;margin-right:5px"></span>${san(e.wristbandName||'—')}</td>
+      <td>${e.phone?'+91 '+e.phone:'—'}</td>
+    </tr>`}).join(''):'<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">No entries today yet</td></tr>';
+
+  // Manager activity
+  const mgrBookings=D.courtBookings.filter(b=>b.bookingSource==='Manager/Walk-in'&&(b.createdAt||0)>=ts);
+  const mgrDiscounts=mgrBookings.filter(b=>(b.discount||0)>0);
+  const mgrNoShows=D.courtBookings.filter(b=>b.status==='No-show'&&(b.createdAt||0)>=ts);
+  const mgrCash=mgrBookings.filter(b=>b.paymentMode==='Cash').reduce((s,b)=>s+(b.amount||0),0);
+  $('mgrActivity').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+      <div style="text-align:center;padding:12px;background:var(--gbg);border-radius:var(--r)"><div style="font-size:22px;font-weight:900;color:var(--g2)">${mgrBookings.length}</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">Bookings</div></div>
+      <div style="text-align:center;padding:12px;background:var(--goldbg);border-radius:var(--r)"><div style="font-size:22px;font-weight:900;color:var(--goldb)">${rupee(mgrCash)}</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">Cash Taken</div></div>
+      <div style="text-align:center;padding:12px;background:${mgrDiscounts.length?'#fef3c7':'var(--gbg)'};border-radius:var(--r)"><div style="font-size:22px;font-weight:900;color:${mgrDiscounts.length?'var(--goldb)':'var(--g2)'}">${mgrDiscounts.length}</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">Discounts</div></div>
+      <div style="text-align:center;padding:12px;background:${mgrNoShows.length?'var(--redbg)':'var(--gbg)'};border-radius:var(--r)"><div style="font-size:22px;font-weight:900;color:${mgrNoShows.length?'var(--red)':'var(--g2)'}">${mgrNoShows.length}</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase">No-shows</div></div>
+    </div>
+    ${mgrDiscounts.length?`<div style="margin-top:12px"><div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Discounts Given Today</div>${mgrDiscounts.map(b=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span>${san(b.name)} — ${san(b.court)}</span><span style="color:var(--red);font-weight:700">-₹${b.discount} (${san(b.discountReason||'No reason')})</span></div>`).join('')}</div>`:''}`;
+}
+
+function renderCourtsLive(todayCourts) {
+  const now=new Date(); const nowMin=now.getHours()*60+now.getMinutes();
+  const dateStr=now.toISOString().split('T')[0];
+  const grid=$('courtsLive'); grid.innerHTML='';
+  COURTS_DEF.forEach(c=>{
+    const occ=todayCourts.find(b=>{
+      if(b.courtId!==c.id||b.date!==dateStr) return false;
+      if(b.status!=='Confirmed') return false;
+      const [h,m]=b.timeSlot.split(':').map(Number); const s=h*60+m; const e=s+(b.duration||60);
+      return nowMin>=s&&nowMin<e;
+    });
+    const div=document.createElement('div');
+    div.className=`cl-item ${occ?'occupied':'free'}`;
+    div.innerHTML=`<div class="cl-icon">${c.icon}</div><div class="cl-name">${c.name}</div><div class="cl-status">${occ?`🔴 ${occ.name}`:'🟢 Free'}</div>`;
+    grid.appendChild(div);
+  });
+}
+
+/* ══ DAILY REPORT ═════════════════════════════ */
+function renderDailyReport() {
+  const dateStr=$('dailyDatePicker').value||new Date().toISOString().split('T')[0];
+  const dayStart=new Date(dateStr).setHours(0,0,0,0);
+  const dayEnd  =new Date(dateStr).setHours(23,59,59,999);
+
+  // Entry revenue
+  // [FIXED] filter only confirmed online payments (have paymentId)
+  const dayVisitors=D.visitors.filter(v=>(v.createdAt||0)>=dayStart&&(v.createdAt||0)<=dayEnd&&v.paymentId);
+  // [FIXED] cash entries from gate_entries (amountPaid field set to 50)
+  const cashEntries=D.gateEntries.filter(e=>(e.entryTime||0)>=dayStart&&(e.entryTime||0)<=dayEnd&&e.entryMethod?.includes('cash'));
+  const cashRev=cashEntries.reduce((s,e)=>s+(e.amountPaid||50),0);
+  const onlineRev=dayVisitors.reduce((s,v)=>s+(v.amount||50),0);
+  $('dr-cash').textContent=rupee(cashRev);
+  $('dr-online').textContent=rupee(onlineRev);
+  $('dr-society').textContent='Free entry';
+  $('dr-entry-total').textContent=rupee(cashRev+onlineRev);
+
+  // Court revenue
+  const dayCourts=D.courtBookings.filter(b=>b.date===dateStr&&b.status==='Confirmed');
+  const courtByType={};
+  dayCourts.forEach(b=>{ courtByType[b.court]=(courtByType[b.court]||0)+(b.amount||0); });
+  const courtTotal=Object.values(courtByType).reduce((s,v)=>s+v,0);
+  $('dr-courts-breakdown').innerHTML=Object.keys(courtByType).length
+    ?Object.entries(courtByType).map(([k,v])=>`<div class="rc-row"><span class="rc-k">${san(k)}</span><span class="rc-v">${rupee(v)}</span></div>`).join('')
+    :'<div style="color:var(--muted);font-size:13px;padding:8px 0">No court bookings this day</div>';
+  $('dr-court-total').textContent=rupee(courtTotal);
+
+  // Visitor categories
+  const dayEntries=D.gateEntries.filter(e=>(e.entryTime||0)>=dayStart&&(e.entryTime||0)<=dayEnd);
+  const cats={Regular:0,'Society Member':0,'Monthly Pass':0};
+  dayEntries.forEach(e=>{ const t=e.visitorType||'Regular'; cats[t]=(cats[t]||0)+1; });
+  $('dr-visitor-cats').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
+      ${Object.entries(cats).map(([k,v])=>`<div style="padding:12px 8px;background:var(--gbg);border-radius:var(--r)"><div style="font-size:24px;font-weight:900;color:var(--g2)">${v}</div><div style="font-size:11px;color:var(--muted);font-weight:600">${k}</div></div>`).join('')}
+    </div>
+    <div style="margin-top:12px;font-size:13px;color:var(--muted)">Total entries: <strong style="color:var(--text)">${dayEntries.length}</strong></div>`;
+
+  // Manager discounts
+  const discountBookings=dayCourts.filter(b=>(b.discount||0)>0);
+  $('dr-discounts').innerHTML=discountBookings.length
+    ?discountBookings.map(b=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><strong>${san(b.name)}</strong> — ${san(b.court)}<br><span style="color:var(--red)">-₹${b.discount} · ${san(b.discountReason||'No reason')}</span></div>`).join('')
+    :'<div style="color:var(--muted);font-size:13px;padding:8px 0">No discounts given</div>';
+
+  // Cash reconciliation
+  // Day-end submission for this date
+  const daySubmissions=D.cashSubmissions.filter(s=>s.date===dateStr);
+  const sub=daySubmissions[0]||null;
+  const vFlag=$('dailyVarFlag');
+  if(sub&&Math.abs(sub.variance||0)>0){
+    const vColour=Math.abs(sub.variance)>500?'var(--red)':Math.abs(sub.variance)>100?'#d97706':'var(--g2)';
+    vFlag.style.display='flex';
+    $('dailyVarMsg').textContent=`Cash variance: ₹${Math.abs(sub.variance)} ${(sub.variance||0)>0?'SHORT':'OVER'} — Expected ₹${sub.totalExpected||0}, Drawer ₹${sub.drawerCash||0}`;
+    vFlag.style.borderColor=vColour; vFlag.style.color=vColour;
+  } else { vFlag.style.display='none'; }
+  $('dr-recon-body').innerHTML = sub ? `
+    <div class="recon-row"><span>Wristbands Issued</span><span class="recon-ok">${sub.wristbandsIssued||0}</span></div>
+    <div class="recon-row"><span>Expected Entry (bands×₹50)</span><span>${rupee(sub.expectedEntryRevenue||0)}</span></div>
+    <div class="recon-row"><span>Cash at Gate</span><span>${rupee(sub.cashAtGate||0)}</span></div>
+    <div class="recon-row"><span>UPI at Gate</span><span>${rupee(sub.upiAtGate||0)}</span></div>
+    <div class="recon-row"><span>Court Cash</span><span>${rupee(sub.courtCash||0)}</span></div>
+    <div class="recon-row"><span>Court UPI</span><span>${rupee(sub.courtUpi||0)}</span></div>
+    <div class="recon-row"><span>Kiosk</span><span>${rupee(sub.kioskRevenue||0)}</span></div>
+    <div class="recon-row"><span>Total Expected</span><span class="recon-ok">${rupee(sub.totalExpected||0)}</span></div>
+    <div class="recon-row"><span>Drawer Cash</span><span>${rupee(sub.drawerCash||0)}</span></div>
+    <div class="recon-row"><span>Variance</span><span class="${Math.abs(sub.variance||0)>500?'recon-flag':Math.abs(sub.variance||0)>100?'recon-flag':'recon-ok'}">${Math.abs(sub.variance||0)>0?`₹${Math.abs(sub.variance)} ${(sub.variance||0)>0?'SHORT':'OVER'}`:'✅ Balanced'}</span></div>
+    <div class="recon-row"><span>Submitted By</span><span>${sub.submittedBy||'—'} at ${sub.submittedAt?new Date(sub.submittedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'—'}</span></div>` :
+    '<div style="color:var(--muted);font-size:13px;padding:8px 0">No day-end report submitted yet for this date</div>';
+
+  // No-shows & cancellations
+  const noShows=D.courtBookings.filter(b=>b.date===dateStr&&['No-show','Cancelled'].includes(b.status));
+  $('dr-noshows-body').innerHTML=noShows.length
+    ?noShows.map(b=>`<tr>
+      <td>${b.createdAt?fmtTime(b.createdAt):'—'}</td>
+      <td>${san(b.court)}</td>
+      <td>${san(b.name)}<br><span style="font-size:11px;color:var(--muted)">${b.phone?'+91 '+b.phone:''}</span></td>
+      <td>${rupee(b.amount)}</td>
+      <td style="font-size:12px">${san(b.cancelReason||'—')}</td>
+      <td><span class="badge ${b.status==='No-show'?'badge-red':'badge-gray'}">${b.status}</span></td>
+    </tr>`).join('')
+    :'<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--muted)">No no-shows or cancellations</td></tr>';
+}
+
+/* ══ CHARTS ═══════════════════════════════════ */
+function buildCharts() {
+  // Last 7 days
+  const labels=[],visitData=[],revData=[];
+  const courtCount={};
+  const hourCount=new Array(15).fill(0); // 6AM-9PM
+
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i); d.setHours(0,0,0,0);
+    const de=new Date(d); de.setHours(23,59,59,999);
+    const ts=d.getTime(); const te=de.getTime();
+    labels.push(i===0?'Today':DAYS[d.getDay()]);
+    const dayEntries=D.gateEntries.filter(e=>(e.entryTime||0)>=ts&&(e.entryTime||0)<=te);
+    visitData.push(dayEntries.length);
+    const dayVis=D.visitors.filter(v=>(v.createdAt||0)>=ts&&(v.createdAt||0)<=te&&v.paymentId); // [FIXED] online paid only
+    const dayCourts=D.courtBookings.filter(b=>b.status==='Confirmed'&&(b.createdAt||0)>=ts&&(b.createdAt||0)<=te);
+    const dayPasses=D.passes.filter(p=>(p.createdAt||0)>=ts&&(p.createdAt||0)<=te);
+    revData.push(
+      dayVis.reduce((s,v)=>s+(v.amount||50),0)+
+      dayCourts.reduce((s,b)=>s+(b.amount||0),0)+
+      dayPasses.reduce((s,p)=>s+(p.passPrice||0),0)
+    );
+  }
+
+  // Court popularity (all time)
+  D.courtBookings.filter(b=>b.status==='Confirmed').forEach(b=>{
+    courtCount[b.court]=(courtCount[b.court]||0)+1;
+  });
+
+  // Peak hours (gate entries)
+  D.gateEntries.forEach(e=>{
+    if(!e.entryTime) return;
+    const h=new Date(e.entryTime).getHours();
+    if(h>=6&&h<=20) hourCount[h-6]++;
+  });
+
+  const GREEN='rgba(22,163,74,';
+  const cfg={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
+
+  // Destroy old charts
+  Object.values(charts).forEach(c=>c.destroy());
+  charts={};
+
+  charts.visitors=new Chart($('chartVisitors'),{type:'bar',data:{labels,datasets:[{data:visitData,backgroundColor:labels.map((_,i)=>i===6?GREEN+'0.9)':GREEN+'0.45)'),borderRadius:6,borderSkipped:false}]},options:{...cfg,scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{stepSize:1}},x:{grid:{display:false}}}}});
+
+  charts.revenue=new Chart($('chartRevenue'),{type:'bar',data:{labels,datasets:[{data:revData,backgroundColor:labels.map((_,i)=>i===6?'rgba(217,119,6,.9)':'rgba(217,119,6,.45)'),borderRadius:6,borderSkipped:false}]},options:{...cfg,scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{callback:v=>'₹'+v}},x:{grid:{display:false}}}}});
+
+  const courtLabels=Object.keys(courtCount); const courtVals=Object.values(courtCount);
+  const pie_colors=['#166534','#16a34a','#4ade80','#d97706','#dc2626','#7c3aed','#1d4ed8','#0891b2'];
+  charts.courts=new Chart($('chartCourts'),{type:'doughnut',data:{labels:courtLabels.length?courtLabels:['No data'],datasets:[{data:courtVals.length?courtVals:[1],backgroundColor:pie_colors.slice(0,courtLabels.length||1),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:8}}}}});
+
+  const hourLabels=Array.from({length:15},(_,i)=>`${i+6}h`);
+  charts.hours=new Chart($('chartHours'),{type:'bar',data:{labels:hourLabels,datasets:[{data:hourCount,backgroundColor:hourCount.map(v=>{const max=Math.max(...hourCount,1);const ratio=v/max;return `rgba(22,163,74,${0.2+ratio*0.8})`;}),borderRadius:4,borderSkipped:false}]},options:{...cfg,scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,.05)'},ticks:{stepSize:1}},x:{grid:{display:false}}}}});
+}
+
+/* ══ VISITORS ═════════════════════════════════ */
+function renderVisitors(list) {
+  // Merge with society and pass data
+  const socByPhone={};
+  D.society.forEach(m=>{ socByPhone[m.Phone||m.phone]=m; });
+  const passByPhone={};
+  D.passes.forEach(p=>{ if(!passByPhone[p.phone]||p.createdAt>passByPhone[p.phone].createdAt) passByPhone[p.phone]=p; });
+
+  // Build unique visitor list by phone
+  const byPhone={};
+  D.visitors.forEach(v=>{
+    const ph=v.phone;
+    if(!byPhone[ph]||v.createdAt>byPhone[ph].createdAt) byPhone[ph]=v;
+  });
+  D.gateEntries.forEach(e=>{
+    if(e.phone&&!byPhone[e.phone]) byPhone[e.phone]={name:e.name,phone:e.phone,createdAt:e.entryTime,photoURL:''};
+  });
+
+  const visitors=list.length>0?list:Object.values(byPhone);
+  const tbody=$('visitorsBody');
+
+  if(!visitors.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">No visitors found</td></tr>'; return; }
+
+  // [NOTE] showing up to 100 visitors — add pagination for larger datasets
+  const displayList=visitors.slice(0,100);
+  if(visitors.length>100){
+    const notice=document.createElement('tr');
+    notice.innerHTML=`<td colspan='7' style='text-align:center;padding:8px;color:var(--muted);font-size:12px'>Showing 100 of ${visitors.length} visitors. Use search to find specific visitors.</td>`;
+    $('visitorsBody').prepend(notice);
+  }
+  tbody.innerHTML=displayList.map(v=>{
+    const ph=v.phone||'';
+    const allVisits=D.gateEntries.filter(e=>e.phone===ph);
+    const lastVisit=allVisits.sort((a,b)=>(b.entryTime||0)-(a.entryTime||0))[0];
+    const soc=socByPhone[ph];
+    const pass=passByPhone[ph];
+    const type=soc?'Society Member':pass&&new Date(pass.endDate)>new Date()?'Monthly Pass':'Regular';
+    const typeColor=type==='Society Member'?'badge-purple':type==='Monthly Pass'?'badge-gold':'badge-green';
+    const photoEl=v.photoURL?`<img src="${v.photoURL}" class="photo" alt="">`:`<div class="avatar">👤</div>`;
+    return `<tr>
+      <td>${photoEl}</td>
+      <td><strong>${san(v.name||'—')}</strong></td>
+      <td>${ph?'+91 '+ph:'—'}</td>
+      <td><span class="badge ${typeColor}">${type}</span></td>
+      <td><strong>${allVisits.length}</strong></td>
+      <td>${lastVisit?fmtDate(lastVisit.entryTime):'—'}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="openVisitorModal('${v.id||''}','${ph}')">View</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+window.openVisitorModal = function(id, phone) {
+  // [FIXED] robust lookup: try visitors by id first, then by phone, then gate entries
+  const v=D.visitors.find(x=>x.id===id)||D.visitors.find(x=>x.phone===phone)||D.gateEntries.find(e=>e.phone===phone)||{};
+  const soc=D.society.find(m=>(m.Phone||m.phone)===phone);
+  const pass=D.passes.filter(p=>p.phone===phone).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))[0];
+  const visits=D.gateEntries.filter(e=>e.phone===phone).sort((a,b)=>(b.entryTime||0)-(a.entryTime||0));
+
+  $('modalTitle').textContent=san(v.name||'Visitor Details');
+  $('modalBody').innerHTML=`
+    ${v.photoURL||pass?.facePhotoURL||soc?.FacePhoto?`<div style="text-align:center;margin-bottom:14px"><img src="${v.photoURL||pass?.facePhotoURL||soc?.FacePhoto}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--g4)"></div>`:''}
+    <div class="dr"><span class="dk">Name</span><span class="dv">${san(v.name||'—')}</span></div>
+    <div class="dr"><span class="dk">Phone</span><span class="dv">${phone?'+91 '+phone:'—'}</span></div>
+    <div class="dr"><span class="dk">Total Visits</span><span class="dv">${visits.length}</span></div>
+    <div class="dr"><span class="dk">Last Visit</span><span class="dv">${visits[0]?fmtDate(visits[0].entryTime):'—'}</span></div>
+    ${soc?`<div class="dr"><span class="dk">Society</span><span class="dv">${san(soc.Society||soc.HouseNumber)}</span></div>`:''}
+    ${pass?`<div class="dr"><span class="dk">Pass</span><span class="dv">${san(pass.passType)} · expires ${fmtDate(pass.endDate)}</span></div>`:''}
+    <div style="margin-top:12px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;margin-bottom:8px">Recent Visits</div>
+    ${visits.slice(0,5).map(e=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px"><span>${fmtDate(e.entryTime)}</span><span style="color:var(--muted)">${fmtTime(e.entryTime)}</span><span>${san(e.visitorType||'Regular')}</span></div>`).join('')}</div>`;
+
+  const acts=$('modalActs'); acts.innerHTML='';
+  acts.innerHTML=`<button class="btn btn-ghost btn-sm" onclick="closeModal()">Close</button>`;
+  $('overlay').classList.remove('hidden');
+};
+
+/* ══ SOCIETY ══════════════════════════════════ */
+function renderSociety(members) {
+  const active=members.filter(m=>m.Status!=='Blocked');
+  $('soc-count').textContent=`${active.length} Active Members`;
+
+  // Build house number filters
+  const houses=[...new Set(members.map(m=>m.HouseNumber).filter(Boolean))].sort();
+  const fRow=$('socFilters');
+  fRow.innerHTML='<div class="fchip active" data-house="">All Houses</div>'+
+    houses.slice(0,10).map(h=>`<div class="fchip" data-house="${h}">${h}</div>`).join('');
+  fRow.querySelectorAll('.fchip').forEach(chip=>{
+    chip.addEventListener('click',()=>{
+      fRow.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      const h=chip.dataset.house;
+      renderSociety(h?members.filter(m=>m.HouseNumber===h):members);
+    });
+  });
+
+  const tbody=$('societyBody');
+  tbody.innerHTML=members.length?members.map(m=>{
+    const name=m.Name||m.name||'—'; const phone=m.Phone||m.phone||'—';
+    const status=m.Status||'Active'; const blocked=status==='Blocked';
+    const photo=m.FacePhoto||m.photoURL;
+    return `<tr ${blocked?'style="opacity:.6"':''}>
+      <td>${photo?`<img src="${photo}" class="photo" alt="">`:(`<div class="avatar">${name[0]||'👤'}</div>`)}</td>
+      <td><strong>${san(name)}</strong></td>
+      <td>${san(m.HouseNumber||'—')}</td>
+      <td>${san(m.Society||'—')}</td>
+      <td>${san(m.Relation||'—')}</td>
+      <td>${phone!=='—'?'+91 '+phone:'—'}</td>
+      <td><span class="badge ${blocked?'badge-red':'badge-green'}">${status}</span></td>
+      <td><button class="btn ${blocked?'btn-primary':'btn-red'} btn-sm" onclick="toggleSocMember('${m.id}','${blocked?'Active':'Blocked'}')">${blocked?'Unblock':'Block'}</button></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">No society members found</td></tr>';
+}
+
+window.toggleSocMember = async function(id, newStatus) {
+  if(!id){ toast('Invalid member ID','err'); return; }
+  if(!confirm(`${newStatus==='Blocked'?'Block':'Unblock'} this member?`)) return;
+  try {
+    const {db,doc,updateDoc}=window.__ownerDb;
+    await updateDoc(doc(db,'society_members',id),{Status:newStatus,statusUpdatedAt:Date.now()});
+    toast(newStatus==='Blocked'?'Member blocked':'Member unblocked','ok');
+    await loadAll();
+  } catch(e){ toast('Failed: '+e.message,'err'); }
+};
+
+/* ══ PASSES ═══════════════════════════════════ */
+function renderPasses(passes) {
+  const now=new Date();
+  const active=passes.filter(p=>p.status==='Active'&&new Date(p.endDate)>now);
+  const expiring7=active.filter(p=>(new Date(p.endDate)-now)/86400000<=7);
+  const monthStart=new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
+  const monthRev=passes.filter(p=>(p.createdAt||0)>=monthStart.getTime()).reduce((s,p)=>s+(p.passPrice||0),0);
+
+  $('pass-active').textContent=active.length;
+  $('pass-expiring').textContent=expiring7.length;
+  $('pass-revenue').textContent=rupee(monthRev);
+
+  const sorted=[...passes].sort((a,b)=>{
+    const ea=new Date(a.endDate||0); const eb=new Date(b.endDate||0);
+    return ea-eb;
+  });
+
+  const tbody=$('passesBody');
+  tbody.innerHTML=sorted.length?sorted.map(p=>{
+    const exp=new Date(p.endDate||0);
+    const daysLeft=Math.ceil((exp-now)/86400000);
+    const isActive=p.status==='Active'&&exp>now;
+    const rowClass=daysLeft<=3&&isActive?'expiry-urgent':daysLeft<=7&&isActive?'expiry-soon':'';
+    return `<tr class="${rowClass}">
+      <td>${p.facePhotoURL?`<img src="${p.facePhotoURL}" class="photo" alt="">`:(`<div class="avatar">👤</div>`)}</td>
+      <td><strong>${san(p.name||'—')}</strong></td>
+      <td>${p.phone?'+91 '+p.phone:'—'}</td>
+      <td><span class="badge badge-gold">${san(p.passType||'—')}</span></td>
+      <td>${fmtDate(p.startDate)}</td>
+      <td>${fmtDate(p.endDate)}<br><span style="font-size:11px;font-weight:700;color:${daysLeft<=3?'var(--red)':daysLeft<=7?'var(--goldb)':'var(--muted)'}">${isActive?(daysLeft>0?daysLeft+' days left':'Expires today'):'Expired'}</span></td>
+      <td>${rupee(p.passPrice)}</td>
+      <td><span class="badge ${isActive?'badge-green':'badge-red'}">${isActive?'Active':'Expired'}</span></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">No passes found</td></tr>';
+}
+
+/* ══ MODAL ════════════════════════════════════ */
+function closeModal(){ $('overlay').classList.add('hidden'); }
+window.closeModal=closeModal;
+$('overlay').addEventListener('click',e=>{ if(e.target===$('overlay'))closeModal(); });
+
+/* ══ CSV EXPORT ═══════════════════════════════ */
+window.exportCSV = function(type) {
+  let rows=[], filename='';
+  const header=(cols)=>cols.join(',');
+  const row=(vals)=>vals.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',');
+
+  if(type==='entries'){
+    filename='entries_today.csv';
+    rows=[header(['Time','Name','Phone','Type','Wristband','Method'])];
+    const ts=todayStart();
+    D.gateEntries.filter(e=>(e.entryTime||0)>=ts).sort((a,b)=>(b.entryTime||0)-(a.entryTime||0)).forEach(e=>{
+      rows.push(row([fmtTime(e.entryTime),e.name||'',e.phone||'',e.visitorType||'Regular',e.wristbandName||'',e.entryMethod||'']));
+    });
+  } else if(type==='daily'){
+    const dateStr=$('dailyDatePicker').value;
+    filename=`daily_report_${dateStr}.csv`;
+    rows=[header(['Date','Name','Phone','Court','Slot','Amount','Payment Mode','Source','Status'])];
+    D.courtBookings.filter(b=>b.date===dateStr).forEach(b=>{
+      rows.push(row([b.date,b.name||'',b.phone||'',b.court||'',`${b.timeSlot}-${b.slotEnd}`,b.amount||'',b.paymentMode||'',b.bookingSource||'',b.status||'']));
+    });
+  } else if(type==='recon'){
+    filename='day_end_reconciliation.csv';
+    rows=[header(['Date','Bands','Exp Entry','Cash Gate','UPI Gate','Court Cash','Court UPI','Kiosk','Total Expected','Drawer','Variance','Submitted By','Time'])];
+    D.cashSubmissions.sort((a,b)=>(b.submittedAt||0)-(a.submittedAt||0)).forEach(s=>{
+      const v=s.variance||0;
+      rows.push(row([s.date||'',s.wristbandsIssued||0,s.expectedEntryRevenue||0,s.cashAtGate||0,s.upiAtGate||0,s.courtCash||0,s.courtUpi||0,s.kioskRevenue||0,s.totalExpected||0,s.drawerCash||0,`${Math.abs(v)} ${v>0?'SHORT':v<0?'OVER':'OK'}`,s.submittedBy||'',s.submittedAt?new Date(s.submittedAt).toLocaleString('en-IN'):'']));
+    });
+  } else if(type==='strikes'){
+    filename='manager_strikes.csv';
+    rows=[header(['Date','Manager','Court','Slot','Customer','Phone','Charge','Released At','Reason'])];
+    D.strikes.sort((a,b)=>(b.loggedAt||0)-(a.loggedAt||0)).forEach(s=>{
+      rows.push(row([s.Date||'',s.ManagerName||'',s.Court||'',`${s.SlotTime||''}-${s.SlotEnd||''}`,s.CustomerName||'',s.CustomerPhone||'',s.CourtCharge||'',s.ReleaseTime?new Date(s.ReleaseTime).toLocaleString('en-IN'):'',s.Reason||'']));
+    });
+  } else if(type==='visitors'){
+    filename='all_visitors.csv';
+    rows=[header(['Name','Phone','Total Visits','Last Visit','Type'])];
+    const byPhone={};
+    D.visitors.forEach(v=>{ if(!byPhone[v.phone]) byPhone[v.phone]=v; });
+    Object.values(byPhone).forEach(v=>{
+      const visits=D.gateEntries.filter(e=>e.phone===v.phone);
+      const last=visits.sort((a,b)=>(b.entryTime||0)-(a.entryTime||0))[0];
+      const soc=D.society.find(m=>(m.Phone||m.phone)===v.phone);
+      const pass=D.passes.find(p=>p.phone===v.phone&&new Date(p.endDate)>new Date());
+      const type=soc?'Society Member':pass?'Monthly Pass':'Regular';
+      rows.push(row([v.name||'',v.phone||'',visits.length,last?fmtDate(last.entryTime):'',type]));
+    });
+  } else if(type==='society'){
+    filename='society_members.csv';
+    rows=[header(['Name','House Number','Society','Phone','Relation','Status','Enroll Date'])];
+    D.society.forEach(m=>{
+      rows.push(row([m.Name||m.name||'',m.HouseNumber||'',m.Society||'',m.Phone||m.phone||'',m.Relation||'',m.Status||'Active',m.EnrollDate?fmtDate(m.EnrollDate):'']));
+    });
+  } else if(type==='passes'){
+    filename='monthly_passes.csv';
+    rows=[header(['Name','Phone','Pass Type','Start Date','End Date','Amount','Status'])];
+    D.passes.forEach(p=>{
+      const isActive=p.status==='Active'&&new Date(p.endDate)>new Date();
+      rows.push(row([p.name||'',p.phone||'',p.passType||'',fmtDate(p.startDate),fmtDate(p.endDate),p.passPrice||'',isActive?'Active':'Expired']));
+    });
+  }
+
+  if(!rows.length){ toast('No data to export','err'); return; }
+  const csv=rows.join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+  toast(`Exported ${rows.length-1} rows as ${filename}`,'ok');
+};
+
+/* ══ DAY-END RECONCILIATION HISTORY ══════════ */
+function renderRecon() {
+  const submissions = [...D.cashSubmissions].sort((a,b)=>(b.submittedAt||0)-(a.submittedAt||0));
+  const tbody = $('reconBody');
+  if (!submissions.length) {
+    tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:24px;color:var(--muted)">No day-end reports yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = submissions.map(s => {
+    const v = s.variance||0;
+    const vColour = Math.abs(v)>500?'var(--red)':Math.abs(v)>100?'var(--goldb)':'var(--g2)';
+    const vText = Math.abs(v)>0 ? `₹${Math.abs(v)} ${v>0?'SHORT':'OVER'}` : '✅';
+    const tStr = s.submittedAt ? new Date(s.submittedAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '—';
+    return `<tr>
+      <td><strong>${san(s.date||'—')}</strong></td>
+      <td>${s.wristbandsIssued||0}</td>
+      <td>${rupee(s.expectedEntryRevenue||0)}</td>
+      <td>${rupee(s.cashAtGate||0)}</td>
+      <td>${rupee(s.upiAtGate||0)}</td>
+      <td>${rupee(s.courtCash||0)}</td>
+      <td>${rupee(s.courtUpi||0)}</td>
+      <td>${rupee(s.kioskRevenue||0)}</td>
+      <td><strong>${rupee(s.totalExpected||0)}</strong></td>
+      <td>${rupee(s.drawerCash||0)}</td>
+      <td style="font-weight:900;color:${vColour}">${vText}</td>
+      <td>${san(s.submittedBy||'—')}</td>
+      <td>${tStr}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══ MANAGER STRIKES ══════════════════════════ */
+function renderStrikes(strikes) {
+  const now       = new Date();
+  const monthStart= new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+  const monthStrikes = strikes.filter(s => (s.loggedAt||0) >= monthStart);
+  const totalLoss    = strikes.reduce((sum,s) => sum + (s.CourtCharge||0), 0);
+
+  $('strike-month').textContent = monthStrikes.length;
+  $('strike-loss').textContent  = rupee(totalLoss);
+  $('strike-total').textContent = strikes.length;
+
+  const tbody = $('strikesBody');
+  if (!strikes.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted)">No strikes recorded ✅</td></tr>';
+    return;
+  }
+
+  const sorted = [...strikes].sort((a,b)=>(b.loggedAt||0)-(a.loggedAt||0));
+  tbody.innerHTML = sorted.map(s => {
+    const relTime = s.ReleaseTime ? new Date(s.ReleaseTime).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) : '—';
+    return `<tr style="background:#fff5f5">
+      <td>${san(s.Date||'—')}</td>
+      <td><strong>${san(s.ManagerName||'—')}</strong></td>
+      <td>${san(s.Court||'—')}</td>
+      <td>${san(s.SlotTime||'—')} – ${san(s.SlotEnd||'—')}</td>
+      <td>${san(s.CustomerName||'—')}</td>
+      <td>${s.CustomerPhone?'+91 '+s.CustomerPhone:'—'}</td>
+      <td><span class="num-red">${rupee(s.CourtCharge)}</span></td>
+      <td>${relTime}</td>
+      <td><span class="badge badge-red">${san(s.Reason||'Late release')}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══ TOAST ════════════════════════════════════ */
+function toast(msg,type='ok'){
+  const t=$('toast'); t.textContent=msg; t.className=`toast show ${type}`;
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),4000);
+}
+</script>
+</body>
+</html>

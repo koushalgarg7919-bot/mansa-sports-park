@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="Mansa Sports Park — Security pass verification">
+<title>Security Check — Mansa Sports Park</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g1:#0D4A26;--g2:#166534;--g3:#16a34a;--g4:#4ade80;--gbg:#f0fdf4;
+  --red:#dc2626;--redbg:#fee2e2;--redbdr:#fca5a5;
+  --bg:#f1f5f2;--surf:#fff;--text:#0a150d;--muted:#4b6358;--border:#d1e4d9;
+  --r:12px;--rlg:20px;--font:'Inter',system-ui,sans-serif;
+  --shadow:0 2px 16px rgba(13,74,38,.10);
+}
+html,body{min-height:100vh;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* LOGIN */
+#pinScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(145deg,#050f08,var(--g1))}
+.pin-card{background:var(--surf);border-radius:var(--rlg);padding:40px 32px;width:100%;max-width:360px;box-shadow:0 24px 64px rgba(0,0,0,.30);text-align:center}
+.pin-icon{font-size:44px;margin-bottom:14px}
+.pin-title{font-size:20px;font-weight:900;color:var(--g1);margin-bottom:4px}
+.pin-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.pin-dots{display:flex;justify-content:center;gap:12px;margin-bottom:28px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);transition:all .2s}
+.pin-dot.filled{background:var(--g2);border-color:var(--g2)}
+.pin-dot.err{background:var(--red);border-color:var(--red)}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto 16px}
+.pin-key{padding:16px;background:var(--gbg);border:1.5px solid var(--border);border-radius:var(--r);font-size:20px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s,transform .1s;user-select:none}
+.pin-key:active{background:#dcfce7;transform:scale(.95)}
+.pin-key.del{font-size:16px;color:var(--red)}
+.pin-key.blank{background:transparent;border:none;cursor:default}
+.pin-err{font-size:12.5px;color:var(--red);font-weight:600;min-height:16px;margin-top:-8px;margin-bottom:8px}
+
+/* MAIN APP */
+#appScreen{display:none;min-height:100vh;padding-bottom:40px}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,var(--g1),var(--g2));padding:18px 20px 28px;position:relative}
+.header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:20px;background:var(--bg);border-radius:20px 20px 0 0}
+.hdr-row{display:flex;align-items:center;justify-content:space-between}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.hdr-icon{font-size:24px}
+.hdr-title{color:#fff;font-size:17px;font-weight:900}
+.hdr-sub{color:rgba(255,255,255,.65);font-size:12px;margin-top:1px}
+.btn-exit{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 12px;color:rgba(255,255,255,.8);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer}
+
+/* CONTENT */
+.content{padding:16px;max-width:480px;margin:0 auto}
+
+/* INFO CARD */
+.info-card{background:var(--surf);border-radius:var(--rlg);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.ic-head{padding:14px 18px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--gbg),#dcfce7);display:flex;align-items:center;gap:8px}
+.ic-head.warn{background:linear-gradient(135deg,#fef3c7,#fde68a)}
+.ic-title{font-size:14px;font-weight:800;color:var(--g1)}
+.ic-head.warn .ic-title{color:#92400e}
+.ic-body{padding:18px}
+
+/* TODAY INFO */
+.today-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.today-row:last-child{border-bottom:none}
+.tr-label{color:var(--muted);font-weight:500}
+.tr-value{font-weight:800;color:var(--text)}
+.colour-badge{display:inline-flex;align-items:center;gap:8px;font-weight:800}
+.colour-dot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(0,0,0,.10);flex-shrink:0}
+.serial-range{font-family:monospace;font-size:16px;font-weight:900;color:var(--g1);letter-spacing:1px}
+
+/* NOT SET */
+.not-set{background:#fff7ed;border:1px solid #fed7aa;border-radius:var(--r);padding:14px 16px;font-size:13px;font-weight:700;color:#c2410c;text-align:center}
+
+/* CHECKER */
+.checker-input{width:100%;padding:16px;border:2.5px solid var(--border);border-radius:var(--r);font-family:'Inter',monospace;font-size:24px;font-weight:900;color:var(--text);background:var(--bg);outline:none;text-align:center;letter-spacing:3px;-webkit-appearance:none;transition:border-color .2s}
+.checker-input:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(22,163,74,.12);background:#fff}
+.checker-input.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.10)}
+.checker-input.ok{border-color:var(--g3);box-shadow:0 0 0 3px rgba(22,163,74,.12)}
+
+.result-box{border-radius:var(--r);padding:18px;margin-top:14px;display:none;text-align:center;animation:popIn .3s ease}
+.result-box.show{display:block}
+@keyframes popIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.result-box.valid{background:#dcfce7;border:2px solid var(--g4)}
+.result-box.invalid{background:var(--redbg);border:2px solid var(--redbdr)}
+.result-box.duplicate{background:#fff7ed;border:2px solid #fed7aa}
+.rb-icon{font-size:48px;margin-bottom:10px}
+.rb-title{font-size:18px;font-weight:900}
+.rb-sub{font-size:13px;font-weight:500;margin-top:4px;opacity:.8}
+.result-box.valid .rb-title{color:#166534}
+.result-box.invalid .rb-title{color:var(--red)}
+.result-box.duplicate .rb-title{color:#c2410c}
+
+.btn-check{width:100%;padding:16px;margin-top:12px;background:linear-gradient(135deg,var(--g1),var(--g3));color:#fff;border:none;border-radius:var(--r);font-family:var(--font);font-size:16px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .2s,transform .15s}
+.btn-check:active{transform:scale(.98)}
+.btn-check:disabled{opacity:.45;cursor:not-allowed}
+.btn-clear{width:100%;padding:12px;margin-top:8px;background:var(--gbg);color:var(--g2);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer}
+
+/* SPINNER */
+.spinner{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:var(--surf);border-radius:var(--r);border:1px solid var(--border);padding:14px;text-align:center;box-shadow:var(--shadow)}
+.sc-val{font-size:26px;font-weight:900;color:var(--g1);letter-spacing:-1px}
+.sc-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);padding:11px 20px;border-radius:999px;font-size:13px;font-weight:700;z-index:9999;transition:transform .3s,opacity .3s;opacity:0;pointer-events:none;max-width:90vw;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{background:var(--g2);color:#fff}
+.toast.err{background:var(--red);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- PIN LOGIN -->
+<div id="pinScreen">
+  <div class="pin-card">
+    <div class="pin-icon">🔒</div>
+    <div class="pin-title">Security Verification</div>
+    <div class="pin-sub">Mansa Sports Park — Enter PIN to continue</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+      <div class="pin-dot" id="d4"></div>
+    </div>
+    <div class="pin-err" id="pinErr"></div>
+    <div class="pin-grid">
+      <div class="pin-key" onclick="pinPress('1')">1</div>
+      <div class="pin-key" onclick="pinPress('2')">2</div>
+      <div class="pin-key" onclick="pinPress('3')">3</div>
+      <div class="pin-key" onclick="pinPress('4')">4</div>
+      <div class="pin-key" onclick="pinPress('5')">5</div>
+      <div class="pin-key" onclick="pinPress('6')">6</div>
+      <div class="pin-key" onclick="pinPress('7')">7</div>
+      <div class="pin-key" onclick="pinPress('8')">8</div>
+      <div class="pin-key" onclick="pinPress('9')">9</div>
+      <div class="pin-key blank"></div>
+      <div class="pin-key" onclick="pinPress('0')">0</div>
+      <div class="pin-key del" onclick="pinDel()">⌫</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="appScreen">
+  <div class="header">
+    <div class="hdr-row">
+      <div class="hdr-left">
+        <div class="hdr-icon">🏟️</div>
+        <div>
+          <div class="hdr-title">Security Check</div>
+          <div class="hdr-sub">Pass Verification — Read Only</div>
+        </div>
+      </div>
+      <button class="btn-exit" onclick="exitApp()">Exit</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- TODAY'S STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="sc-val" id="statMonthly">—</div>
+        <div class="sc-lbl">Monthly Passes</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-val" id="statAnnual">—</div>
+        <div class="sc-lbl">Annual Passes</div>
+      </div>
+    </div>
+
+    <!-- PASS CHECKER -->
+    <div class="info-card">
+      <div class="ic-head">
+        <span style="font-size:18px">🔍</span>
+        <div class="ic-title">Check Member Pass by Phone</div>
+      </div>
+      <div class="ic-body">
+        <input
+          type="tel"
+          class="checker-input"
+          id="serialInput"
+          placeholder="10-digit mobile"
+          maxlength="10"
+          inputmode="numeric"
+        >
+        <button class="btn-check" id="btnCheck">Check Pass</button>
+        <button class="btn-clear" id="btnClear">Clear</button>
+        <div class="result-box" id="resultBox">
+          <div class="rb-icon" id="rbIcon">✅</div>
+          <div class="rb-title" id="rbTitle">—</div>
+          <div class="rb-sub" id="rbSub">—</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCr0ITLauBZY1tEvXZcbMilWbCGuOYJLrM",
+  authDomain:        "mansasportspark-e0f3d.firebaseapp.com",
+  projectId:         "mansasportspark-e0f3d",
+  storageBucket:     "mansasportspark-e0f3d.firebasestorage.app",
+  messagingSenderId: "521169146944",
+  appId:             "1:521169146944:web:9877d8f7be192c60993ba5",
+  measurementId:     "G-9ZSKTGTJRC"
+};
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+window.__secDb = { db, collection, getDocs, query, where };
+window.dispatchEvent(new Event('sec-ready'));
+</script>
+
+<script>
+'use strict';
+
+/* ══ SECURITY PIN — change this to your preferred 4-digit PIN ══ */
+const SECURITY_PIN = '1234';
+/* ═══════════════════════════════════════════════════════════════ */
+
+const $ = id => document.getElementById(id);
+let pinValue = '';
+let fbReady  = false;
+let allPasses = []; // all monthly_passes records
+
+window.addEventListener('sec-ready', () => {
+  fbReady = true;
+  if (sessionStorage.getItem('msp_sec') === '1') loadData();
+});
+
+/* ══ PIN LOGIC ════════════════════════════════════════════════ */
+function pinPress(digit) {
+  if (pinValue.length >= 4) return;
+  pinValue += digit;
+  updateDots();
+  if (pinValue.length === 4) setTimeout(checkPin, 150);
+}
+
+function pinDel() {
+  pinValue = pinValue.slice(0,-1);
+  updateDots();
+  $('pinErr').textContent = '';
+}
+
+function updateDots(state='') {
+  [1,2,3,4].forEach(i => {
+    const dot = $(`d${i}`);
+    dot.classList.toggle('filled', i <= pinValue.length);
+    dot.classList.toggle('err', state === 'err');
+  });
+}
+
+function checkPin() {
+  if (pinValue === SECURITY_PIN) {
+    sessionStorage.setItem('msp_sec','1');
+    $('pinScreen').style.display = 'none';
+    $('appScreen').style.display = 'block';
+    if (fbReady) loadData();
+  } else {
+    updateDots('err');
+    $('pinErr').textContent = 'Incorrect PIN. Try again.';
+    setTimeout(() => {
+      pinValue = '';
+      updateDots();
+      $('pinErr').textContent = '';
+    }, 1000);
+  }
+}
+
+if (sessionStorage.getItem('msp_sec') === '1') {
+  $('pinScreen').style.display = 'none';
+  $('appScreen').style.display = 'block';
+  if (fbReady) loadData();
+}
+
+window.exitApp = function() {
+  sessionStorage.removeItem('msp_sec');
+  $('pinScreen').style.display = 'flex';
+  $('appScreen').style.display = 'none';
+  pinValue = '';
+  updateDots();
+};
+
+/* ══ LOAD DATA ════════════════════════════════════════════════ */
+async function loadData() {
+  if (!window.__secDb) return;
+  const { db, collection, getDocs } = window.__secDb;
+  try {
+    const snap = await getDocs(collection(db, 'monthly_passes'));
+    allPasses = [];
+    snap.forEach(d => allPasses.push({ id: d.id, ...d.data() }));
+    renderStats();
+  } catch(e) { console.error(e); }
+}
+
+function renderStats() {
+  const now = new Date();
+  const active = allPasses.filter(p => p.status === 'Active' && new Date(p.endDate) > now);
+  const monthly = active.filter(p => p.passType === 'Monthly Pass').length;
+  const annual  = active.filter(p => p.passType === 'Annual Pass').length;
+  $('statMonthly').textContent = monthly;
+  $('statAnnual').textContent  = annual;
+}
+
+/* ══ PASS CHECKER ════════════════════════════════════════════ */
+$('btnCheck').addEventListener('click', checkPhone);
+$('serialInput').addEventListener('keydown', e => { if(e.key==='Enter') checkPhone(); });
+
+function checkPhone() {
+  const phone = $('serialInput').value.trim().replace(/\D/g,'');
+  const result = $('resultBox');
+  result.className = 'result-box';
+
+  if (phone.length !== 10) {
+    toast('Enter a valid 10-digit mobile number', 'err');
+    return;
+  }
+
+  const now = new Date();
+  // Find most recent active pass for this phone
+  const passes = allPasses
+    .filter(p => p.phone === phone)
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  if (!passes.length) {
+    result.classList.add('show','invalid');
+    $('rbIcon').textContent = '🚫';
+    $('rbTitle').textContent = 'No Pass Found';
+    $('rbSub').textContent = `No pass registered for +91 ${phone}. Ask them to purchase one at pass.html or pay ₹50 at gate.`;
+    $('serialInput').classList.add('err');
+    $('serialInput').classList.remove('ok');
+    return;
+  }
+
+  const p = passes[0];
+  const expiry = p.endDate ? new Date(p.endDate) : null;
+  const isActive = p.status === 'Active' && expiry && expiry > now;
+  const fmtDate = d => d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+
+  if (!isActive) {
+    result.classList.add('show','invalid');
+    $('rbIcon').textContent = '❌';
+    $('rbTitle').textContent = 'Pass Expired';
+    $('rbSub').textContent = `${p.name || phone} — ${p.passType || 'Pass'} expired on ${expiry ? fmtDate(expiry) : '—'}. Do not allow free entry.`;
+    $('serialInput').classList.add('err');
+    $('serialInput').classList.remove('ok');
+    return;
+  }
+
+  // Check expiring today
+  const todayEnd = new Date(); todayEnd.setHours(23,59,59,999);
+  const expiresToday = expiry <= todayEnd;
+
+  result.classList.add('show','valid');
+  $('rbIcon').textContent = expiresToday ? '⚠️' : '✅';
+  $('rbTitle').textContent = expiresToday ? `VALID — Expires TODAY` : `VALID PASS — Allow Entry`;
+  $('rbSub').textContent = `${p.name || '—'} · ${p.passType} · Valid till ${fmtDate(expiry)}`;
+  $('serialInput').classList.add('ok');
+  $('serialInput').classList.remove('err');
+}
+
+$('btnClear').addEventListener('click', () => {
+  $('serialInput').value = '';
+  $('serialInput').classList.remove('ok','err');
+  const r = $('resultBox');
+  r.className = 'result-box';
+  $('serialInput').focus();
+});
+
+// Auto-refresh every 60s
+setInterval(() => { if (fbReady && sessionStorage.getItem('msp_sec')==='1') loadData(); }, 60000);
+
+function toast(msg, type='ok') {
+  const t=$('toast'); t.textContent=msg; t.className=`toast show ${type}`;
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>

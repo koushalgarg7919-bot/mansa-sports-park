@@ -698,20 +698,20 @@ html,body{min-height:100vh;font-family:var(--font);background:var(--bg);color:va
           <div class="fg" style="margin-bottom:14px">
             <label class="flbl">Pass Type <span style="color:var(--red)">*</span></label>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
-              <div class="pass-opt" id="mpOptMorning" data-type="Morning Pass" data-price="500"
+              <div class="pass-opt" id="mpOptMonthly" data-type="Monthly Pass" data-price="800" data-days="30"
                 style="border:2.5px solid var(--border);border-radius:var(--r);padding:14px 12px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;position:relative">
-                <div style="font-size:22px;margin-bottom:6px">🌅</div>
-                <div style="font-size:13px;font-weight:800;color:var(--text)">Morning Pass</div>
-                <div style="font-size:20px;font-weight:900;color:var(--goldb);letter-spacing:-.5px">₹500</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:2px">6AM–9AM only</div>
+                <div style="font-size:22px;margin-bottom:6px">📅</div>
+                <div style="font-size:13px;font-weight:800;color:var(--text)">Monthly Pass</div>
+                <div style="font-size:20px;font-weight:900;color:var(--goldb);letter-spacing:-.5px">₹800</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">30 days · All day access</div>
               </div>
-              <div class="pass-opt" id="mpOptFull" data-type="Full Day Pass" data-price="1500"
+              <div class="pass-opt" id="mpOptAnnual" data-type="Annual Pass" data-price="6000" data-days="365"
                 style="border:2.5px solid var(--border);border-radius:var(--r);padding:14px 12px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;position:relative">
-                <div style="position:absolute;top:8px;right:8px;background:var(--goldb);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:999px;text-transform:uppercase">Popular</div>
-                <div style="font-size:22px;margin-bottom:6px">☀️</div>
-                <div style="font-size:13px;font-weight:800;color:var(--text)">Full Day Pass</div>
-                <div style="font-size:20px;font-weight:900;color:var(--goldb);letter-spacing:-.5px">₹1,500</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:2px">All day access</div>
+                <div style="position:absolute;top:8px;right:8px;background:var(--goldb);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:999px;text-transform:uppercase">Best Value</div>
+                <div style="font-size:22px;margin-bottom:6px">🏆</div>
+                <div style="font-size:13px;font-weight:800;color:var(--text)">Annual Pass</div>
+                <div style="font-size:20px;font-weight:900;color:var(--goldb);letter-spacing:-.5px">₹6,000</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">365 days · Save ₹3,600</div>
               </div>
             </div>
             <div style="font-size:11.5px;color:var(--red);font-weight:600;margin-top:6px;display:none" id="mpPassErr">⚠️ Select a pass type</div>
@@ -1896,6 +1896,7 @@ $('btnIssuePass')?.addEventListener('click', async()=>{
 ════════════════════════════════════════════════════════════════════════ */
 let mpPassType    = '';
 let mpPassPrice   = 0;
+let mpPassDays    = 30;
 let mpPayMode_    = 'Cash';
 let mpPhotoData   = '';
 let mpCamStream   = null;
@@ -1918,10 +1919,11 @@ document.querySelectorAll('.pass-opt').forEach(opt => {
     opt.style.background  = 'var(--goldbg)';
     mpPassType  = opt.dataset.type;
     mpPassPrice = parseInt(opt.dataset.price);
+    mpPassDays  = parseInt(opt.dataset.days) || 30;
     $('mpPassErr').style.display = 'none';
-    // Show validity dates
+    // Show validity dates based on actual pass duration
     const now = new Date();
-    const end = new Date(now); end.setDate(end.getDate() + 30);
+    const end = new Date(now); end.setDate(end.getDate() + mpPassDays);
     $('mpStartDate').textContent = fmtDateShort(now);
     $('mpEndDate').textContent   = fmtDateShort(end);
     $('mpDatesWrap').style.display = 'grid';
@@ -2080,7 +2082,7 @@ $('btnIssueMonthlyPass')?.addEventListener('click', async () => {
   const btn=$('btnIssueMonthlyPass'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Issuing pass…';
 
   const now      = new Date();
-  const endDate  = new Date(now); endDate.setDate(endDate.getDate()+30);
+  const endDate  = new Date(now); endDate.setDate(endDate.getDate() + mpPassDays);
   const startStr = fmtDateShort(now);
   const endStr   = fmtDateShort(endDate);
 
@@ -2169,7 +2171,7 @@ $('btnIssueMonthlyPass')?.addEventListener('click', async () => {
 function mpResetForm() {
   $('mpName').value=''; $('mpPhone').value='';
   $('mpUpiRef').value=''; $('mpNotes').value='';
-  mpPassType=''; mpPassPrice=0; mpPayMode_='Cash'; mpPhotoData='';
+  mpPassType=''; mpPassPrice=0; mpPassDays=30; mpPayMode_='Cash'; mpPhotoData='';
   document.querySelectorAll('.pass-opt').forEach(o=>{ o.style.borderColor='var(--border)'; o.style.background=''; });
   document.querySelectorAll('#mpPayMode .pm-btn').forEach((b,i)=>b.classList.toggle('sel',i===0));
   $('mpUpiWrap').style.display='none';

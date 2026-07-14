@@ -483,7 +483,7 @@ html, body {
   import { initializeApp }           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword }
                                      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, Timestamp }
+  import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, Timestamp, runTransaction }
                                      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getStorage, ref, uploadString, getDownloadURL }
                                      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
@@ -520,7 +520,7 @@ html, body {
     console.error('Firebase auth error:', err);
   }
 
-  window.__fb2 = { db, storage, collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, Timestamp, ref, uploadString, getDownloadURL };
+  window.__fb2 = { db, storage, collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, Timestamp, ref, uploadString, getDownloadURL, runTransaction };
   window.dispatchEvent(new Event('fb2-ready'));
 </script>
 
@@ -747,10 +747,24 @@ $('btnEnroll').addEventListener('click', async () => {
   const now = new Date();
   try {
     const fb = window.__fb2;
+
+    // Get next member serial number
+    let memberSerial = null;
+    try {
+      const counterRef = fb.doc(fb.db, 'counters', 'member_serial');
+      await fb.runTransaction(fb.db, async (tx) => {
+        const snap = await tx.get(counterRef);
+        const next = snap.exists() ? (snap.data().current || 0) + 1 : 1;
+        tx.set(counterRef, { current: next });
+        memberSerial = next;
+      });
+    } catch(e) { console.warn('Serial counter failed:', e); memberSerial = Date.now(); }
+
     const storageRef = fb.ref(fb.storage, `society_faces/${phone}_${Date.now()}.jpg`);
     await fb.uploadString(storageRef, photoDataUrl, 'data_url');
     const facePhotoURL = await fb.getDownloadURL(storageRef);
     const memberRef = await fb.addDoc(fb.collection(fb.db, 'society_members'), {
+      serialNo: memberSerial,
       Name: name, Phone: phone, HouseNumber: house, Society: society, Relation: relation,
       FacePhoto: facePhotoURL, EnrollDate: now.toISOString(), Status: 'Active',
       ExpiryDate: expiry, WristbandColor: 'Daily', createdAt: Date.now()
@@ -836,7 +850,7 @@ function renderMemberList(members) {
     return `<div class="recent-item" style="flex-wrap:wrap;gap:8px">
       <div class="recent-avatar">${photoEl}</div>
       <div class="recent-info" style="flex:1;min-width:0">
-        <div class="recent-name">${m.Name||'—'}</div>
+        <div class="recent-name">${m.Name||'—'} <span style="font-size:11px;font-weight:600;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:1px 5px">#${m.serialNo||'—'}</span></div>
         <div class="recent-meta">House ${m.HouseNumber||'—'} · ${m.Relation||'—'} · ${m.Phone||''}</div>
         <div class="recent-meta" style="margin-top:2px;font-size:11px;color:${isExpired?'#dc2626':expiresSOon?'#d97706':'var(--muted)'}">
           ${isExpired?'⏰ Expired':'📅 Valid until'}: ${expiryFmt}

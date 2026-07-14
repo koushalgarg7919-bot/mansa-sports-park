@@ -900,11 +900,14 @@ $('btnFaceScan').addEventListener('click', async () => {
   btn.disabled = true;
   const vid = $('faceVideo');
   const canvas = $('faceCanvas');
-  canvas.width  = vid.videoWidth  || 640;
-  canvas.height = vid.videoHeight || 480;
+  // Resize to 640x480 max for speed — Rekognition works great at this size
+  const MAX_W = 640, MAX_H = 480;
+  const scale = Math.min(MAX_W / (vid.videoWidth||640), MAX_H / (vid.videoHeight||480), 1);
+  canvas.width  = Math.round((vid.videoWidth||640)  * scale);
+  canvas.height = Math.round((vid.videoHeight||480) * scale);
   const ctx = canvas.getContext('2d');
   ctx.save(); ctx.scale(-1,1); ctx.drawImage(vid,-canvas.width,0,canvas.width,canvas.height); ctx.restore();
-  const photoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+  const photoBase64 = canvas.toDataURL('image/jpeg', 0.75);
   try {
     const resp = await fetch(REKOGNITION_MATCH_URL, {
       method: 'POST',

@@ -734,7 +734,7 @@ html,body{min-height:100vh;font-family:var(--font);background:var(--bg);color:va
 
           <!-- Optional face photo -->
           <div class="fg" style="margin-bottom:14px">
-            <label class="flbl">Face Photo <span style="font-weight:500;text-transform:none;color:var(--muted)">(optional — for gate recognition)</span></label>
+            <label class="flbl">Face Photo <span style="color:var(--red)">*</span> <span style="font-weight:500;text-transform:none;color:var(--muted);font-size:11px">Required for gate recognition</span></label>
             <div style="border:2px dashed var(--border);border-radius:var(--r);overflow:hidden;background:var(--bg)">
               <div id="mpCamPlaceholder" style="padding:20px;text-align:center;color:var(--muted);font-size:13px">
                 <div style="font-size:28px;margin-bottom:6px">📸</div>
@@ -822,7 +822,7 @@ import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/fir
 import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 import {
   getFirestore, collection, addDoc, getDocs, updateDoc, doc,
-  query, where, orderBy, getDoc, setDoc, Timestamp
+  query, where, orderBy, getDoc, setDoc, Timestamp, runTransaction
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* ══ CONFIG — same as all other modules ══ */
@@ -851,7 +851,7 @@ try {
   console.warn('Manager Firebase Auth failed:', e.message);
 }
 
-window.__mgDb  = { db, storage, collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, getDoc, setDoc, ref, uploadString, getDownloadURL };
+window.__mgDb  = { db, storage, collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, getDoc, setDoc, ref, uploadString, getDownloadURL, runTransaction };
 window.__mgCfg = { TWILIO_FN_URL };
 window.dispatchEvent(new Event('mg-ready'));
 </script>
@@ -2075,6 +2075,8 @@ $('btnIssueMonthlyPass')?.addEventListener('click', async () => {
   if(!mpPassType){ $('mpPassErr').style.display='block'; ok=false; }
   else { $('mpPassErr').style.display='none'; }
 
+  if(!mpPhotoTaken || !mpPhotoData){ toast('⚠️ Face photo is required for gate recognition','err'); ok=false; }
+
   if(mpPayMode_==='UPI'&&!upiRef){ toast('Enter UPI reference number','err'); ok=false; }
 
   if(!ok) return;
@@ -2087,20 +2089,43 @@ $('btnIssueMonthlyPass')?.addEventListener('click', async () => {
   const endStr   = fmtDateShort(endDate);
 
   try {
-    const { db, storage, collection, addDoc, ref, uploadString, getDownloadURL } = window.__mgDb;
+    const { db, storage, collection, addDoc, getDocs, ref, uploadString, getDownloadURL, doc, runTransaction, getDoc, setDoc } = window.__mgDb;
 
-    // 1. Upload photo if captured
-    let facePhotoURL = '';
-    if (mpPhotoTaken && mpPhotoData && window.__mgDb.ref) {
+    // 0. Get next pass serial number from counter
+    let passSerial = null;
+    try {
+      const counterRef = doc(db, 'counters', 'pass_serial');
+      await runTransaction(db, async (tx) => {
+        const snap = await tx.get(counterRef);
+        const next = snap.exists() ? (snap.data().current || 0) + 1 : 1;
+        tx.set(counterRef, { current: next });
+        passSerial = next;
+      });
+    } catch(e) { console.warn('Serial counter failed:', e); passSerial = Date.now(); }
+
+    // 1. Resize photo to 640x480 and upload
+    let facePhotoURL = '', compressedPhoto = mpPhotoData;
+    if (mpPhotoTaken && mpPhotoData) {
       try {
+        // Compress image for faster Rekognition
+        const img = new Image();
+        await new Promise(r => { img.onload=r; img.src=mpPhotoData; });
+        const tmpCanvas = document.createElement('canvas');
+        const MAX = 640;
+        const scale = Math.min(MAX/img.width, MAX/img.height, 1);
+        tmpCanvas.width  = Math.round(img.width  * scale);
+        tmpCanvas.height = Math.round(img.height * scale);
+        tmpCanvas.getContext('2d').drawImage(img, 0, 0, tmpCanvas.width, tmpCanvas.height);
+        compressedPhoto = tmpCanvas.toDataURL('image/jpeg', 0.80);
         const storageRef = ref(storage, `pass_faces/${phone}_mgr_${Date.now()}.jpg`);
-        await uploadString(storageRef, mpPhotoData, 'data_url');
+        await uploadString(storageRef, compressedPhoto, 'data_url');
         facePhotoURL = await getDownloadURL(storageRef);
-      } catch(e) { console.warn('Photo upload failed (non-critical):', e); }
+      } catch(e) { console.warn('Photo upload failed:', e); }
     }
 
-    // 2. Save to monthly_passes
-    await addDoc(collection(db,'monthly_passes'), {
+    // 2. Save to monthly_passes with serial number
+    const passRef = await addDoc(collection(db,'monthly_passes'), {
+      serialNo:      passSerial,
       name:          san(name),
       phone,
       facePhotoURL,
@@ -2111,7 +2136,6 @@ $('btnIssueMonthlyPass')?.addEventListener('click', async () => {
       startDateStr:  startStr,
       endDateStr:    endStr,
       status:        'Active',
-      wristbandColor:'Daily',
       paymentMode:   mpPayMode_,
       upiRef:        san(upiRef),
       issuedBy:      S.mgrName||'Manager',
@@ -2121,6 +2145,23 @@ $('btnIssueMonthlyPass')?.addEventListener('click', async () => {
       reminderSent:  false,
       createdAt:     Date.now()
     });
+
+    // 3. Enroll face in AWS Rekognition — mandatory for gate recognition
+    if (compressedPhoto) {
+      try {
+        const rekResp = await fetch('https://us-central1-mansasportspark-e0f3d.cloudfunctions.net/rekognitionEnroll', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ memberId: passRef.id, photoBase64: compressedPhoto, name: san(name), phone, collection: 'monthly_passes' })
+        });
+        const rekData = await rekResp.json();
+        if (rekData.faceId) {
+          // Save faceId back to the pass record
+          const { updateDoc } = window.__mgDb;
+          await updateDoc(doc(db, 'monthly_passes', passRef.id), { rekFaceId: rekData.faceId });
+        }
+      } catch(e) { console.warn('Rekognition enroll failed:', e); }
+    }
 
     // 3. Also log to court_bookings so it appears in cash register
     await addDoc(collection(db,'court_bookings'), {

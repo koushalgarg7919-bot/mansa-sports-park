@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mansa Sports Park — Staff Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1A6B3C;--green-mid:#23904F;--green-light:#4ade80;--green-bg:#f0fdf4;
+  --gold:#92400e;--goldb:#d97706;--gold-bg:#fffbeb;
+  --red:#dc2626;--red-bg:#fef2f2;
+  --blue:#1d4ed8;--blue-bg:#eff6ff;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;
+  --bg:#f8faf8;--surf:#fff;--text:#0d1f10;--muted:#4b6358;--border:#d1e4d9;
+  --font:'Inter',system-ui,sans-serif;
+  --r:14px;--shadow:0 2px 12px rgba(13,74,38,.08);--shadow-lg:0 8px 32px rgba(13,74,38,.12);
+}
+html,body{min-height:100vh;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* ── HEADER ── */
+.header{background:linear-gradient(160deg,#0D3320 0%,var(--green) 60%,var(--green-mid) 100%);padding:28px 20px 56px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,.04);border-radius:50%}
+.header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:32px;background:var(--bg);border-radius:32px 32px 0 0}
+.header-inner{max-width:720px;margin:0 auto;position:relative;z-index:1}
+.park-logo{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.logo-icon{width:48px;height:48px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.park-name{color:#fff;font-size:15px;font-weight:800;letter-spacing:-.2px}
+.park-sub{color:rgba(255,255,255,.55);font-size:12px;font-weight:500;margin-top:1px}
+.header h1{font-size:26px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1.2;margin-bottom:6px}
+.header p{color:rgba(255,255,255,.65);font-size:13px;font-weight:500}
+
+/* ── BODY ── */
+.body{max-width:720px;margin:0 auto;padding:0 16px 48px}
+
+/* ── SECTION LABEL ── */
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:28px 0 12px;padding-left:2px}
+
+/* ── MODULE CARD ── */
+.card{background:var(--surf);border-radius:var(--r);border:1.5px solid var(--border);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;transition:box-shadow .2s,transform .15s;-webkit-tap-highlight-color:transparent}
+.card:active{transform:scale(.99)}
+.card:hover{box-shadow:var(--shadow-lg)}
+.card-head{display:flex;align-items:center;gap:14px;padding:16px 18px 14px}
+.card-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.card-icon.green{background:var(--green-bg)}
+.card-icon.gold{background:var(--gold-bg)}
+.card-icon.blue{background:var(--blue-bg)}
+.card-icon.purple{background:var(--purple-bg)}
+.card-icon.red{background:var(--red-bg)}
+.card-title{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.2px;line-height:1.2}
+.card-who{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
+.card-features{padding:0 18px 14px;display:flex;flex-direction:column;gap:5px}
+.feat{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--muted);font-weight:500;line-height:1.4}
+.feat-dot{width:5px;height:5px;border-radius:50%;background:var(--border);flex-shrink:0;margin-top:5px}
+.feat-dot.green{background:var(--green-light)}
+.feat-dot.gold{background:var(--goldb)}
+.feat-dot.blue{background:#60a5fa}
+.feat-dot.purple{background:#a78bfa}
+.feat-dot.red{background:#f87171}
+.card-footer{padding:12px 18px 14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-pw{font-size:11px;color:var(--muted);font-weight:600;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;letter-spacing:.3px}
+.btn-open{padding:10px 20px;border:none;border-radius:10px;font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;-webkit-tap-highlight-color:transparent;transition:opacity .15s}
+.btn-open:active{opacity:.85}
+.btn-open.green{background:linear-gradient(135deg,var(--green),var(--green-mid))}
+.btn-open.gold{background:linear-gradient(135deg,#78350f,var(--goldb))}
+.btn-open.blue{background:linear-gradient(135deg,#1e40af,var(--blue))}
+.btn-open.purple{background:linear-gradient(135deg,#5b21b6,var(--purple))}
+.btn-open.red{background:linear-gradient(135deg,#991b1b,var(--red))}
+.btn-open.grey{background:linear-gradient(135deg,#374151,#6b7280)}
+
+/* ── PARKED BANNER ── */
+.parked-banner{background:var(--gold-bg);border:1.5px solid #fde68a;border-radius:var(--r);padding:14px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px}
+.parked-banner-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.parked-banner-text{font-size:12.5px;color:var(--gold);font-weight:500;line-height:1.5}
+.parked-banner-text strong{font-weight:800}
+
+/* ── CLOUD SECTION ── */
+.cloud-card{background:var(--surf);border-radius:var(--r);border:1.5px solid var(--border);padding:16px 18px;margin-bottom:12px}
+.cloud-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.cloud-row:last-child{border-bottom:none;padding-bottom:0}
+.cloud-fn{font-weight:700;color:var(--text);flex:1}
+.cloud-desc{font-size:12px;color:var(--muted);font-weight:500}
+.cloud-status{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--green-bg);color:var(--green);flex-shrink:0}
+
+/* ── FOOTER ── */
+.footer{text-align:center;padding:20px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="park-logo">
+      <div class="logo-icon">🏟️</div>
+      <div>
+        <div class="park-name">Mansa Sports Park</div>
+        <div class="park-sub">18-acre multi-sport facility · Mansa, Punjab</div>
+      </div>
+    </div>
+    <h1>Staff Portal</h1>
+    <p>All modules in one place — tap to open any app</p>
+  </div>
+</div>
+
+<div class="body">
+
+  <!-- STAFF MODULES -->
+  <div class="section-label">Active Staff Modules</div>
+
+  <!-- Gate -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon green">🚪</div>
+      <div>
+        <div class="card-title">Gate</div>
+        <div class="card-who">👤 Gate Staff</div>
+      </div>
+    </div>
+    <div class="card-features">
+      <div class="feat"><div class="feat-dot green"></div>Scan member face via tablet camera — instant recognition</div>
+      <div class="feat"><div class="feat-dot green"></div>Search visitor by phone number — shows photo + pass status</div>
+      <div class="feat"><div class="feat-dot green"></div>Multiple family members on same phone — pick correct profile</div>
+      <div class="feat"><div class="feat-dot green"></div>Log ₹50 cash walk-in entries</div>
+      <div class="feat"><div class="feat-dot green"></div>Today's entry log with wristband color</div>
+      <div class="feat"><div class="feat-dot green"></div>Auto wristband color by day of week</div>
+    </div>
+    <div class="card-footer">
+      <div class="card-pw">🔐 Admin@123</div>
+      <a class="btn-open green" href="gate.html" target="_blank">Open Gate →</a>
+    </div>
+  </div>
+
+  <!-- Enroll -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon blue">📋</div>
+      <div>
+        <div class="card-title">Enroll</div>
+        <div class="card-who">👤 Enrollment Staff</div>
+      </div>
+    </div>
+    <div class="card-features">
+      <div class="feat"><div class="feat-dot blue"></div>Enroll society members with face photo + details</div>
+      <div class="feat"><div class="feat-dot blue"></div>Front & back camera support — oval face guide for accuracy</div>
+      <div class="feat"><div class="feat-dot blue"></div>Auto financial year expiry (31 Mar) — staff can change</div>
+      <div class="feat"><div class="feat-dot blue"></div>Face automatically uploaded to AWS Rekognition on enroll</div>
+      <div class="feat"><div class="feat-dot blue"></div>Renew membership expiry date with calendar picker</div>
+      <div class="feat"><div class="feat-dot blue"></div>Delete member — removes from app + AWS face collection</div>
+      <div class="feat"><div class="feat-dot blue"></div>Export all members to Excel with status + expiry</div>
+      <div class="feat"><div class="feat-dot blue"></div>Search members by name, phone, or house number</div>
+    </div>
+    <div class="card-footer">
+      <div class="card-pw">🔐 Punjab@123</div>
+      <a class="btn-open blue" href="enroll.html" target="_blank">Open Enroll →</a>
+    </div>
+  </div>
+
+  <!-- Manager -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon gold">📊</div>
+      <div>
+        <div class="card-title">Manager</div>
+        <div class="card-who">👤 Manager</div>
+      </div>
+    </div>
+    <div class="card-features">
+      <div class="feat"><div class="feat-dot gold"></div>Quick Book — court bookings for walk-in customers (cash/UPI)</div>
+      <div class="feat"><div class="feat-dot gold"></div>Call Booking — hold tentative slots, confirm on arrival</div>
+      <div class="feat"><div class="feat-dot gold"></div>Issue Pass — Monthly (₹800/30 days) or Annual (₹6,000/365 days)</div>
+      <div class="feat"><div class="feat-dot gold"></div>Cash Register — all today's cash & UPI transactions + pass revenue</div>
+      <div class="feat"><div class="feat-dot gold"></div>Court Grid — live schedule view across all courts</div>
+      <div class="feat"><div class="feat-dot gold"></div>Courts Live — real-time court availability with date navigation</div>
+    </div>
+    <div class="card-footer">
+      <div class="card-pw">🔐 mansaManager2024</div>
+      <a class="btn-open gold" href="manager.html" target="_blank">Open Manager →</a>
+    </div>
+  </div>
+
+  <!-- Owner -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon purple">👑</div>
+      <div>
+        <div class="card-title">Owner</div>
+        <div class="card-who">👤 Owner (Koushal)</div>
+      </div>
+    </div>
+    <div class="card-features">
+      <div class="feat"><div class="feat-dot purple"></div>Revenue analytics — today, this week, this month</div>
+      <div class="feat"><div class="feat-dot purple"></div>All entries, court bookings, and pass holders in one view</div>
+      <div class="feat"><div class="feat-dot purple"></div>Cash submissions from manager — day-end reconciliation</div>
+      <div class="feat"><div class="feat-dot purple"></div>Staff strike log for policy violations</div>
+    </div>
+    <div class="card-footer">
+      <div class="card-pw">🔐 Owner PIN</div>
+      <a class="btn-open purple" href="owner.html" target="_blank">Open Owner →</a>
+    </div>
+  </div>
+
+  <!-- Security -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon red">🛡️</div>
+      <div>
+        <div class="card-title">Security</div>
+        <div class="card-who">👤 Security Staff</div>
+      </div>
+    </div>
+    <div class="card-features">
+      <div class="feat"><div class="feat-dot red"></div>Verify pass holders by phone number</div>
+      <div class="feat"><div class="feat-dot red"></div>Shows pass type, validity, and expiry date</div>
+      <div class="feat"><div class="feat-dot red"></div>Active Monthly and Annual pass counts</div>
+    </div>
+    <div class="card-footer">
+      <div class="card-pw">🔐 PIN: 1234</div>
+      <a class="btn-open red" href="security.html" target="_blank">Open Security →</a>
+    </div>
+  </div>
+
+  <!-- PUBLIC MODULES -->
+  <div class="section-label">Public Modules — Parked</div>
+
+  <div class="parked-banner">
+    <div class="parked-banner-icon">⏳</div>
+    <div class="parked-banner-text">
+      <strong>Awaiting approvals:</strong> These pages are ready but payments won't go through until <strong>Razorpay live approval</strong> and <strong>Twilio WhatsApp Business verification</strong> are complete.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon green">🌐</div>
+      <div>
+        <div class="card-title">Public App</div>
+        <div class="card-who">👤 Customers (public)</div>
+      </div>
+    </div>
+    <div class="card-features">
+      <div class="feat"><div class="feat-dot green"></div>Pay ₹50 entry fee online — get QR for gate</div>
+      <div class="feat"><div class="feat-dot green"></div>Buy Monthly Pass (₹800) or Annual Pass (₹6,000) with face photo</div>
+      <div class="feat"><div class="feat-dot green"></div>Book courts online with time slot + payment</div>
+      <div class="feat"><div class="feat-dot green"></div>WhatsApp confirmation after every transaction</div>
+    </div>
+    <div class="card-footer">
+      <div class="card-pw">No login — public</div>
+      <a class="btn-open grey" href="public.html" target="_blank">Open Public →</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-icon green">🏟️</div>
+      <div>
+        <div class="card-title">Courts Schedule</div>
+        <div class="card-who">👤 Anyone — public view</div>
+      </div>
+    </div>
+    <div class="card-features">
+      <div class="feat"><div class="feat-dot green"></div>Live court availability across all sports</div>
+      <div class="feat"><div class="feat-dot green"></div>View bookings by date — no login needed</div>
+    </div>
+    <div class="card-footer">
+      <div class="card-pw">No login — public</div>
+      <a class="btn-open grey" href="courts.html" target="_blank">Open Courts →</a>
+    </div>
+  </div>
+
+  <!-- CLOUD FUNCTIONS -->
+  <div class="section-label">Cloud Functions — Live on Firebase</div>
+
+  <div class="cloud-card">
+    <div class="cloud-row">
+      <div class="cloud-fn">rekognitionEnroll</div>
+      <div class="cloud-desc">Uploads face to AWS when enrolling</div>
+      <div class="cloud-status">✅ Live</div>
+    </div>
+    <div class="cloud-row">
+      <div class="cloud-fn">rekognitionMatch</div>
+      <div class="cloud-desc">Matches face at gate scanner</div>
+      <div class="cloud-status">✅ Live</div>
+    </div>
+    <div class="cloud-row">
+      <div class="cloud-fn">rekognitionDelete</div>
+      <div class="cloud-desc">Removes face from AWS on delete</div>
+      <div class="cloud-status">✅ Live</div>
+    </div>
+    <div class="cloud-row">
+      <div class="cloud-fn">sendWhatsApp</div>
+      <div class="cloud-desc">WhatsApp messages via Twilio</div>
+      <div class="cloud-status">✅ Live</div>
+    </div>
+    <div class="cloud-row">
+      <div class="cloud-fn">sendPassRenewalReminders</div>
+      <div class="cloud-desc">Daily 3AM expiry reminders</div>
+      <div class="cloud-status">✅ Live</div>
+    </div>
+    <div class="cloud-row">
+      <div class="cloud-fn">esslADMS</div>
+      <div class="cloud-desc">eSSL device keep-alive (returns OK)</div>
+      <div class="cloud-status">✅ Live</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">mansasportspark.com · Built for Mansa Sports Park</div>
+
+</body>
+</html>
